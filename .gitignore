@@ -1,0 +1,22 @@
+# Python-related
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+.venv/
+
+# Flask-Migrate files
+migrations/
+
+# Docker
+*.log
+*.pid
+*.seed
+*.pid.lock
+*.swp
+.env
+
+# SQLite database
+*.sqlite3
+
