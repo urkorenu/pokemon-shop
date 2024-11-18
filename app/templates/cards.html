@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Available Pokémon Cards</h2>
+<ul>
+    {% for card in cards %}
+    <li>
+        <img src="{{ card.image_url }}" alt="{{ card.name }}" style="width:100px; height:150px;">
+        <p><strong>Name:</strong> {{ card.name }}</p>
+        <p><strong>Price:</strong> ${{ card.price }}</p>
+        <p><strong>Condition:</strong> {{ card.condition }}</p>
+        <p><strong>Set:</strong> {{ card.set_name }}</p>
+        <p><strong>Amount:</strong> {{ card.amount }}</p>
+        <a href="/user/cart/add?card_id={{ card.id }}">Add to Cart</a>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
+

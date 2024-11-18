@@ -3,7 +3,7 @@ from ..models import Card, Cart, db
 
 user_bp = Blueprint("user", __name__)
 
-@user_bp.route("/cards")
+@user_bp.route("/")
 def view_cards():
     cards = Card.query.all()
     return render_template("cards.html", cards=cards)
