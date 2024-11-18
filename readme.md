@@ -21,6 +21,12 @@
     ```bash
     docker-compose up --build
     ```
+    might need to exec and insert this command to initiate the db connection/migration:
+    ```bash
+    flask db init || true  # Initialize migrations (ignore if already exists)
+    flask db migrate -m "Initial migration" || true  # Create migration scripts
+    flask db upgrade  # Apply Migrations
+    ```
 
 3. **Database Migrations**:
     ```bash
