@@ -1,19 +1,58 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Available Pokémon Cards</h2>
-<ul>
-    {% for card in cards %}
-    <li>
-        <img src="{{ card.image_url }}" alt="{{ card.name }}" style="width:100px; height:150px;">
-        <p><strong>Name:</strong> {{ card.name }}</p>
-        <p><strong>Price:</strong> ${{ card.price }}</p>
-        <p><strong>Condition:</strong> {{ card.condition }}</p>
-        <p><strong>Set:</strong> {{ card.set_name }}</p>
-        <p><strong>Amount:</strong> {{ card.amount }}</p>
-        <a href="/user/cart/add?card_id={{ card.id }}">Add to Cart</a>
-    </li>
-    {% endfor %}
-</ul>
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Available Pokémon Cards</h2>
+
+    <!-- Search and Filter Form -->
+    <form method="GET" action="/" class="row g-3 mb-4">
+        <div class="col-md-4">
+            <input type="text" name="name" class="form-control" placeholder="Search by Pokémon Name" value="{{ request.args.get('name', '') }}">
+        </div>
+        <div class="col-md-3">
+            <select name="set_name" class="form-select">
+                <option value="">Filter by Set Name</option>
+                {% for set_name in unique_set_names %}
+                <option value="{{ set_name }}" {% if request.args.get('set_name') == set_name %}selected{% endif %}>
+                    {{ set_name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="sort" class="form-select">
+                <option value="">Sort by</option>
+                <option value="price_asc" {% if request.args.get('sort') == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+                <option value="price_desc" {% if request.args.get('sort') == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+                <option value="card_number" {% if request.args.get('sort') == 'card_number' %}selected{% endif %}>Card Number</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Search</button>
+        </div>
+    </form>
+
+    <!-- Card Display -->
+    <div class="row">
+        {% for card in cards %}
+        <div class="col-md-3 mb-4">
+            <div class="card shadow-sm">
+                <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}" style="height: 200px; object-fit: cover;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ card.name }}</h5>
+                    <p class="card-text">
+                        <strong>Card Number:</strong> {{ card.number }}<br>
+                        <strong>Set:</strong> {{ card.set_name }}<br>
+                        <strong>Condition:</strong> {{ card.condition }}<br>
+                        <strong>Amount:</strong> {{ card.amount }}<br>
+                        <strong>Price:</strong> ${{ card.price }}
+                    </p>
+                    <a href="/user/cart/add?card_id={{ card.id }}" class="btn btn-primary btn-sm w-100">Add to Cart</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}
 
