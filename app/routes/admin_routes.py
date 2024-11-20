@@ -1,9 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from ..models import Card, db
+from flask_login import login_required
 
 admin_bp = Blueprint("admin", __name__)
 
 @admin_bp.route("/upload", methods=["GET", "POST"])
+@login_required
 def upload_card():
     if request.method == "POST":
         # Extract data from the form
