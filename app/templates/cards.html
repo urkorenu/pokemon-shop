@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container">
     <h2 class="text-center mb-4">Available Pokémon Cards</h2>
 
     <!-- Search and Filter Form -->
@@ -37,7 +37,10 @@
         {% for card in cards %}
         <div class="col-md-3 mb-4">
             <div class="card shadow-sm">
-                <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}" style="height: 200px; object-fit: cover;">
+                <!-- Image Link to Modal -->
+                <a href="#" data-bs-toggle="modal" data-bs-target="#cardModal{{ card.id }}">
+                    <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}" style="height: 200px; object-fit: cover;">
+                </a>
                 <div class="card-body">
                     <h5 class="card-title">{{ card.name }}</h5>
                     <p class="card-text">
@@ -48,6 +51,21 @@
                         <strong>Price:</strong> ${{ card.price }}
                     </p>
                     <a href="/user/cart/add?card_id={{ card.id }}" class="btn btn-primary btn-sm w-100">Add to Cart</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for Full-Screen Image -->
+        <div class="modal fade" id="cardModal{{ card.id }}" tabindex="-1" aria-labelledby="cardModalLabel{{ card.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cardModalLabel{{ card.id }}">{{ card.name }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <img src="{{ card.image_url }}" class="img-fluid" alt="{{ card.name }}">
+                    </div>
                 </div>
             </div>
         </div>
