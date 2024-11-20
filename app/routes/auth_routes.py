@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_user, logout_user, login_required
-from ..models import User, db
+from flask_login import login_user, logout_user, login_required, current_user
+from ..models import User, db, Order
+from flask_bcrypt import generate_password_hash, check_password_hash
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -56,4 +57,51 @@ def logout():
     logout_user()
     flash("You have been logged out.", "success")
     return redirect(url_for("auth.login"))
+
+
+@auth_bp.route("/account", methods=["GET", "POST"])
+@login_required
+def account():
+    if request.method == "POST":
+        # Handle profile updates
+        username = request.form.get("username")
+        email = request.form.get("email")
+
+        if username:
+            current_user.username = username
+        if email:
+            current_user.email = email
+
+        db.session.commit()
+        flash("Profile updated successfully!", "success")
+        return redirect(url_for("auth.account"))
+
+    # Get user's order history
+    orders = Order.query.filter_by(user_id=current_user.id).all()
+
+    return render_template("account.html", orders=orders)
+
+@auth_bp.route("/change_password", methods=["POST"])
+@login_required
+def change_password():
+    old_password = request.form.get("old_password")
+    new_password = request.form.get("new_password")
+
+    if not check_password_hash(current_user.password_hash, old_password):
+        flash("Old password is incorrect.", "error")
+        return redirect(url_for("auth.account"))
+
+    current_user.password_hash = generate_password_hash(new_password).decode("utf-8")
+    db.session.commit()
+    flash("Password updated successfully!", "success")
+    return redirect(url_for("auth.account"))
+
+@auth_bp.route("/delete_account", methods=["POST"])
+@login_required
+def delete_account():
+    db.session.delete(current_user)
+    db.session.commit()
+    logout_user()
+    flash("Your account has been deleted.", "success")
+    return redirect(url_for("auth.register"))
 
