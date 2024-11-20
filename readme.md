@@ -1,31 +1,35 @@
 # Pokémon Card Store Web App
 
+A modern web application for managing and showcasing Pokémon cards with advanced search and user-friendly features.
+
 ## Features
-- Display Pokémon cards with images and details.
-- Search, sort, add to cart, and order functionality for users.
+- Browse Cards: View Pokémon cards with images, names, prices, and other details.
+- Advanced Search: Search by Pokémon name, Filter by set name, Sort by price (low to high, high to low) or card number.
+- Authentication: User registration and login/logout functionality.
 - Admin dashboard for uploading new cards.
 
 ## Technologies
-- **Backend**: Flask, Flask-SQLAlchemy, Flask-Migrate.
+- **Backend**: Flask, Flask-SQLAlchemy, Flask-Migrate, Flask-Login.
 - **Database**: PostgreSQL (via Docker).
+- **Frontend**: Bootstrap 5.
 - **DevOps**: Docker, Kubernetes, ArgoCD, AWS.
 
 ## Setup Instructions
 1. **Clone Repository**:
     ```bash
     git clone <repository-url>
-    cd pokemon-card-store
+    cd pokemon-shop
     ```
 
 2. **Set Up Docker**:
     ```bash
     docker-compose up --build
     ```
-    might need to exec and insert this command to initiate the db connection/migration:
+    Might need to exec and insert this command to initiate the db connection/migration:
     ```bash
-    flask db init || true  # Initialize migrations (ignore if already exists)
-    flask db migrate -m "Initial migration" || true  # Create migration scripts
-    flask db upgrade  # Apply Migrations
+    docker-compose exec app flask db init || true  # Initialize migrations
+    docker-compose exec app flask db migrate -m "Initial migration" || true  # Create migration scripts
+    docker-compose exec app flask db upgrade  # Apply migrations
     ```
 
 3. **Database Migrations**:
@@ -47,7 +51,7 @@ See the main project structure in the documentation.
 - `DATABASE_URL`: Database connection string.
 
 ## To-Do
-- Add CI/CD with GitHub Actions and ArgoCD.
-- Set up S3 for storing card images.
-- Implement a user authentication system.
+- Add image upload to S3 for cards.
+- Implement pagination for large card collections.
+- Improve test coverage with unit and integration tests.
 
