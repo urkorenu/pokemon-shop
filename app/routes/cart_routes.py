@@ -11,7 +11,12 @@ def view_cart():
     return render_template("cart.html", cart_items=cart_items, total_price=total_price)
 
 @cart_bp.route("/cart/add", methods=["POST"])
+@login_required  # Ensures only authenticated users can access this route
 def add_to_cart():
+    if not current_user.is_authenticated:
+        flash("You need to log in to add items to your cart.", "danger")
+        return redirect(url_for("auth.login"))
+
     card_id = request.form.get("card_id")
     card = Card.query.get_or_404(card_id)
 
@@ -35,10 +40,7 @@ def add_to_cart():
         else:
             flash(f"{card.name} is out of stock.", "danger")
 
-    #return redirect(request.referrer)  # Redirects back to the current page
-    #return redirect(url_for("user.view_cards"))
     return redirect(request.referrer)
-
 
 
 @cart_bp.route("/cart/remove/<int:cart_id>", methods=["POST"])

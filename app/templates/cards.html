@@ -68,6 +68,19 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="cardModal{{ card.id }}" tabindex="-1" aria-labelledby="cardModalLabel{{ card.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cardModalLabel{{ card.id }}">{{ card.name }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <img src="{{ card.image_url }}" class="img-fluid" alt="{{ card.name }}">
+                    </div>
+                </div>
+            </div>
+        </div>
         {% endfor %}
     </div>
 </div>
