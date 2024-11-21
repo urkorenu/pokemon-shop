@@ -4,20 +4,6 @@
 <div class="container">
     <h2 class="text-center mb-4">Available Pokémon Cards</h2>
 
-    <!-- Display Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <div class="alert-container">
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-        {% endfor %}
-    </div>
-    {% endif %}
-    {% endwith %}
-
     <!-- Search and Filter Form -->
     <form method="GET" action="/" class="row g-3 mb-4">
         <div class="col-md-4">
@@ -51,7 +37,11 @@
         {% for card in cards %}
         <div class="col-md-3 mb-4">
             <div class="card shadow-sm">
-                <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}" style="height: 200px; object-fit: cover;">
+                <!-- Image with Modal Trigger -->
+                <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}" 
+                     style="height: 200px; object-fit: cover; cursor: pointer;" 
+                     data-bs-toggle="modal" data-bs-target="#cardModal{{ card.id }}">
+
                 <div class="card-body">
                     <h5 class="card-title">{{ card.name }}</h5>
                     <p class="card-text">
@@ -68,6 +58,8 @@
                 </div>
             </div>
         </div>
+
+        <!-- Modal for Full-Screen Image -->
         <div class="modal fade" id="cardModal{{ card.id }}" tabindex="-1" aria-labelledby="cardModalLabel{{ card.id }}" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
