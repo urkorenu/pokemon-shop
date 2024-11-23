@@ -38,5 +38,9 @@ class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     card_id = db.Column(db.Integer, db.ForeignKey("card.id"), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False)
+    quantity = db.Column(db.Integer, nullable=False, default=1)
+
+    user = db.relationship("User", backref="cart_items")
+    card = db.relationship("Card", backref="cart_entries")
+
 

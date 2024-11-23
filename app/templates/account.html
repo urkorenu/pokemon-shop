@@ -35,7 +35,7 @@
 
     <!-- Delete Account -->
     <h4>Delete Account</h4>
-    <form method="POST" action="/auth/delete_account">
+    <form method="POST" action="{{ url_for('auth.delete_account') }}">
         <p class="text-danger">Deleting your account is permanent and cannot be undone.</p>
         <button type="submit" class="btn btn-danger">Delete Account</button>
     </form>

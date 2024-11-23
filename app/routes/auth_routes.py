@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
-from ..models import User, db, Order
+from ..models import User, db, Order, Cart
 from flask_bcrypt import generate_password_hash, check_password_hash
 
 auth_bp = Blueprint("auth", __name__)
@@ -96,12 +96,19 @@ def change_password():
     flash("Password updated successfully!", "success")
     return redirect(url_for("auth.account"))
 
-@auth_bp.route("/delete_account", methods=["POST"])
+@auth_bp.route("/auth/delete_account", methods=["POST"])
 @login_required
 def delete_account():
-    db.session.delete(current_user)
+    # Delete all cart items for the user
+    Cart.query.filter_by(user_id=current_user.id).delete()
+
+    # Now delete the user
+    user = User.query.get_or_404(current_user.id)
+    db.session.delete(user)
     db.session.commit()
+
     logout_user()
-    flash("Your account has been deleted.", "success")
-    return redirect(url_for("auth.register"))
+    flash("Your account and all associated data have been deleted.", "success")
+    return redirect(url_for("auth.login"))
+
 

@@ -37,10 +37,11 @@
         {% for card in cards %}
         <div class="col-md-3 mb-4">
             <div class="card shadow-sm">
-                <!-- Image Link to Modal -->
-                <a href="#" data-bs-toggle="modal" data-bs-target="#cardModal{{ card.id }}">
-                    <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}" style="height: 200px; object-fit: cover;">
-                </a>
+                <!-- Image with Modal Trigger -->
+                <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}" 
+                     style="height: 200px; object-fit: cover; cursor: pointer;" 
+                     data-bs-toggle="modal" data-bs-target="#cardModal{{ card.id }}">
+
                 <div class="card-body">
                     <h5 class="card-title">{{ card.name }}</h5>
                     <p class="card-text">
@@ -50,7 +51,10 @@
                         <strong>Amount:</strong> {{ card.amount }}<br>
                         <strong>Price:</strong> ${{ card.price }}
                     </p>
-                    <a href="/user/cart/add?card_id={{ card.id }}" class="btn btn-primary btn-sm w-100">Add to Cart</a>
+                    <form method="POST" action="{{ url_for('cart.add_to_cart') }}">
+                        <input type="hidden" name="card_id" value="{{ card.id }}">
+                        <button type="submit" class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                    </form>
                 </div>
             </div>
         </div>
