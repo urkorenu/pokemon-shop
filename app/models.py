@@ -1,4 +1,5 @@
 from flask_login import UserMixin
+from datetime import datetime
 from . import db
 
 class User(db.Model, UserMixin):
@@ -26,6 +27,14 @@ class Card(db.Model):
     set_name = db.Column(db.String(120), nullable=False)
     number = db.Column(db.String(50), nullable=False)
     image_url = db.Column(db.String(250), nullable=True)
+    is_graded = db.Column(db.Boolean, default=False)
+    grade = db.Column(db.Float, nullable=True)
+    grading_company = db.Column(db.String(50), nullable=True)
+    tcg_price = db.Column(db.Float, nullable=True)
+    card_type = db.Column(db.String(50), nullable=True)
+    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow) 
+
+
 
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)

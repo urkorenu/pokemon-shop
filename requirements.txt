@@ -8,4 +8,5 @@ Flask-Bcrypt==1.0.1
 WTForms==3.0.1
 gunicorn==21.2.0
 requests==2.31.0
+pokemontcgsdk
 

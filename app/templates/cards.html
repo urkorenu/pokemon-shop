@@ -6,25 +6,32 @@
 
     <!-- Search and Filter Form -->
     <form method="GET" action="/" class="row g-3 mb-4">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <input type="text" name="name" class="form-control" placeholder="Search by Pokémon Name" value="{{ request.args.get('name', '') }}">
         </div>
         <div class="col-md-3">
             <select name="set_name" class="form-select">
                 <option value="">Filter by Set Name</option>
-                {% for set_name in unique_set_names %}
+                {% for set_name in unique_set_names|unique %}
                 <option value="{{ set_name }}" {% if request.args.get('set_name') == set_name %}selected{% endif %}>
                     {{ set_name }}
                 </option>
                 {% endfor %}
             </select>
         </div>
-        <div class="col-md-3">
-            <select name="sort" class="form-select">
-                <option value="">Sort by</option>
-                <option value="price_asc" {% if request.args.get('sort') == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
-                <option value="price_desc" {% if request.args.get('sort') == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
-                <option value="card_number" {% if request.args.get('sort') == 'card_number' %}selected{% endif %}>Card Number</option>
+        <div class="col-md-2">
+            <select name="is_graded" class="form-select">
+                <option value="">Graded?</option>
+                <option value="yes" {% if request.args.get('is_graded') == 'yes' %}selected{% endif %}>Yes</option>
+                <option value="no" {% if request.args.get('is_graded') == 'no' %}selected{% endif %}>No</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select name="grading_company" class="form-select">
+                <option value="">Grading Company</option>
+                <option value="cgc" {% if request.args.get('grading_company') == 'cgc' %}selected{% endif %}>CGC</option>
+                <option value="psa" {% if request.args.get('grading_company') == 'psa' %}selected{% endif %}>PSA</option>
+                <option value="beckett" {% if request.args.get('grading_company') == 'beckett' %}selected{% endif %}>Beckett</option>
             </select>
         </div>
         <div class="col-md-2">
@@ -36,21 +43,29 @@
     <div class="row">
         {% for card in cards %}
         <div class="col-md-3 mb-4">
-            <div class="card shadow-sm">
-                <!-- Image with Modal Trigger -->
-                <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}" 
-                     style="height: 200px; object-fit: cover; cursor: pointer;" 
-                     data-bs-toggle="modal" data-bs-target="#cardModal{{ card.id }}">
-
+            <div class="card shadow-sm position-relative">
+                <!-- Upload Date Label -->
+                <span class="badge bg-secondary position-absolute top-0 start-0 m-2">
+                    Uploaded: {{ card.uploaded_at.strftime('%Y-%m-%d') if card.uploaded_at else "N/A" }}
+                </span>
+                <!-- Amount Badge -->
+                <span class="badge bg-primary position-absolute top-0 end-0 m-2">
+                    x{{ card.amount }}
+                </span>
+                <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}" style="height: 200px; object-fit: cover; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#cardModal{{ card.id }}">
                 <div class="card-body">
                     <h5 class="card-title">{{ card.name }}</h5>
                     <p class="card-text">
-                        <strong>Card Number:</strong> {{ card.number }}<br>
+                        <strong>Card Type:</strong> {{ card.card_type|capitalize }}<br>
                         <strong>Set:</strong> {{ card.set_name }}<br>
+                        <strong>Card Number:</strong> {{ card.number }}<br>
                         <strong>Condition:</strong> {{ card.condition }}<br>
-                        <strong>Amount:</strong> {{ card.amount }}<br>
-                        <strong>Price:</strong> ${{ card.price }}
+                        <strong>Price:</strong> ${{ card.price }}<br>
                     </p>
+                    <!-- TCGPlayer Price Badge -->
+                    <div class="badge bg-info text-dark d-inline-block mb-2 px-3 py-2 rounded">
+                        TCGPlayer Price: ${{ card.tcg_price if card.tcg_price else "N/A" }}
+                    </div>
                     <form method="POST" action="{{ url_for('cart.add_to_cart') }}">
                         <input type="hidden" name="card_id" value="{{ card.id }}">
                         <button type="submit" class="btn btn-primary btn-sm w-100">Add to Cart</button>
@@ -59,7 +74,7 @@
             </div>
         </div>
 
-        <!-- Modal for Full-Screen Image -->
+        <!-- Modal for More Details -->
         <div class="modal fade" id="cardModal{{ card.id }}" tabindex="-1" aria-labelledby="cardModalLabel{{ card.id }}" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -68,7 +83,20 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <img src="{{ card.image_url }}" class="img-fluid" alt="{{ card.name }}">
+                        <img src="{{ card.image_url }}" class="img-fluid mb-3" alt="{{ card.name }}">
+                        <p>
+                            <strong>Card Number:</strong> {{ card.number }}<br>
+                            <strong>Set:</strong> {{ card.set_name }}<br>
+                            <strong>Condition:</strong> {{ card.condition }}<br>
+                            <strong>Amount:</strong> {{ card.amount }}<br>
+                            <strong>Price:</strong> ${{ card.price }}<br>
+                            <strong>Graded:</strong> {{ 'Yes' if card.is_graded else 'No' }}<br>
+                            {% if card.is_graded %}
+                            <strong>Grading Company:</strong> {{ card.grading_company }}<br>
+                            <strong>Grade:</strong> {{ card.grade }}<br>
+                            {% endif %}
+                            <strong>TCGPlayer Price:</strong> ${{ card.tcg_price if card.tcg_price else "N/A" }}
+                        </p>
                     </div>
                 </div>
             </div>
