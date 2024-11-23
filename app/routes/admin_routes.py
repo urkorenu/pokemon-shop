@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from ..models import Card, db
 from flask_login import login_required
 import requests
+from app.upload_to_s3 import upload_to_s3
 
 admin_bp = Blueprint("admin", __name__)
 
@@ -30,7 +31,7 @@ def upload_card():
         set_name = request.form.get("set_name")
         number = request.form.get("number")
         image_url = request.form.get("image_url")
-        card_type = request.form.get("card_type")  # NEW: Card type (normal, reverse, etc.)
+        card_type = request.form.get("card_type")  
         is_graded = request.form.get("is_graded") == "on"
         grade = request.form.get("grade") if is_graded else None
         grading_company = request.form.get("grading_company") if is_graded else None
@@ -62,6 +63,10 @@ def upload_card():
             flash("Failed to fetch card details. Please try again later.", "danger")
             return render_template("upload.html", sets=sets)
 
+        file = request.files.get("image")
+        if file:
+            image_url = upload_to_s3(file, bucket_name="your-s3-bucket", object_name=file.filename)
+        
         # Save card to database
         card = Card(
             name=name,

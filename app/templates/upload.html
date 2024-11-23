@@ -1,187 +1,88 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2 class="text-center mb-4">Upload New Pokémon Card</h2>
+<div class="container mt-4">
+    <h2 class="text-center">Upload New Pokémon Card</h2>
 
-<form action="/admin/upload" method="POST">
-    <!-- Set Name -->
-    <div class="mb-3">
-        <label for="set_name" class="form-label">Set Name:</label>
-        <input class="form-control" list="sets" id="set_name" name="set_name" placeholder="Type to search..." required>
-        <datalist id="sets">
-            {% for set in sets %}
-            <option value="{{ set.name }}">{{ set.name }}</option>
-            {% endfor %}
-        </datalist>
-    </div>
+    <!-- Card Upload Form -->
+    <form action="/admin/upload" method="POST" enctype="multipart/form-data">
+        <!-- Set Name -->
+        <div class="mb-3">
+            <label for="set_name" class="form-label">Set Name:</label>
+            <select id="set_name" name="set_name" class="form-select" required>
+                <option value="">Select Set</option>
+                {% for s in sets %}
+                <option value="{{ s.name }}">{{ s.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-    <!-- Card Number -->
-    <div class="mb-3">
-        <label for="number" class="form-label">Card Number:</label>
-        <input type="text" id="number" name="number" class="form-control" placeholder="Enter card number (e.g., 84/165)" required>
-    </div>
+        <!-- Card Number -->
+        <div class="mb-3">
+            <label for="number" class="form-label">Card Number:</label>
+            <input type="number" id="number" name="number" class="form-control" required>
+        </div>
 
-    <!-- Card Type -->
-    <div class="mb-3">
-        <label for="card_type" class="form-label">Card Type:</label>
-        <select id="card_type" name="card_type" class="form-select" required>
-            <option value="">Select Card Type</option>
-        </select>
-    </div>
+        <!-- Card Type -->
+        <div class="mb-3">
+            <label for="card_type" class="form-label">Card Type:</label>
+            <select id="card_type" name="card_type" class="form-select" required>
+                <option value="Normal">Normal</option>
+                <option value="Holofoil">Holofoil</option>
+                <option value="Reverse Holofoil">Reverse Holofoil</option>
+                <option value="First Edition">First Edition</option>
+            </select>
+        </div>
 
-    <!-- Card Name -->
-    <div class="mb-3">
-        <label for="name" class="form-label">Card Name:</label>
-        <input type="text" id="name" name="name" class="form-control" placeholder="Card name will be auto-filled" readonly required>
-    </div>
+        <!-- Card Name -->
+        <div class="mb-3">
+            <label for="name" class="form-label">Card Name:</label>
+            <input type="text" id="name" name="name" class="form-control" readonly>
+        </div>
 
-    <!-- Price -->
-    <div class="mb-3">
-        <label for="price" class="form-label">Price:</label>
-        <input type="number" id="price" name="price" step="0.01" class="form-control" placeholder="Enter price" required>
-    </div>
+        <!-- Condition -->
+        <div class="mb-3">
+            <label for="condition" class="form-label">Condition:</label>
+            <select id="condition" name="condition" class="form-select" required>
+                <option value="NM">Near Mint (NM)</option>
+                <option value="LP">Lightly Played (LP)</option>
+                <option value="MP">Moderately Played (MP)</option>
+                <option value="HP">Heavily Played (HP)</option>
+                <option value="DMG">Damaged (DMG)</option>
+            </select>
+        </div>
 
-    <!-- Condition -->
-    <div class="mb-3">
-        <label for="condition" class="form-label">Condition:</label>
-        <select id="condition" name="condition" class="form-select" required>
-            <option value="NM">Near Mint (NM)</option>
-            <option value="LP">Lightly Played (LP)</option>
-            <option value="MP">Moderately Played (MP)</option>
-            <option value="HP">Heavily Played (HP)</option>
-            <option value="DMG">Damaged (DMG)</option>
-        </select>
-    </div>
+        <!-- Price -->
+        <div class="mb-3">
+            <label for="price" class="form-label">Price:</label>
+            <input type="number" id="price" name="price" class="form-control" step="0.01" required>
+        </div>
 
+        <!-- Amount -->
+        <div class="mb-3">
+            <label for="amount" class="form-label">Amount:</label>
+            <input type="number" id="amount" name="amount" class="form-control" required>
+        </div>
 
-    <!-- Amount -->
-    <div class="mb-3">
-        <label for="amount" class="form-label">Amount:</label>
-        <input type="number" id="amount" name="amount" min="1" class="form-control" placeholder="Enter amount" required>
-    </div>
+        <!-- File Upload -->
+        <div class="mb-3">
+            <label for="image" class="form-label">Card Image:</label>
+            <input type="file" id="image" name="image" class="form-control" accept="image/*" required>
+        </div>
 
-    <!-- Image URL -->
-    <div class="mb-3">
-        <label for="image_url" class="form-label">Image URL:</label>
-        <input type="url" id="image_url" name="image_url" class="form-control" placeholder="Enter image URL">
-    </div>
-
-    <!-- Is Graded -->
-    <div class="form-check mb-3">
-        <input type="checkbox" id="is_graded" name="is_graded" class="form-check-input">
-        <label for="is_graded" class="form-check-label">Is Graded?</label>
-    </div>
-
-    <!-- Grade -->
-    <div id="graded_fields" class="mb-3" style="display: none;">
-        <label for="grade" class="form-label">Grade (1-10):</label>
-        <input type="number" id="grade" name="grade" step="0.5" min="1" max="10" class="form-control" placeholder="Enter grade">
-        <label for="grading_company" class="form-label mt-3">Grading Company:</label>
-        <select id="grading_company" name="grading_company" class="form-select">
-            <option value="cgc">CGC</option>
-            <option value="psa">PSA</option>
-            <option value="beckett">Beckett</option>
-        </select>
-    </div>
-
-    <!-- Submit and Reset Buttons -->
-    <div class="d-flex justify-content-between mt-4">
-        <button type="submit" class="btn btn-primary">Upload</button>
-        <button type="button" id="reset_cards" class="btn btn-danger">Reset All Cards</button>
-    </div>
-</form>
-
-<script>
-    // Debounce function to limit API calls
-    function debounce(func, wait) {
-        let timeout;
-        return function (...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
-
-    // Fetch Card Details
-    async function fetchCardDetails() {
-        const setName = document.getElementById('set_name').value;
-        const cardNumber = document.getElementById('number').value;
-
-        // Clear previous fields
-        document.getElementById('card_type').innerHTML = '<option value="">Select Card Type</option>';
-        document.getElementById('name').value = '';
-
-        if (!setName || !cardNumber) return;
-
-        try {
-            const query = `set.name:"${setName}" number:"${cardNumber}"`;
-            const apiKey = "d12c4b42-2505-47cd-b85a-48b96e76859f";
-            const apiUrl = `https://api.pokemontcg.io/v2/cards?q=${encodeURIComponent(query)}`;
-
-            const response = await fetch(apiUrl, {
-                headers: { "X-Api-Key": apiKey },
-            });
-
-            if (!response.ok) {
-                console.error("Failed to fetch card details:", response.status);
-                return;
-            }
-
-            const data = await response.json();
-            const card = data.data[0];
-
-            if (!card) {
-                console.error("No card data found.");
-                return;
-            }
-
-            console.log("Fetched card data:", card);
-
-            // Populate Card Type Dropdown
-            const prices = card.tcgplayer?.prices || {};
-            const cardTypes = Object.keys(prices);
-
-            const cardTypeDropdown = document.getElementById('card_type');
-            cardTypes.forEach((type) => {
-                const option = document.createElement("option");
-                option.value = type;
-                option.textContent = type.replace("_", " ").toUpperCase();
-                cardTypeDropdown.appendChild(option);
-            });
-
-            // Auto-fill the Card Name
-            document.getElementById('name').value = card.name;
-        } catch (error) {
-            console.error("Error fetching card details:", error);
-        }
-    }
-
-    // Reset Cards
-    document.getElementById('reset_cards').addEventListener('click', async () => {
-        if (confirm("Are you sure you want to delete all cards?")) {
-            try {
-                await fetch('/admin/reset_cards', { method: 'POST' });
-                alert("All cards have been reset.");
-                location.reload();
-            } catch (error) {
-                console.error("Failed to reset cards:", error);
-            }
-        }
-    });
-
-    // Event listeners for fetching card details
-    const debouncedFetch = debounce(fetchCardDetails, 300);
-    document.getElementById('set_name').addEventListener('input', debouncedFetch);
-    document.getElementById('number').addEventListener('input', debouncedFetch);
-
-    // Show/Hide Graded Fields
-    document.getElementById('is_graded').addEventListener('change', function () {
-        const gradedFields = document.getElementById('graded_fields');
-        gradedFields.style.display = this.checked ? 'block' : 'none';
-    });
-</script>
-{% endblock %}
+        <!-- Grading Details -->
+        <div class="mb-3 form-check">
+            <input type="checkbox" id="is_graded" name="is_graded" class="form-check-input">
+            <label for="is_graded" class="form-check-label">Is Graded?</label>
+        </div>
+        <div id="grading-details" style="display: none;">
+            <div class="mb-3">
+                <label for="grade" class="form-label">Grade (1-10):</label>
+                <input type="number" id="grade" name="grade" class="form-control" min="1" max="10" step="0.5">
+            </div>
+            <div class="mb-3">
+                <label for="grading_company" class="form-label">Grading Company:</label>
+                <select id="grading_company" name="grading_company" class="form-select">
+                    <option value="PSA">PSA</option>
+       
 
