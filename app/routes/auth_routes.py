@@ -23,7 +23,7 @@ def register():
             return redirect(url_for("auth.login"))
 
         # Create the new user
-        user = User(username=username, email=email)
+        user = User(username=username, email=email, role="normal")
         user.set_password(password)  # Hash and set the password
         db.session.add(user)
         db.session.commit()
