@@ -91,7 +91,7 @@ def upload_card():
             is_graded=is_graded,
             grade=grade,
             grading_company=grading_company,
-            card_type=card_typei,
+            card_type=card_type,
             uploader_id=current_user.id
         )
         db.session.add(card)
