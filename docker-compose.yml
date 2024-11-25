@@ -17,4 +17,22 @@ services:
       S3_BUCKET: "${S3_BUCKET}"
       API_KEY: "${API_KEY}"
       PYTHONPATH: "./"
+  test:
+    build: .
+    depends_on:
+      - app
+    environment:
+      FLASK_ENV: testing
+      DB_USERNAME: "${DB_USERNAME}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_HOST: "${DB_HOST}"
+      DB_NAME: "${DB_NAME}"
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+      AWS_REGION: "${AWS_REGION}"
+      S3_BUCKET: "${S3_BUCKET}"
+      API_KEY: "${API_KEY}"
+      PYTHONPATH: "./"
+    command: pytest --maxfail=5 --disable-warnings -q
+
 

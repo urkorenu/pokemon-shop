@@ -29,35 +29,13 @@ jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
-    env:
-      DB_HOST: ${{ secrets.DB_HOST }}
-      SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      API_KEY: ${{ secrets.API_KEY }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
-      DB_NAME: ${{ secrets.DB_NAME }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      DB_USERNAME: ${{ secrets.DB_USERNAME }}
-      S3_BUCKET: ${{ secrets.S3_BUCKET }}
-      PYTHONPATH: ./
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.10.12
-      - name: Install Dependencies
+      - name: Set up Docker Compose
         run: |
-          pip install -r requirements.txt
-      - name: Debug Configuration
-        run: |
-          echo $PYTHONPATH
-          python -c "from app import create_app; print(create_app().config['SQLALCHEMY_DATABASE_URI'])"
-      - name: Run Tests
-        run: |
-          pytest --maxfail=5 --disable-warnings -q
+          docker-compose up --build test
+
 
   build:
     name: Build and Push Docker Image
