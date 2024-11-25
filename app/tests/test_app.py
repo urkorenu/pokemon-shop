@@ -10,7 +10,7 @@ def test_app():
     """
     app = create_app()
     app.config["TESTING"] = True
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"  # Temporary DB for test isolation
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
     app.config["SECRET_KEY"] = "test_secret"
 
     with app.app_context():
@@ -43,4 +43,3 @@ def test_login_page(client):
     response = client.get("/auth/login")
     assert response.status_code == 200
     assert b"Login" in response.data  # Check if "Login" text is in the page
-
