@@ -8,8 +8,10 @@ def test_app():
     # Setup
     app = create_app()
     app.config["TESTING"] = True
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"  # Use in-memory DB
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
     app.config["SECRET_KEY"] = "test_secret"
+
+    print(f"Database URI during tests: {app.config['SQLALCHEMY_DATABASE_URI']}")
 
     with app.app_context():
         db.create_all()
