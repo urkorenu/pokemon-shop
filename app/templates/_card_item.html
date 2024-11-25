@@ -1,0 +1,74 @@
+<div class="col-md-3 mb-4">
+    <div class="card shadow-sm position-relative">
+        <!-- Upload Date Label -->
+        <span class="badge bg-secondary position-absolute top-0 start-0 m-2">
+            Uploaded: {{ card.uploaded_at.strftime('%Y-%m-%d') if card.uploaded_at else "N/A" }}
+        </span>
+        <!-- Amount Badge -->
+        <span class="badge bg-primary position-absolute top-0 end-0 m-2">
+            x{{ card.amount }}
+        </span>
+        <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}"
+             style="height: 200px; object-fit: cover; cursor: pointer;"
+             data-bs-toggle="modal" data-bs-target="#cardModal{{ card.id }}">
+        <div class="card-body">
+            <h5 class="card-title">{{ card.name }}</h5>
+            <p class="card-text">
+                <strong>Card Type:</strong> {{ card.card_type|capitalize }}<br>
+                <strong>Set:</strong> {{ card.set_name }}<br>
+                <strong>Card Number:</strong> {{ card.number }}<br>
+                <strong>Condition:</strong> {{ card.condition }}<br>
+                <strong>Price:</strong> {{ card.price }} ILS<br>
+                {% if card.uploader %}
+                <strong>Uploaded By:</strong>
+                <a href="{{ url_for('user.profile', user_id=card.uploader.id) }}">
+                    {{ card.uploader.username }}
+                </a>
+                {% endif %}
+            </p>
+            <!-- TCGPlayer Price Badge -->
+            <div class="badge bg-info text-dark d-inline-block mb-2 px-3 py-2 rounded">
+                TCGPlayer Price: ${{ card.tcg_price if card.tcg_price else "N/A" }}
+            </div>
+            <form method="POST" action="{{ url_for('cart.add_to_cart') }}">
+                <input type="hidden" name="card_id" value="{{ card.id }}">
+                <button type="submit" class="btn btn-primary btn-sm w-100">Add to Cart</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for More Details -->
+    <div class="modal fade" id="cardModal{{ card.id }}" tabindex="-1" aria-labelledby="cardModalLabel{{ card.id }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ card.name }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img src="{{ card.image_url }}" class="img-fluid" alt="{{ card.name }}">
+                    <p class="mt-3">
+                        <strong>Card Number:</strong> {{ card.number }}<br>
+                        <strong>Set:</strong> {{ card.set_name }}<br>
+                        <strong>Condition:</strong> {{ card.condition }}<br>
+                        <strong>Amount:</strong> {{ card.amount }}<br>
+                        <strong>Price:</strong> {{ card.price }} ILS<br>
+                        <strong>Graded:</strong> {{ 'Yes' if card.is_graded else 'No' }}<br>
+                        {% if card.is_graded %}
+                        <strong>Grading Company:</strong> {{ card.grading_company }}<br>
+                        <strong>Grade:</strong> {{ card.grade }}<br>
+                        {% endif %}
+                        {% if card.uploader %}
+                        <strong>Uploaded By:</strong>
+                        <a href="{{ url_for('user.profile', user_id=card.uploader.id) }}">
+                            {{ card.uploader.username }}
+                        </a><br>
+                        {% endif %}
+                        <strong>TCGPlayer Price:</strong> ${{ card.tcg_price if card.tcg_price else "N/A" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
