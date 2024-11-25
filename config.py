@@ -1,5 +1,6 @@
 import os
 
+
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "default_secret_key")
     SQLALCHEMY_DATABASE_URI = (
@@ -11,4 +12,3 @@ class Config:
     S3_BUCKET = os.getenv("S3_BUCKET")
     API_KEY = os.getenv("API_KEY")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-

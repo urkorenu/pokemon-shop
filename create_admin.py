@@ -17,4 +17,3 @@ with app.app_context():
         print(f"Admin user {username} created successfully.")
     else:
         print(f"Admin user with email {email} already exists.")
-

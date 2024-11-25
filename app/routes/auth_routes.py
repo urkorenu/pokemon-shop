@@ -5,6 +5,7 @@ from flask_bcrypt import generate_password_hash, check_password_hash
 
 auth_bp = Blueprint("auth", __name__)
 
+
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
@@ -81,6 +82,7 @@ def account():
 
     return render_template("account.html", orders=orders)
 
+
 @auth_bp.route("/change_password", methods=["POST"])
 @login_required
 def change_password():
@@ -96,6 +98,7 @@ def change_password():
     flash("Password updated successfully!", "success")
     return redirect(url_for("auth.account"))
 
+
 @auth_bp.route("/auth/delete_account", methods=["POST"])
 @login_required
 def delete_account():
@@ -110,5 +113,3 @@ def delete_account():
     logout_user()
     flash("Your account and all associated data have been deleted.", "success")
     return redirect(url_for("auth.login"))
-
-

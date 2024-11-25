@@ -2,6 +2,7 @@ from flask_login import UserMixin
 from datetime import datetime
 from . import db
 
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), nullable=False, unique=True)
@@ -11,12 +12,13 @@ class User(db.Model, UserMixin):
 
     def set_password(self, password):
         from flask_bcrypt import generate_password_hash
+
         self.password_hash = generate_password_hash(password).decode("utf-8")
 
     def check_password(self, password):
         from flask_bcrypt import check_password_hash
-        return check_password_hash(self.password_hash, password)
 
+        return check_password_hash(self.password_hash, password)
 
 
 class Card(db.Model):
@@ -33,10 +35,11 @@ class Card(db.Model):
     grading_company = db.Column(db.String(50), nullable=True)
     tcg_price = db.Column(db.Float, nullable=True)
     card_type = db.Column(db.String(50), nullable=True)
-    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow) 
-    uploader_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)  # Tracks who uploaded the card
+    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
+    uploader_id = db.Column(
+        db.Integer, db.ForeignKey("user.id"), nullable=True
+    )  # Tracks who uploaded the card
     uploader = db.relationship("User", backref="uploaded_cards")
-
 
 
 class Order(db.Model):
@@ -46,6 +49,7 @@ class Order(db.Model):
     status = db.Column(db.String(50), default="Pending")
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
 
+
 class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
@@ -54,5 +58,3 @@ class Cart(db.Model):
 
     user = db.relationship("User", backref="cart_items")
     card = db.relationship("Card", backref="cart_entries")
-
-
