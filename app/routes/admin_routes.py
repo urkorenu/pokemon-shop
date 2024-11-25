@@ -87,7 +87,6 @@ def upload_card():
             image_url = upload_to_s3(
                 file,
                 bucket_name=Config.S3_BUCKET,
-                object_name=f"{set_name}_{number}_{file.filename}",
             )
 
         # Save card to database
