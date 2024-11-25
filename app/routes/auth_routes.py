@@ -12,9 +12,10 @@ def register():
         username = request.form.get("username")
         email = request.form.get("email")
         password = request.form.get("password")
+        location = request.form.get("location")
 
         # Validate form inputs
-        if not username or not email or not password:
+        if not username or not email or not password or not location:
             flash("All fields are required.", "error")
             return redirect(url_for("auth.register"))
 
@@ -24,7 +25,7 @@ def register():
             return redirect(url_for("auth.login"))
 
         # Create the new user
-        user = User(username=username, email=email, role="normal")
+        user = User(username=username, email=email, location=location, role="normal")
         user.set_password(password)  # Hash and set the password
         db.session.add(user)
         db.session.commit()
@@ -33,7 +34,6 @@ def register():
         return redirect(url_for("auth.login"))
 
     return render_template("register.html")
-
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
