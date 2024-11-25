@@ -13,3 +13,4 @@ pymysql
 boto3
 psycopg2-binary
 flask_caching
+pytest

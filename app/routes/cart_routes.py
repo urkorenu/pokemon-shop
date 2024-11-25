@@ -4,11 +4,13 @@ from ..models import Cart, Card, db
 
 cart_bp = Blueprint("cart", __name__)
 
+
 @cart_bp.route("/cart")
 def view_cart():
     cart_items = Cart.query.filter_by(user_id=current_user.id).all()
     total_price = sum(item.card.price * item.quantity for item in cart_items)
     return render_template("cart.html", cart_items=cart_items, total_price=total_price)
+
 
 @cart_bp.route("/cart/add", methods=["POST"])
 @login_required  # Ensures only authenticated users can access this route
@@ -22,7 +24,7 @@ def add_to_cart():
 
     # Check if the card is already in the cart
     cart_item = Cart.query.filter_by(user_id=current_user.id, card_id=card.id).first()
-    
+
     if cart_item:
         # Check if adding more exceeds the available amount
         if cart_item.quantity < card.amount:
@@ -30,7 +32,10 @@ def add_to_cart():
             db.session.commit()
             flash(f"{card.name} has been added to your cart.", "success")
         else:
-            flash(f"You cannot add more {card.name} cards. Only {card.amount} available.", "danger")
+            flash(
+                f"You cannot add more {card.name} cards. Only {card.amount} available.",
+                "danger",
+            )
     else:
         if card.amount > 0:
             cart_item = Cart(user_id=current_user.id, card_id=card.id, quantity=1)
@@ -55,6 +60,7 @@ def remove_from_cart(cart_id):
     flash("Item removed from cart.", "success")
     return redirect(url_for("cart.view_cart"))
 
+
 @cart_bp.route("/cart/update", methods=["POST"])
 def update_cart():
     cart_id = request.form.get("cart_id")
@@ -69,4 +75,3 @@ def update_cart():
     db.session.commit()
     flash("Cart updated successfully.", "success")
     return redirect(url_for("cart.view_cart"))
-

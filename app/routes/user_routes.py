@@ -4,6 +4,7 @@ from flask_login import login_required
 
 user_bp = Blueprint("user", __name__)
 
+
 @user_bp.route("/")
 def view_cards():
     # Get search and filter parameters from the request
@@ -39,13 +40,11 @@ def view_cards():
     cards = query.all()
 
     # Get unique set names for the filter dropdown
-    unique_set_names = [card.set_name for card in Card.query.distinct(Card.set_name).all()]
+    unique_set_names = [
+        card.set_name for card in Card.query.distinct(Card.set_name).all()
+    ]
 
-    return render_template(
-        "cards.html", 
-        cards=cards, 
-        unique_set_names=unique_set_names
-    )
+    return render_template("cards.html", cards=cards, unique_set_names=unique_set_names)
 
 
 @user_bp.route("/cart", methods=["POST"])
@@ -59,10 +58,10 @@ def add_to_cart():
     db.session.commit()
     return redirect(url_for("user.view_cards"))
 
+
 @user_bp.route("/cart")
 @login_required
 def view_cart():
     user_id = 1  # Replace with session user ID
     cart_items = Cart.query.filter_by(user_id=user_id).all()
     return render_template("cart.html", cart_items=cart_items)
-

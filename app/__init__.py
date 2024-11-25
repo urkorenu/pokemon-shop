@@ -10,11 +10,12 @@ db = SQLAlchemy()
 migrate = Migrate()
 cache = Cache()
 
+
 def create_app():
     # Create and configure the Flask app
     app = Flask(__name__)
     app.config.from_object("config.Config")
-    
+
     # Cache configuration
     app.config["CACHE_TYPE"] = "SimpleCache"  # Change to "RedisCache" if Redis is used
     app.config["CACHE_DEFAULT_TIMEOUT"] = 300  # Default timeout for cached items in seconds
@@ -52,4 +53,3 @@ def create_app():
         return "This is a test route! Flask is running correctly."
 
     return app
-

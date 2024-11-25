@@ -13,6 +13,7 @@ admin_bp = Blueprint("admin", __name__)
 API_KEY = Config.API_KEY
 BASE_URL = "https://api.pokemontcg.io/v2"
 
+
 @admin_bp.route("/upload", methods=["GET", "POST"])
 @roles_required("admin", "uploader")
 def upload_card():
@@ -21,7 +22,11 @@ def upload_card():
         """Fetch Pokémon TCG sets from the API."""
         response = requests.get(f"{BASE_URL}/sets", headers={"X-Api-Key": API_KEY})
         response.raise_for_status()
-        return [{"name": s["name"], "max_card_number": s.get("printedTotal", 0)} for s in response.json().get("data", []) if s.get("printedTotal")]
+        return [
+            {"name": s["name"], "max_card_number": s.get("printedTotal", 0)}
+            for s in response.json().get("data", [])
+            if s.get("printedTotal")
+        ]
 
     try:
         sets = get_pokemon_sets()
@@ -45,12 +50,17 @@ def upload_card():
 
         try:
             query = f'set.name:"{set_name}" number:"{number}"'
-            response = requests.get(f"{BASE_URL}/cards", params={"q": query}, headers={"X-Api-Key": API_KEY})
+            response = requests.get(
+                f"{BASE_URL}/cards", params={"q": query}, headers={"X-Api-Key": API_KEY}
+            )
             response.raise_for_status()
             card_data = response.json().get("data", [])
 
             if not card_data:
-                flash("No card found. Please verify the set name and card number.", "danger")
+                flash(
+                    "No card found. Please verify the set name and card number.",
+                    "danger",
+                )
                 return render_template("upload.html", sets=sets)
 
             card_details = card_data[0]
@@ -74,9 +84,11 @@ def upload_card():
         file = request.files.get("image")
         image_url = None
         if file:
-            unique_filename = f"{set_name}_{number}_{file.filename}"
-            image_url = upload_to_s3(file, bucket_name=Config.S3_BUCKET, object_name=f"{set_name}_{number}_{file.filename}")
-
+            image_url = upload_to_s3(
+                file,
+                bucket_name=Config.S3_BUCKET,
+                object_name=f"{set_name}_{number}_{file.filename}",
+            )
 
         # Save card to database
         card = Card(
@@ -92,7 +104,7 @@ def upload_card():
             grade=grade,
             grading_company=grading_company,
             card_type=card_type,
-            uploader_id=current_user.id
+            uploader_id=current_user.id,
         )
         db.session.add(card)
         db.session.commit()
@@ -114,7 +126,9 @@ def get_card_details():
 
     try:
         query = f'set.name:"{set_name}" number:"{number}"'
-        response = requests.get(f"{BASE_URL}/cards", params={"q": query}, headers={"X-Api-Key": API_KEY})
+        response = requests.get(
+            f"{BASE_URL}/cards", params={"q": query}, headers={"X-Api-Key": API_KEY}
+        )
         response.raise_for_status()
         card_data = response.json().get("data", [])
 
@@ -131,7 +145,8 @@ def get_card_details():
         print(f"Error fetching card details: {e}", flush=True)
         return jsonify({"error": "Failed to fetch card details"}), 500
 
-@admin_bp.route('/reset_cards', methods=['POST'])
+
+@admin_bp.route("/reset_cards", methods=["POST"])
 @login_required
 def reset_cards():
     try:
@@ -140,7 +155,7 @@ def reset_cards():
         image_urls = [card.image_url for card in cards if card.image_url]
 
         # Initialize S3 client
-        s3 = boto3.client('s3', region_name=Config.AWS_REGION)
+        s3 = boto3.client("s3", region_name=Config.AWS_REGION)
         bucket_name = Config.S3_BUCKET
 
         # Delete images from S3
@@ -162,6 +177,7 @@ def reset_cards():
         print(f"Error resetting cards: {e}", flush=True)
         return {"message": "Failed to reset cards."}, 500
 
+
 @admin_bp.route("/users", methods=["GET", "POST"])
 @login_required
 def manage_users():
@@ -173,7 +189,9 @@ def manage_users():
 
     if request.method == "POST":
         user_id = request.form.get("user_id")  # Ensure user_id is correctly submitted
-        new_role = request.form.get(f"role_{user_id}")  # Fetch the role for the specific user
+        new_role = request.form.get(
+            f"role_{user_id}"
+        )  # Fetch the role for the specific user
 
         if not user_id or not new_role:
             flash("Invalid user or role data.", "error")
@@ -192,4 +210,3 @@ def manage_users():
             flash("User not found.", "error")
 
     return render_template("manage_users.html", users=users)
-
