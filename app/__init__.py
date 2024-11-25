@@ -17,8 +17,8 @@ def create_app():
     app.config.from_object("config.Config")
 
     # Cache configuration
-    app.config["CACHE_TYPE"] = "SimpleCache"  # Change to "RedisCache" if Redis is used
-    app.config["CACHE_DEFAULT_TIMEOUT"] = 300  # Default timeout for cached items in seconds
+    app.config["CACHE_TYPE"] = "SimpleCache"
+    app.config["CACHE_DEFAULT_TIMEOUT"] = 300
 
     # Initialize extensions with the app
     db.init_app(app)

@@ -22,9 +22,9 @@ def view_cards():
     if set_name_query:
         query = query.filter(Card.set_name == set_name_query)
     if is_graded == "yes":
-        query = query.filter(Card.is_graded == True)
+        query = query.filter(Card.is_graded.is_(True))
     elif is_graded == "no":
-        query = query.filter(Card.is_graded == False)
+        query = query.filter(Card.is_graded.is_(False))
     if grading_company:
         query = query.filter(Card.grading_company.ilike(f"%{grading_company}%"))
 
