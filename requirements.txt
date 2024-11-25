@@ -9,4 +9,7 @@ WTForms==3.0.1
 gunicorn==21.2.0
 requests==2.31.0
 pokemontcgsdk
-
+pymysql
+boto3
+psycopg2-binary
+flask_caching

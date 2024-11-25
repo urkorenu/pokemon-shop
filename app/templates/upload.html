@@ -3,7 +3,7 @@
 {% block content %}
 <h2 class="text-center mb-4">Upload New Pokémon Card</h2>
 
-<form action="/admin/upload" method="POST">
+<form action="/admin/upload" method="POST" enctype="multipart/form-data">
     <!-- Set Name -->
     <div class="mb-3">
         <label for="set_name" class="form-label">Set Name:</label>
@@ -53,17 +53,16 @@
         </select>
     </div>
 
-
     <!-- Amount -->
     <div class="mb-3">
         <label for="amount" class="form-label">Amount:</label>
         <input type="number" id="amount" name="amount" min="1" class="form-control" placeholder="Enter amount" required>
     </div>
 
-    <!-- Image URL -->
+    <!-- File Upload -->
     <div class="mb-3">
-        <label for="image_url" class="form-label">Image URL:</label>
-        <input type="url" id="image_url" name="image_url" class="form-control" placeholder="Enter image URL">
+        <label for="image" class="form-label">Card Image:</label>
+        <input type="file" id="image" name="image" class="form-control" accept="image/*" required>
     </div>
 
     <!-- Is Graded -->
@@ -78,9 +77,9 @@
         <input type="number" id="grade" name="grade" step="0.5" min="1" max="10" class="form-control" placeholder="Enter grade">
         <label for="grading_company" class="form-label mt-3">Grading Company:</label>
         <select id="grading_company" name="grading_company" class="form-select">
-            <option value="cgc">CGC</option>
-            <option value="psa">PSA</option>
-            <option value="beckett">Beckett</option>
+            <option value="CGC">CGC</option>
+            <option value="PSA">PSA</option>
+            <option value="Beckett">Beckett</option>
         </select>
     </div>
 
@@ -92,38 +91,18 @@
 </form>
 
 <script>
-    // Debounce function to limit API calls
-    function debounce(func, wait) {
-        let timeout;
-        return function (...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
-
-    // Fetch Card Details
     async function fetchCardDetails() {
-        const setName = document.getElementById('set_name').value;
-        const cardNumber = document.getElementById('number').value;
+        const setName = document.getElementById("set_name").value;
+        const cardNumber = document.getElementById("number").value;
 
-        // Clear previous fields
-        document.getElementById('card_type').innerHTML = '<option value="">Select Card Type</option>';
-        document.getElementById('name').value = '';
+        document.getElementById("name").value = "";
+        document.getElementById("card_type").innerHTML = '<option value="">Select Card Type</option>';
 
         if (!setName || !cardNumber) return;
 
         try {
-            const query = `set.name:"${setName}" number:"${cardNumber}"`;
-            const apiKey = "d12c4b42-2505-47cd-b85a-48b96e76859f";
-            const apiUrl = `https://api.pokemontcg.io/v2/cards?q=${encodeURIComponent(query)}`;
-
-            const response = await fetch(apiUrl, {
-                headers: { "X-Api-Key": apiKey },
-            });
+            const apiUrl = `/admin/card-details?set_name=${encodeURIComponent(setName)}&number=${encodeURIComponent(cardNumber)}`;
+            const response = await fetch(apiUrl);
 
             if (!response.ok) {
                 console.error("Failed to fetch card details:", response.status);
@@ -131,56 +110,48 @@
             }
 
             const data = await response.json();
-            const card = data.data[0];
 
-            if (!card) {
-                console.error("No card data found.");
+            if (data.error) {
+                console.error("Error in API response:", data.error);
                 return;
             }
 
-            console.log("Fetched card data:", card);
-
-            // Populate Card Type Dropdown
-            const prices = card.tcgplayer?.prices || {};
-            const cardTypes = Object.keys(prices);
-
-            const cardTypeDropdown = document.getElementById('card_type');
-            cardTypes.forEach((type) => {
+            document.getElementById("name").value = data.name;
+            const cardTypeDropdown = document.getElementById("card_type");
+            data.types.forEach((type) => {
                 const option = document.createElement("option");
                 option.value = type;
                 option.textContent = type.replace("_", " ").toUpperCase();
                 cardTypeDropdown.appendChild(option);
             });
-
-            // Auto-fill the Card Name
-            document.getElementById('name').value = card.name;
         } catch (error) {
             console.error("Error fetching card details:", error);
         }
     }
 
-    // Reset Cards
-    document.getElementById('reset_cards').addEventListener('click', async () => {
-        if (confirm("Are you sure you want to delete all cards?")) {
+    document.getElementById("set_name").addEventListener("input", fetchCardDetails);
+    document.getElementById("number").addEventListener("input", fetchCardDetails);
+
+    document.getElementById("is_graded").addEventListener("change", function () {
+        const gradedFields = document.getElementById("graded_fields");
+        gradedFields.style.display = this.checked ? "block" : "none";
+    });
+
+    document.getElementById("reset_cards").addEventListener("click", async () => {
+        if (confirm("Are you sure you want to delete all cards and images?")) {
             try {
-                await fetch('/admin/reset_cards', { method: 'POST' });
-                alert("All cards have been reset.");
-                location.reload();
+                const response = await fetch('/admin/reset_cards', { method: 'POST' });
+                if (response.ok) {
+                    alert("All cards and associated images have been deleted.");
+                    location.reload();
+                } else {
+                    const data = await response.json();
+                    alert(`Failed to reset cards: ${data.message}`);
+                }
             } catch (error) {
                 console.error("Failed to reset cards:", error);
             }
         }
-    });
-
-    // Event listeners for fetching card details
-    const debouncedFetch = debounce(fetchCardDetails, 300);
-    document.getElementById('set_name').addEventListener('input', debouncedFetch);
-    document.getElementById('number').addEventListener('input', debouncedFetch);
-
-    // Show/Hide Graded Fields
-    document.getElementById('is_graded').addEventListener('change', function () {
-        const gradedFields = document.getElementById('graded_fields');
-        gradedFields.style.display = this.checked ? 'block' : 'none';
     });
 </script>
 {% endblock %}

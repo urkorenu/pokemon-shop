@@ -35,12 +35,21 @@
             </select>
         </div>
         <div class="col-md-2">
+            <select name="sort" class="form-select">
+                <option value="">Sort By</option>
+                <option value="price_asc" {% if request.args.get('sort') == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+                <option value="price_desc" {% if request.args.get('sort') == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+                <option value="card_number" {% if request.args.get('sort') == 'card_number' %}selected{% endif %}>Card Number</option>
+            </select>
+        </div>
+        <div class="col-md-2">
             <button type="submit" class="btn btn-primary w-100">Search</button>
         </div>
     </form>
 
     <!-- Card Display -->
     <div class="row">
+        {% if cards %}
         {% for card in cards %}
         <div class="col-md-3 mb-4">
             <div class="card shadow-sm position-relative">
@@ -60,7 +69,7 @@
                         <strong>Set:</strong> {{ card.set_name }}<br>
                         <strong>Card Number:</strong> {{ card.number }}<br>
                         <strong>Condition:</strong> {{ card.condition }}<br>
-                        <strong>Price:</strong> ${{ card.price }}<br>
+                        <strong>Price:</strong> {{ card.price }} ILS<br>
                     </p>
                     <!-- TCGPlayer Price Badge -->
                     <div class="badge bg-info text-dark d-inline-block mb-2 px-3 py-2 rounded">
@@ -82,14 +91,14 @@
                         <h5 class="modal-title" id="cardModalLabel{{ card.id }}">{{ card.name }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
-                        <img src="{{ card.image_url }}" class="img-fluid mb-3" alt="{{ card.name }}">
-                        <p>
+                    <div class="modal-body text-center">
+                        <img src="{{ card.image_url }}" class="img-fluid" alt="{{ card.name }}">
+                        <p class="mt-3">
                             <strong>Card Number:</strong> {{ card.number }}<br>
                             <strong>Set:</strong> {{ card.set_name }}<br>
                             <strong>Condition:</strong> {{ card.condition }}<br>
                             <strong>Amount:</strong> {{ card.amount }}<br>
-                            <strong>Price:</strong> ${{ card.price }}<br>
+                            <strong>Price:</strong> {{ card.price }} ILS<br>
                             <strong>Graded:</strong> {{ 'Yes' if card.is_graded else 'No' }}<br>
                             {% if card.is_graded %}
                             <strong>Grading Company:</strong> {{ card.grading_company }}<br>
@@ -102,6 +111,11 @@
             </div>
         </div>
         {% endfor %}
+        {% else %}
+        <div class="col-12 text-center">
+            <p>No cards found. Try adjusting your search or filters.</p>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

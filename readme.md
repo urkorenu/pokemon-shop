@@ -1,57 +1,68 @@
 # Pokémon Card Store Web App
 
-A modern web application for managing and showcasing Pokémon cards with advanced search and user-friendly features.
+A modern web application for managing and showcasing Pokémon cards with advanced search, user roles, and cloud deployment.
 
-## Features
-- Browse Cards: View Pokémon cards with images, names, prices, and other details.
-- Advanced Search: Search by Pokémon name, Filter by set name, Sort by price (low to high, high to low) or card number.
-- Authentication: User registration and login/logout functionality.
-- Admin dashboard for uploading new cards.
+## **Features**
+- **Browse Cards**: View Pokémon cards with images, names, prices, and other details.
+- **Advanced Search**: Search by Pokémon name, filter by set name, sort by price (low to high, high to low), or card number.
+- **Authentication**:
+  - User registration and login/logout functionality.
+  - **User Roles**:
+    - **Normal Users**: Add cards to their cart and view available cards.
+    - **Uploaders**: Upload new cards.
+    - **Admins**: Access all features, manage users, and upload cards.
+- **Admin Panel**:
+  - Promote users to "Uploader" role.
+  - Manage all user accounts.
+  - Reset all cards, including deleting card images from S3.
+- **Cloud Integration**:
+  - Image uploads stored securely in AWS S3.
+  - PostgreSQL hosted on AWS RDS.
+- **Modal Views**: View full card details and images in an enlarged modal.
 
-## Technologies
-- **Backend**: Flask, Flask-SQLAlchemy, Flask-Migrate, Flask-Login.
-- **Database**: PostgreSQL (via Docker).
+## **Technologies**
+- **Backend**: Flask, Flask-SQLAlchemy, Flask-Migrate, Flask-Login, Flask-Caching.
+- **Database**: PostgreSQL (via AWS RDS).
+- **Cloud Services**: AWS S3 for image storage, AWS RDS for database.
 - **Frontend**: Bootstrap 5.
-- **DevOps**: Docker, Kubernetes, ArgoCD, AWS.
+- **DevOps**: Docker, Kubernetes, ArgoCD, AWS EC2.
 
-## Setup Instructions
-1. **Clone Repository**:
+## **Setup Instructions**
+1. **Clone the Repository**:
     ```bash
     git clone <repository-url>
     cd pokemon-shop
     ```
 
-2. **Set Up Docker**:
-    ```bash
-    docker-compose up --build
-    ```
-    Might need to exec and insert this command to initiate the db connection/migration:
-    ```bash
-    docker-compose exec app flask db init || true  # Initialize migrations
-    docker-compose exec app flask db migrate -m "Initial migration" || true  # Create migration scripts
-    docker-compose exec app flask db upgrade  # Apply migrations
-    ```
+2. **Set Up Environment Variables**:
+   Todo
 
-3. **Database Migrations**:
-    ```bash
-    docker-compose exec app flask db upgrade
-    ```
+3. **Set Up Docker and Run the App**:
+ ```bash
+ docker-compose up --build
+ ```
 
 4. **Access the App**:
-   - Local: [http://localhost:5000](http://localhost:5000)
+- Local: [http://localhost:5000](http://localhost:5000)
+- Deployed (example): [http://cards-il.duckdns.org](http://cards-il.duckdns.org)
 
-5. **Deployment**:
-   - Deploy via Kubernetes with your preferred CI/CD setup (e.g., ArgoCD).
+## **Admin Operations**
+- **Admin Panel**: Accessible at `/admin/users`.
+- **Promote Users**: Change roles from "Normal" to "Uploader".
+- **Reset Cards**: Removes all cards from the database and deletes images from S3.
 
-## Directory Structure
-See the main project structure in the documentation.
+## **Environment Variables**
+- **General**:
+  - `SECRET_KEY`: Flask app secret key.
+- **Database**:
+  - `DB_USERNAME`, `DB_PASSWORD`, `DB_HOST`, `DB_NAME`: PostgreSQL credentials.
+- **AWS Integration**:
+  - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`: Credentials for AWS.
+  - `AWS_REGION`: AWS region for S3.
+  - `S3_BUCKET`: Name of the S3 bucket.
 
-## Environment Variables
-- `SECRET_KEY`: Flask app secret key.
-- `DATABASE_URL`: Database connection string.
-
-## To-Do
-- Add image upload to S3 for cards.
+## **Future Enhancements**
 - Implement pagination for large card collections.
-- Improve test coverage with unit and integration tests.
-
+- Add test coverage with unit and integration tests.
+- Extend user roles with additional permissions.
+- Improve logging and monitoring for cloud services.

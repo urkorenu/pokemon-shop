@@ -10,6 +10,8 @@ def view_cards():
     name_query = request.args.get("name", "").strip()
     set_name_query = request.args.get("set_name", "")
     sort_option = request.args.get("sort", "")
+    is_graded = request.args.get("is_graded", "")
+    grading_company = request.args.get("grading_company", "")
 
     # Query the database
     query = Card.query
@@ -18,6 +20,12 @@ def view_cards():
         query = query.filter(Card.name.ilike(f"%{name_query}%"))
     if set_name_query:
         query = query.filter(Card.set_name == set_name_query)
+    if is_graded == "yes":
+        query = query.filter(Card.is_graded == True)
+    elif is_graded == "no":
+        query = query.filter(Card.is_graded == False)
+    if grading_company:
+        query = query.filter(Card.grading_company.ilike(f"%{grading_company}%"))
 
     # Apply sorting
     if sort_option == "price_asc":
@@ -27,12 +35,17 @@ def view_cards():
     elif sort_option == "card_number":
         query = query.order_by(Card.number.asc())
 
+    # Execute the query
     cards = query.all()
 
     # Get unique set names for the filter dropdown
     unique_set_names = [card.set_name for card in Card.query.distinct(Card.set_name).all()]
 
-    return render_template("cards.html", cards=cards, unique_set_names=unique_set_names)
+    return render_template(
+        "cards.html", 
+        cards=cards, 
+        unique_set_names=unique_set_names
+    )
 
 
 @user_bp.route("/cart", methods=["POST"])
