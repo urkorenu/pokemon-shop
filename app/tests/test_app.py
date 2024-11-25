@@ -1,5 +1,6 @@
 import pytest
 from app import create_app, db
+from app.models import User
 
 
 @pytest.fixture
@@ -7,12 +8,19 @@ def test_app():
     # Setup
     app = create_app()
     app.config["TESTING"] = True
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"  # Use in-memory DB
     app.config["SECRET_KEY"] = "test_secret"
 
     with app.app_context():
         db.create_all()
+        # Add a test user
+        user = User(username="testuser", email="test@test.ctest")
+        user.set_password("test")  # Set a hashed password
+        db.session.add(user)
+        db.session.commit()
+
         yield app
+
         db.session.remove()
         db.drop_all()
 
@@ -28,7 +36,9 @@ def test_home_page(client):
 
 
 def test_login(client):
+    # Attempt to login with the test user
     response = client.post(
         "/auth/login", data={"email": "test@test.ctest", "password": "test"}
     )
     assert response.status_code == 200
+    assert b"Welcome, testuser!" in response.data
