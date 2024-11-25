@@ -4,7 +4,6 @@
 <div class="container">
     <h2 class="text-center mb-4">{{ user.username }}'s Profile</h2>
     <p><strong>Email:</strong> {{ user.email }}</p>
-    <p><strong>Role:</strong> {{ user.role|capitalize }}</p>
     <p><strong>Location:</strong> {{ user.location if user.location else "N/A" }}</p>
 
     <h3 class="mt-4">Uploaded Cards</h3>
