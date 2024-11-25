@@ -16,4 +16,5 @@ services:
       AWS_REGION: "${AWS_REGION}"
       S3_BUCKET: "${S3_BUCKET}"
       API_KEY: "${API_KEY}"
+      PYTHONPATH: "./"
 
