@@ -10,8 +10,12 @@
     <label for="password">Password:</label>
     <input type="password" id="password" name="password" required>
     <label for="location">Location:</label>
-    <input type="text" id="location" name="location" required> <!-- New location field -->
+    <select id="location" name="location" required>
+        <option value="" disabled selected>Select your city</option>
+        {% for city in cities %}
+        <option value="{{ city }}">{{ city }}</option>
+        {% endfor %}
+    </select>
     <button type="submit">Register</button>
 </form>
 {% endblock %}
-

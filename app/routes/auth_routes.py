@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from ..models import User, db, Order, Cart
 from flask_bcrypt import generate_password_hash, check_password_hash
+from ..cities import CITIES_IN_ISRAEL
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -26,14 +27,14 @@ def register():
 
         # Create the new user
         user = User(username=username, email=email, location=location, role="normal")
-        user.set_password(password)  # Hash and set the password
+        user.set_password(password)
         db.session.add(user)
         db.session.commit()
 
         flash("Registration successful! Please log in.", "success")
         return redirect(url_for("auth.login"))
 
-    return render_template("register.html")
+    return render_template("register.html", cities=CITIES_IN_ISRAEL)
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])
