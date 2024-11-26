@@ -70,18 +70,19 @@ def view_cart():
     return render_template("cart.html", cart_items=cart_items)
 
 
-@user_bp.route('/profile/<int:user_id>')
+@user_bp.route("/profile/<int:user_id>")
 def profile(user_id):
     # Fetch the user and their uploaded cards
     user = User.query.get_or_404(user_id)
     user_cards = Card.query.filter_by(uploader_id=user_id).all()
 
-    return render_template('profile.html', user=user, cards=user_cards)
+    return render_template("profile.html", user=user, cards=user_cards)
+
 
 @user_bp.route("/my-cards")
 @login_required
 def my_cards():
-    if current_user.role == "normal" :
+    if current_user.role == "normal":
         flash("You do not have permission to access this page.", "danger")
         return redirect(url_for("user.view_cards"))
 
@@ -117,6 +118,7 @@ def edit_card(card_id):
         return redirect(url_for("user.my_cards"))
 
     return render_template("edit_card.html", card=card)
+
 
 @user_bp.route("/delete-card/<int:card_id>", methods=["POST"])
 @login_required
@@ -158,4 +160,3 @@ def delete_card(card_id):
     db.session.commit()
     flash("Card deleted successfully!", "success")
     return redirect(url_for("user.my_cards"))
-
