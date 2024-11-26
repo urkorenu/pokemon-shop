@@ -1,8 +1,6 @@
-version: "3.8"
-
 services:
   app:
-    build: .
+    image: urkoren/pokemon-shop:latest
     ports:
       - "5000:5000"
     environment:
@@ -34,5 +32,4 @@ services:
       API_KEY: "${API_KEY}"
       PYTHONPATH: "./"
     command: pytest --maxfail=5 --disable-warnings -q
-
 

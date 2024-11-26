@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center mb-4">{{ user.username }}'s Profile</h2>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Location:</strong> {{ user.location if user.location else "N/A" }}</p>
+
+    <h3 class="mt-4">Uploaded Cards</h3>
+    <div class="row">
+        {% if cards %}
+        {% for card in cards %}
+            {% include '_card_item.html' %}
+        {% endfor %}
+        {% else %}
+        <div class="col-12 text-center">
+            <p>This user has not uploaded any cards yet.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

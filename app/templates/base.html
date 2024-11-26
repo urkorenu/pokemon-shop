@@ -88,6 +88,11 @@
                         <a class="nav-link" href="/admin/upload">Upload</a>
                     </li>
                     {% endif %}
+		    {% if current_user.is_authenticated and current_user.role in ["uploader", "admin"] %}
+		    <li class="nav-item">
+		        <a class="nav-link" href="{{ url_for('user.my_cards') }}">My Cards</a>
+		    </li>
+		    {% endif %}
                 </ul>
                 <ul class="navbar-nav align-items-center">
                     {% if current_user.is_authenticated %}

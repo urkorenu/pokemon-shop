@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center mb-4">Edit Card</h2>
+    <form method="POST" action="{{ url_for('user.edit_card', card_id=card.id) }}">
+        <div class="mb-3">
+            <label for="name" class="form-label">Card Name</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ card.name }}">
+        </div>
+        <div class="mb-3">
+            <label for="price" class="form-label">Price (ILS)</label>
+            <input type="number" class="form-control" id="price" name="price" value="{{ card.price }}" step="0.01">
+        </div>
+        <div class="mb-3">
+            <label for="condition" class="form-label">Condition</label>
+            <input type="text" class="form-control" id="condition" name="condition" value="{{ card.condition }}">
+        </div>
+        <div class="mb-3">
+            <label for="amount" class="form-label">Amount</label>
+            <input type="number" class="form-control" id="amount" name="amount" value="{{ card.amount }}">
+        </div>
+        <div class="mb-3">
+            <label for="set_name" class="form-label">Set Name</label>
+            <input type="text" class="form-control" id="set_name" name="set_name" value="{{ card.set_name }}">
+        </div>
+        <div class="mb-3">
+            <label for="number" class="form-label">Card Number</label>
+            <input type="text" class="form-control" id="number" name="number" value="{{ card.number }}">
+        </div>
+        <div class="mb-3">
+            <label for="card_type" class="form-label">Card Type</label>
+            <input type="text" class="form-control" id="card_type" name="card_type" value="{{ card.card_type }}">
+        </div>
+        <div class="mb-3">
+            <label for="is_graded" class="form-label">Graded?</label>
+            <select id="is_graded" name="is_graded" class="form-select">
+                <option value="no" {% if not card.is_graded %}selected{% endif %}>No</option>
+                <option value="yes" {% if card.is_graded %}selected{% endif %}>Yes</option>
+            </select>
+        </div>
+        {% if card.is_graded %}
+        <div class="mb-3">
+            <label for="grading_company" class="form-label">Grading Company</label>
+            <input type="text" class="form-control" id="grading_company" name="grading_company" value="{{ card.grading_company }}">
+        </div>
+        <div class="mb-3">
+            <label for="grade" class="form-label">Grade</label>
+            <input type="text" class="form-control" id="grade" name="grade" value="{{ card.grade }}">
+        </div>
+        {% endif %}
+        <button type="submit" class="btn btn-success">Save Changes</button>
+        <a href="{{ url_for('user.my_cards') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
+

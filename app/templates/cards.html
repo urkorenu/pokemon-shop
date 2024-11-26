@@ -27,14 +27,6 @@
             </select>
         </div>
         <div class="col-md-2">
-            <select name="grading_company" class="form-select">
-                <option value="">Grading Company</option>
-                <option value="cgc" {% if request.args.get('grading_company') == 'cgc' %}selected{% endif %}>CGC</option>
-                <option value="psa" {% if request.args.get('grading_company') == 'psa' %}selected{% endif %}>PSA</option>
-                <option value="beckett" {% if request.args.get('grading_company') == 'beckett' %}selected{% endif %}>Beckett</option>
-            </select>
-        </div>
-        <div class="col-md-2">
             <select name="sort" class="form-select">
                 <option value="">Sort By</option>
                 <option value="price_asc" {% if request.args.get('sort') == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
@@ -70,6 +62,10 @@
                         <strong>Card Number:</strong> {{ card.number }}<br>
                         <strong>Condition:</strong> {{ card.condition }}<br>
                         <strong>Price:</strong> {{ card.price }} ILS<br>
+                        <strong>Uploaded By:</strong>
+                        <a href="{{ url_for('user.profile', user_id=card.uploader.id) }}">
+                            {{ card.uploader.username }}
+                        </a>
                     </p>
                     <!-- TCGPlayer Price Badge -->
                     <div class="badge bg-info text-dark d-inline-block mb-2 px-3 py-2 rounded">
@@ -82,34 +78,38 @@
                 </div>
             </div>
         </div>
+	<!-- Modal for More Details -->
+	<div class="modal fade" id="cardModal{{ card.id }}" tabindex="-1" aria-labelledby="cardModalLabel{{ card.id }}" aria-hidden="true">
+	    <div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+		    <div class="modal-header">
+			<h5 class="modal-title" id="cardModalLabel{{ card.id }}">{{ card.name }}</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		    </div>
+		    <div class="modal-body text-center">
+			<img src="{{ card.image_url }}" class="img-fluid" alt="{{ card.name }}">
+			<p class="mt-3">
+			    <strong>Card Number:</strong> {{ card.number }}<br>
+			    <strong>Set:</strong> {{ card.set_name }}<br>
+			    <strong>Condition:</strong> {{ card.condition }}<br>
+			    <strong>Amount:</strong> {{ card.amount }}<br>
+			    <strong>Price:</strong> {{ card.price }} ILS<br>
+			    <strong>Graded:</strong> {{ 'Yes' if card.is_graded else 'No' }}<br>
+			    {% if card.is_graded %}
+			    <strong>Grading Company:</strong> {{ card.grading_company }}<br>
+			    <strong>Grade:</strong> {{ card.grade }}<br>
+			    {% endif %}
+			    <strong>Uploaded By:</strong>
+			    <a href="{{ url_for('user.profile', user_id=card.uploader.id) }}">
+				{{ card.uploader.username }}
+			    </a><br>
+			    <strong>TCGPlayer Price:</strong> ${{ card.tcg_price if card.tcg_price else "N/A" }}
+			</p>
+		    </div>
+		</div>
+	    </div>
+	</div>
 
-        <!-- Modal for More Details -->
-        <div class="modal fade" id="cardModal{{ card.id }}" tabindex="-1" aria-labelledby="cardModalLabel{{ card.id }}" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="cardModalLabel{{ card.id }}">{{ card.name }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body text-center">
-                        <img src="{{ card.image_url }}" class="img-fluid" alt="{{ card.name }}">
-                        <p class="mt-3">
-                            <strong>Card Number:</strong> {{ card.number }}<br>
-                            <strong>Set:</strong> {{ card.set_name }}<br>
-                            <strong>Condition:</strong> {{ card.condition }}<br>
-                            <strong>Amount:</strong> {{ card.amount }}<br>
-                            <strong>Price:</strong> {{ card.price }} ILS<br>
-                            <strong>Graded:</strong> {{ 'Yes' if card.is_graded else 'No' }}<br>
-                            {% if card.is_graded %}
-                            <strong>Grading Company:</strong> {{ card.grading_company }}<br>
-                            <strong>Grade:</strong> {{ card.grade }}<br>
-                            {% endif %}
-                            <strong>TCGPlayer Price:</strong> ${{ card.tcg_price if card.tcg_price else "N/A" }}
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
         {% endfor %}
         {% else %}
         <div class="col-12 text-center">
@@ -119,4 +119,3 @@
     </div>
 </div>
 {% endblock %}
-
