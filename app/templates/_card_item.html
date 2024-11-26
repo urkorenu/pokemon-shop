@@ -23,7 +23,8 @@
                 <strong>Uploaded By:</strong>
                 <a href="{{ url_for('user.profile', user_id=card.uploader.id) }}">
                     {{ card.uploader.username }}
-                </a>
+                </a><br>
+                <strong>Uploader Location:</strong> {{ card.uploader.location if card.uploader.location else "N/A" }}<br>
                 {% endif %}
             </p>
             <!-- TCGPlayer Price Badge -->
@@ -63,6 +64,7 @@
                         <a href="{{ url_for('user.profile', user_id=card.uploader.id) }}">
                             {{ card.uploader.username }}
                         </a><br>
+                        <strong>Uploader Location:</strong> {{ card.uploader.location if card.uploader.location else "N/A" }}<br>
                         {% endif %}
                         <strong>TCGPlayer Price:</strong> ${{ card.tcg_price if card.tcg_price else "N/A" }}
                     </p>

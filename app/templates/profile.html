@@ -6,6 +6,9 @@
     <p><strong>Email:</strong> {{ user.email }}</p>
     <p><strong>Location:</strong> {{ user.location if user.location else "N/A" }}</p>
 
+    <!-- Include the Search Form -->
+    {% include "_search_form.html" %}
+
     <h3 class="mt-4">Uploaded Cards</h3>
     <div class="row">
         {% if cards %}
