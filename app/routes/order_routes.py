@@ -57,6 +57,27 @@ def confirm_order(order_id):
     flash("Order confirmed and buyer notified.", "success")
     return redirect(url_for("order.pending_orders"))
 
+@order_bp.route("/reject-order/<int:order_id>", methods=["POST"])
+@login_required
+def reject_order(order_id):
+    order = Order.query.get_or_404(order_id)
+    if order.seller_id != current_user.id:
+        flash("You are not authorized to reject this order.", "danger")
+        return redirect(url_for("order.pending_orders"))
+
+    order.status = "Rejected"
+    db.session.commit()
+
+    # Notify buyer
+    send_email(
+        recipient=order.buyer.email,
+        subject="Order Rejected",
+        body=f"Your order with ID {order.id} has been rejected by the seller."
+    )
+    flash("Order rejected successfully.", "success")
+    return redirect(url_for("order.pending_orders"))
+
+
 
 @order_bp.route("/submit-feedback/<int:order_id>", methods=["POST"])
 @login_required
@@ -95,13 +116,37 @@ def my_orders():
     orders = Order.query.filter_by(buyer_id=current_user.id).all()
     return render_template("my_orders.html", orders=orders)
 
+
 @order_bp.route("/pending-orders")
 @login_required
 def pending_orders():
-    if current_user.role != "uploader" and current_user.role != "admin":
+    if current_user.role not in ["uploader", "admin"]:
         flash("You do not have permission to access this page.", "danger")
         return redirect(url_for("user.view_cards"))
 
+    # Fetch pending orders for the current seller
     pending_orders = Order.query.filter_by(seller_id=current_user.id, status="Pending").all()
-    return render_template("pending_orders.html", orders=pending_orders)
+
+    # Process orders for template
+    orders_with_details = []
+    for order in pending_orders:
+        # Query cards in the order using the order_cards table
+        cards = db.session.execute(
+            """
+            SELECT card.id, card.name, card.set_name, card.number, card.is_graded, card.grade, card.price
+            FROM card
+            INNER JOIN order_cards ON card.id = order_cards.card_id
+            WHERE order_cards.order_id = :order_id
+            """,
+            {"order_id": order.id},
+        ).fetchall()
+
+        orders_with_details.append({
+            "id": order.id,
+            "buyer": order.buyer,
+            "created_at": order.created_at,
+            "cards": cards,  # Contains the card details
+        })
+
+    return render_template("pending_orders.html", orders=orders_with_details)
 
