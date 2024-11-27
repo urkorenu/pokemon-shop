@@ -20,6 +20,11 @@ def register():
             flash("All fields are required.", "error")
             return redirect(url_for("auth.register"))
 
+        # Check if the username is already taken
+        if User.query.filter_by(username=username).first():
+            flash("Username already taken. Please choose a different one.", "error")
+            return redirect(url_for("auth.register"))
+
         # Check if the email is already registered
         if User.query.filter_by(email=email).first():
             flash("Email already registered. Please log in.", "error")
@@ -29,10 +34,15 @@ def register():
         user = User(username=username, email=email, location=location, role="normal")
         user.set_password(password)
         db.session.add(user)
-        db.session.commit()
 
-        flash("Registration successful! Please log in.", "success")
-        return redirect(url_for("auth.login"))
+        try:
+            db.session.commit()
+            flash("Registration successful! Please log in.", "success")
+            return redirect(url_for("auth.login"))
+        except Exception as e:
+            db.session.rollback()  # Roll back the transaction in case of errors
+            flash("An error occurred during registration. Please try again.", "error")
+            print(f"Error during registration: {e}")
 
     return render_template("register.html", cities=CITIES_IN_ISRAEL)
 
