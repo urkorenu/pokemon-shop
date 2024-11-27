@@ -11,6 +11,9 @@
                 <thead>
                     <tr>
                         <th>Card</th>
+                        <th>Set</th>
+                        <th>Card Number</th>
+                        <th>Grade</th>
                         <th>Price</th>
                         <th>Actions</th>
                     </tr>
@@ -19,6 +22,15 @@
                     {% for item in items %}
                     <tr>
                         <td>{{ item.card.name }}</td>
+                        <td>{{ item.card.set_name }}</td>
+                        <td>{{ item.card.number }}</td>
+                        <td>
+                            {% if item.card.is_graded %}
+                                {{ item.card.grade }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
                         <td>{{ item.card.price }} ILS</td>
                         <td>
                             <form method="POST" action="{{ url_for('cart.remove_from_cart', cart_id=item.id) }}" class="d-inline">
@@ -31,7 +43,7 @@
             </table>
         {% endfor %}
         <div class="text-end">
-		<h5>Total Price: {{ total_price }} ILS</h5>
+            <h5>Total Price: {{ total_price }} ILS</h5>
             <form method="POST" action="{{ url_for('cart.checkout') }}">
                 <button type="submit" class="btn btn-success">Proceed to Checkout</button>
             </form>
