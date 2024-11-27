@@ -36,11 +36,13 @@ def create_app():
     from app.routes.admin_routes import admin_bp
     from app.routes.auth_routes import auth_bp
     from app.routes.cart_routes import cart_bp
+    from app.routes.order_routes import order_bp
 
     app.register_blueprint(user_bp, url_prefix="/")
     app.register_blueprint(admin_bp, url_prefix="/admin")
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(cart_bp, url_prefix="/cart")
+    app.register_blueprint(order_bp, url_prefix="/order")
 
     return app
 

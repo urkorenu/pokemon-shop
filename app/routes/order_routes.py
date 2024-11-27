@@ -1,8 +1,8 @@
 # order_routes.py
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_required, current_user
-from .models import db, Order, Card, User
-from .mail_service import send_email
+from ..models import db, Order, Card, User
+from ..mail_service import send_email
 
 order_bp = Blueprint("order", __name__)
 
@@ -38,9 +38,9 @@ def place_order(card_id):
 @login_required
 def confirm_order(order_id):
     order = Order.query.get_or_404(order_id)
-    if order.card.seller_id != current_user.id:
-        flash("You are not authorized to confirm this order.", "error")
-        return redirect(url_for("user.my_cards"))
+    if order.seller_id != current_user.id:
+        flash("You are not authorized to confirm this order.", "danger")
+        return redirect(url_for("order.pending_orders"))
 
     order.status = "Confirmed"
     db.session.commit()
@@ -50,35 +50,58 @@ def confirm_order(order_id):
     send_email(
         recipient=buyer.email,
         subject="Order Confirmed",
-        body=f"Your order for '{order.card.name}' has been confirmed by the seller.\n"
+        body=f"Your order for cards has been confirmed by the seller.\n"
              f"The seller will contact you soon."
     )
 
     flash("Order confirmed and buyer notified.", "success")
-    return redirect(url_for("user.my_orders"))
+    return redirect(url_for("order.pending_orders"))
 
 
 @order_bp.route("/submit-feedback/<int:order_id>", methods=["POST"])
 @login_required
 def submit_feedback(order_id):
     order = Order.query.get_or_404(order_id)
-    if order.buyer_id != current_user.id or order.status != "Confirmed":
-        flash("You are not authorized to provide feedback for this order.", "error")
-        return redirect(url_for("user.my_orders"))
 
+    # Ensure the user is the buyer and the order is confirmed
+    if order.buyer_id != current_user.id or order.status != "Confirmed":
+        flash("You are not authorized to provide feedback for this order.", "danger")
+        return redirect(url_for("order.my_orders"))
+
+    # Get feedback and rating from the form
     feedback = request.form.get("feedback")
     rating = int(request.form.get("rating"))
 
+    # Update the order with feedback and mark it as completed
     order.feedback = feedback
     order.rating = rating
     order.status = "Completed"
 
-    # Update seller's rating
-    seller = order.card.seller
-    seller.rating = ((seller.rating * seller.feedback_count) + rating) / (seller.feedback_count + 1)
+    # Update the seller's rating
+    seller = order.seller
+    if seller.rating is None:
+        seller.rating = rating
+    else:
+        seller.rating = ((seller.rating * seller.feedback_count) + rating) / (seller.feedback_count + 1)
     seller.feedback_count += 1
 
     db.session.commit()
     flash("Thank you for your feedback!", "success")
-    return redirect(url_for("user.my_orders"))
+    return redirect(url_for("order.my_orders"))
+
+@order_bp.route("/my-orders")
+@login_required
+def my_orders():
+    orders = Order.query.filter_by(buyer_id=current_user.id).all()
+    return render_template("my_orders.html", orders=orders)
+
+@order_bp.route("/pending-orders")
+@login_required
+def pending_orders():
+    if current_user.role != "uploader" and current_user.role != "admin":
+        flash("You do not have permission to access this page.", "danger")
+        return redirect(url_for("user.view_cards"))
+
+    pending_orders = Order.query.filter_by(seller_id=current_user.id, status="Pending").all()
+    return render_template("pending_orders.html", orders=pending_orders)
 

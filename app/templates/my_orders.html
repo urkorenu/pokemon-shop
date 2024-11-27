@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>My Orders</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Seller</th>
+            <th>Status</th>
+            <th>Feedback</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.seller.username }}</td>
+            <td>{{ order.status }}</td>
+            <td>
+                {% if order.status == "Confirmed" and not order.feedback %}
+                <!-- Feedback Form -->
+                <form method="POST" action="{{ url_for('order.submit_feedback', order_id=order.id) }}">
+                    <textarea name="feedback" class="form-control" placeholder="Write your feedback" required></textarea>
+                    <select name="rating" class="form-select mt-2" required>
+                        <option value="" disabled selected>Rate the seller</option>
+                        <option value="5">5 - Excellent</option>
+                        <option value="4">4 - Good</option>
+                        <option value="3">3 - Average</option>
+                        <option value="2">2 - Poor</option>
+                        <option value="1">1 - Very Poor</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary mt-2">Submit Feedback</button>
+                </form>
+                {% elif order.feedback %}
+                <strong>Feedback:</strong> {{ order.feedback }}<br>
+                <strong>Rating:</strong> {{ order.rating }}
+                {% else %}
+                N/A
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+

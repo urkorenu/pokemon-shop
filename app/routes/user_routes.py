@@ -53,25 +53,6 @@ def view_cards():
     return render_template("cards.html", cards=cards, unique_set_names=unique_set_names, cities=CITIES_IN_ISRAEL)
 
 
-@user_bp.route("/cart", methods=["POST"])
-@login_required
-def add_to_cart():
-    card_id = request.form.get("card_id")
-    user_id = current_user.id
-    quantity = request.form.get("quantity", 1)
-    cart_item = Cart(user_id=user_id, card_id=card_id, quantity=quantity)
-    db.session.add(cart_item)
-    db.session.commit()
-    return redirect(url_for("user.view_cards"))
-
-
-@user_bp.route("/cart")
-@login_required
-def view_cart():
-    user_id = current_user.id
-    cart_items = Cart.query.filter_by(user_id=user_id).all()
-    return render_template("cart.html", cart_items=cart_items)
-
 
 @user_bp.route('/profile/<int:user_id>')
 def profile(user_id):
@@ -194,3 +175,33 @@ def delete_card(card_id):
     db.session.commit()
     flash("Card deleted successfully!", "success")
     return redirect(url_for("user.my_cards"))
+
+@user_bp.route("/cart", methods=["POST"])
+@login_required
+def add_to_cart():
+    card_id = request.form.get("card_id")
+    user_id = current_user.id
+    quantity = request.form.get("quantity", 1)
+    cart_item = Cart(user_id=user_id, card_id=card_id, quantity=quantity)
+    db.session.add(cart_item)
+    db.session.commit()
+    return redirect(url_for("user.view_cards"))
+
+@user_bp.route("/cart")
+@login_required
+def view_cart():
+    user_id = current_user.id
+    cart_items = Cart.query.filter_by(user_id=user_id).all()
+
+    # Group items by seller
+    grouped_cart = {}
+    for item in cart_items:
+        seller_id = item.card.uploader_id
+        if seller_id not in grouped_cart:
+            grouped_cart[seller_id] = []
+        grouped_cart[seller_id].append(item)
+
+    total_price = sum(item.card.price * item.quantity for item in cart_items)
+    return render_template("cart.html", grouped_cart=grouped_cart, total_price=total_price)
+
+

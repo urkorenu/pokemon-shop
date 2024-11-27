@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Pending Orders</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Buyer</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.buyer.username }}</td>
+            <td>{{ order.status }}</td>
+            <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td>
+                <form method="POST" action="{{ url_for('order.confirm_order', order_id=order.id) }}">
+                    <button type="submit" class="btn btn-success">Confirm</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
