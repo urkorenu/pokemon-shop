@@ -1,0 +1,44 @@
+<form method="GET" action="/" class="row g-3 mb-4">
+    <div class="col-md-2">
+        <input type="text" name="name" class="form-control" placeholder="Search by Pokémon Name" value="{{ request.args.get('name', '') }}">
+    </div>
+    <div class="col-md-2">
+        <select name="set_name" class="form-select">
+            <option value="">Filter by Set Name</option>
+            {% for set_name in unique_set_names|unique %}
+            <option value="{{ set_name }}" {% if request.args.get('set_name') == set_name %}selected{% endif %}>
+                {{ set_name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select name="is_graded" class="form-select">
+            <option value="">Graded?</option>
+            <option value="yes" {% if request.args.get('is_graded') == 'yes' %}selected{% endif %}>Yes</option>
+            <option value="no" {% if request.args.get('is_graded') == 'no' %}selected{% endif %}>No</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select name="location" class="form-select">
+            <option value="">Filter by Location</option>
+            {% for city in cities %}
+            <option value="{{ city }}" {% if request.args.get('location') == city %}selected{% endif %}>
+                {{ city }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select name="sort" class="form-select">
+            <option value="">Sort By</option>
+            <option value="price_asc" {% if request.args.get('sort') == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+            <option value="price_desc" {% if request.args.get('sort') == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+            <option value="card_number" {% if request.args.get('sort') == 'card_number' %}selected{% endif %}>Card Number</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary w-100">Search</button>
+    </div>
+</form>
+

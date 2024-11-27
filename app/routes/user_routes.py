@@ -4,6 +4,8 @@ from flask_login import login_required, current_user
 from sqlalchemy.orm import joinedload
 import boto3
 from config import Config
+from ..cities import CITIES_IN_ISRAEL
+
 
 user_bp = Blueprint("user", __name__)
 
@@ -14,8 +16,8 @@ def view_cards():
     name_query = request.args.get("name", "").strip()
     set_name_query = request.args.get("set_name", "")
     sort_option = request.args.get("sort", "")
+    location_query = request.args.get("location", "").strip()
     is_graded = request.args.get("is_graded", "")
-    grading_company = request.args.get("grading_company", "")
 
     # Query the database with eager loading for uploader relationship
     query = Card.query.options(joinedload(Card.uploader))
@@ -24,12 +26,14 @@ def view_cards():
         query = query.filter(Card.name.ilike(f"%{name_query}%"))
     if set_name_query:
         query = query.filter(Card.set_name == set_name_query)
+    if location_query:
+        query = query.join(Card.uploader).filter(
+            User.location.ilike(f"%{location_query}%")
+        )
     if is_graded == "yes":
         query = query.filter(Card.is_graded.is_(True))
     elif is_graded == "no":
         query = query.filter(Card.is_graded.is_(False))
-    if grading_company:
-        query = query.filter(Card.grading_company.ilike(f"%{grading_company}%"))
 
     # Apply sorting
     if sort_option == "price_asc":
@@ -47,7 +51,12 @@ def view_cards():
         card.set_name for card in Card.query.distinct(Card.set_name).all()
     ]
 
-    return render_template("cards.html", cards=cards, unique_set_names=unique_set_names)
+    return render_template(
+        "cards.html",
+        cards=cards,
+        unique_set_names=unique_set_names,
+        cities=CITIES_IN_ISRAEL,
+    )
 
 
 @user_bp.route("/cart", methods=["POST"])
@@ -70,18 +79,51 @@ def view_cart():
     return render_template("cart.html", cart_items=cart_items)
 
 
-@user_bp.route('/profile/<int:user_id>')
+@user_bp.route("/profile/<int:user_id>")
 def profile(user_id):
-    # Fetch the user and their uploaded cards
     user = User.query.get_or_404(user_id)
-    user_cards = Card.query.filter_by(uploader_id=user_id).all()
 
-    return render_template('profile.html', user=user, cards=user_cards)
+    # Get search and filter parameters
+    name_query = request.args.get("name", "").strip()
+    set_name_query = request.args.get("set_name", "")
+    is_graded = request.args.get("is_graded", "")
+    sort_option = request.args.get("sort", "")
+
+    # Filter user's uploaded cards
+    query = Card.query.filter_by(uploader_id=user_id)
+
+    if name_query:
+        query = query.filter(Card.name.ilike(f"%{name_query}%"))
+    if set_name_query:
+        query = query.filter(Card.set_name == set_name_query)
+    if is_graded == "yes":
+        query = query.filter(Card.is_graded.is_(True))
+    elif is_graded == "no":
+        query = query.filter(Card.is_graded.is_(False))
+
+    # Apply sorting
+    if sort_option == "price_asc":
+        query = query.order_by(Card.price.asc())
+    elif sort_option == "price_desc":
+        query = query.order_by(Card.price.desc())
+    elif sort_option == "card_number":
+        query = query.order_by(Card.number.asc())
+
+    cards = query.all()
+
+    return render_template(
+        "profile.html",
+        user=user,
+        cards=cards,
+        unique_set_names=Card.query.distinct(Card.set_name).all(),
+        include_location=False,  # Exclude location filter
+    )
+
 
 @user_bp.route("/my-cards")
 @login_required
 def my_cards():
-    if current_user.role == "normal" :
+    if current_user.role == "normal":
         flash("You do not have permission to access this page.", "danger")
         return redirect(url_for("user.view_cards"))
 
@@ -117,6 +159,7 @@ def edit_card(card_id):
         return redirect(url_for("user.my_cards"))
 
     return render_template("edit_card.html", card=card)
+
 
 @user_bp.route("/delete-card/<int:card_id>", methods=["POST"])
 @login_required
@@ -158,4 +201,3 @@ def delete_card(card_id):
     db.session.commit()
     flash("Card deleted successfully!", "success")
     return redirect(url_for("user.my_cards"))
-

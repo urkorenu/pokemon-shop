@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cards IL</title>
+    <title>Pika-Card</title>
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
@@ -45,7 +45,7 @@
             color: white;
             padding: 20px 0;
             text-align: center;
-            margin-top: auto; /* Ensures footer sticks to the bottom */
+            margin-top: auto; 
         }
 
         /* Card styling */
@@ -63,7 +63,7 @@
         }
 
         #darkModeLabel {
-            font-weight: 500; /* Adds slight emphasis */
+            font-weight: 500; 
         }
     </style>
 </head>
@@ -73,7 +73,7 @@
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ url_for('user.view_cards') }}">
                 <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
-                Cards IL
+                Pika-Card
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -151,7 +151,7 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <p>&copy; 2024 Pokémon Card Store. All rights reserved.</p>
+        <p>&copy; 2024 Pika-Card. All rights reserved.</p>
     </footer>
 
     <!-- Bootstrap JS -->

@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from ..models import Card, db, User
-from flask_login import login_required, current_user
+from flask_login import current_user
 import requests
 from app.upload_to_s3 import upload_to_s3
 import boto3
@@ -146,7 +146,7 @@ def get_card_details():
 
 
 @admin_bp.route("/reset_cards", methods=["POST"])
-@login_required
+@roles_required("admin")
 def reset_cards():
     try:
         # Fetch all image URLs from the Card table
@@ -178,12 +178,8 @@ def reset_cards():
 
 
 @admin_bp.route("/users", methods=["GET", "POST"])
-@login_required
+@roles_required("admin")
 def manage_users():
-    if current_user.role != "admin":
-        flash("You do not have permission to access this page.", "error")
-        return redirect(url_for("user.view_cards"))
-
     users = User.query.filter(User.role != "admin").all()  # Exclude admins
 
     if request.method == "POST":

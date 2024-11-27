@@ -6,8 +6,8 @@ SQLAlchemy==1.4.49
 Flask-Migrate==4.0.4
 Flask-Bcrypt==1.0.1
 WTForms==3.0.1
-gunicorn==21.2.0
-requests==2.31.0
+gunicorn>=22.0.0
+requests>=2.32.0
 pymysql
 boto3
 psycopg2-binary

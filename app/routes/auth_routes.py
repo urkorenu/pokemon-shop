@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from ..models import User, db, Order, Cart
 from flask_bcrypt import generate_password_hash, check_password_hash
+from ..cities import CITIES_IN_ISRAEL
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -19,6 +20,11 @@ def register():
             flash("All fields are required.", "error")
             return redirect(url_for("auth.register"))
 
+        # Check if the username is already taken
+        if User.query.filter_by(username=username).first():
+            flash("Username already taken. Please choose a different one.", "error")
+            return redirect(url_for("auth.register"))
+
         # Check if the email is already registered
         if User.query.filter_by(email=email).first():
             flash("Email already registered. Please log in.", "error")
@@ -26,14 +32,20 @@ def register():
 
         # Create the new user
         user = User(username=username, email=email, location=location, role="normal")
-        user.set_password(password)  # Hash and set the password
+        user.set_password(password)
         db.session.add(user)
-        db.session.commit()
 
-        flash("Registration successful! Please log in.", "success")
-        return redirect(url_for("auth.login"))
+        try:
+            db.session.commit()
+            flash("Registration successful! Please log in.", "success")
+            return redirect(url_for("auth.login"))
+        except Exception as e:
+            db.session.rollback()  # Roll back the transaction in case of errors
+            flash("An error occurred during registration. Please try again.", "error")
+            print(f"Error during registration: {e}")
 
-    return render_template("register.html")
+    return render_template("register.html", cities=CITIES_IN_ISRAEL)
+
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
