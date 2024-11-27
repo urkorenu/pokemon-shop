@@ -75,3 +75,50 @@ def update_cart():
     db.session.commit()
     flash("Cart updated successfully.", "success")
     return redirect(url_for("cart.view_cart"))
+
+@cart_bp.route("/checkout", methods=["POST"])
+@login_required
+def checkout():
+    cart_items = Cart.query.filter_by(user_id=current_user.id).all()
+
+    if not cart_items:
+        flash("Your cart is empty.", "error")
+        return redirect(url_for("cart.view_cart"))
+
+    # Group cart items by seller
+    grouped_items = {}
+    for item in cart_items:
+        seller_id = item.card.uploader_id
+        if seller_id not in grouped_items:
+            grouped_items[seller_id] = []
+        grouped_items[seller_id].append(item)
+
+    # Create an order for each seller
+    for seller_id, items in grouped_items.items():
+        order = Order(buyer_id=current_user.id, seller_id=seller_id, status="Pending")
+        db.session.add(order)
+        db.session.flush()  # Get the order ID for the bridge table
+
+        for item in items:
+            order_card = OrderCard(order_id=order.id, card_id=item.card_id, quantity=item.quantity)
+            db.session.add(order_card)
+
+            # Notify the seller
+            seller = User.query.get(seller_id)
+            send_email(
+                recipient=seller.email,
+                subject="New Order Received",
+                body=f"You have received a new order containing the following cards:\n" +
+                     "\n".join(f"- {item.card.name} (x{item.quantity})" for item in items) +
+                     f"\n\nBuyer Details:\nName: {current_user.username}\n"
+                     f"Contact: {current_user.contact_details} ({current_user.contact_preference})\n"
+                     f"Please confirm the order in your dashboard."
+            )
+
+    # Clear the cart
+    Cart.query.filter_by(user_id=current_user.id).delete()
+    db.session.commit()
+
+    flash("Orders placed successfully! Sellers have been notified.", "success")
+    return redirect(url_for("user.view_cards"))
+

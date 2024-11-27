@@ -1,6 +1,7 @@
 from flask_login import UserMixin
 from datetime import datetime
-from . import db
+from sqlalchemy import Table, Column, Integer, ForeignKey
+from app import db
 
 
 class User(db.Model, UserMixin):
@@ -10,6 +11,10 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String(128), nullable=False)
     role = db.Column(db.String(20), default="normal")
     location = db.Column(db.String(120), nullable=True)
+    contact_preference = db.Column(db.String(20), nullable=False)
+    contact_details = db.Column(db.String(250), nullable=False)
+    rating = db.Column(db.Float, nullable=True)
+    feedback_count = db.Column(db.Integer, default=0)
 
     def set_password(self, password):
         from flask_bcrypt import generate_password_hash
@@ -41,12 +46,27 @@ class Card(db.Model):
     uploader = db.relationship("User", backref="uploaded_cards")
 
 
+# Define the association table for orders and cards
+order_cards = db.Table(
+    "order_cards",
+    db.Column("order_id", db.Integer, db.ForeignKey("order.id"), primary_key=True),
+    db.Column("card_id", db.Integer, db.ForeignKey("card.id"), primary_key=True),
+    db.Column("quantity", db.Integer, nullable=False, default=1),
+)
+
+
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    total_price = db.Column(db.Float, nullable=False)
+    buyer_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    seller_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     status = db.Column(db.String(50), default="Pending")
-    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    feedback = db.Column(db.Text, nullable=True)
+    rating = db.Column(db.Integer, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    buyer = db.relationship("User", foreign_keys=[buyer_id], backref="orders")
+    seller = db.relationship("User", foreign_keys=[seller_id], backref="sales")
+    cards = db.relationship("Card", secondary=order_cards, backref="orders")
 
 
 class Cart(db.Model):
@@ -57,3 +77,4 @@ class Cart(db.Model):
 
     user = db.relationship("User", backref="cart_items")
     card = db.relationship("Card", backref="cart_entries")
+
