@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from ..models import Card, db, User
-from flask_login import login_required, current_user
+from flask_login import current_user
 import requests
 from app.upload_to_s3 import upload_to_s3
 import boto3

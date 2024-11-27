@@ -27,12 +27,13 @@ def view_cards():
     if set_name_query:
         query = query.filter(Card.set_name == set_name_query)
     if location_query:
-        query = query.join(Card.uploader).filter(User.location.ilike(f"%{location_query}%"))
+        query = query.join(Card.uploader).filter(
+            User.location.ilike(f"%{location_query}%")
+        )
     if is_graded == "yes":
         query = query.filter(Card.is_graded.is_(True))
     elif is_graded == "no":
         query = query.filter(Card.is_graded.is_(False))
-
 
     # Apply sorting
     if sort_option == "price_asc":
@@ -50,7 +51,12 @@ def view_cards():
         card.set_name for card in Card.query.distinct(Card.set_name).all()
     ]
 
-    return render_template("cards.html", cards=cards, unique_set_names=unique_set_names, cities=CITIES_IN_ISRAEL)
+    return render_template(
+        "cards.html",
+        cards=cards,
+        unique_set_names=unique_set_names,
+        cities=CITIES_IN_ISRAEL,
+    )
 
 
 @user_bp.route("/cart", methods=["POST"])
@@ -73,7 +79,7 @@ def view_cart():
     return render_template("cart.html", cart_items=cart_items)
 
 
-@user_bp.route('/profile/<int:user_id>')
+@user_bp.route("/profile/<int:user_id>")
 def profile(user_id):
     user = User.query.get_or_404(user_id)
 
@@ -112,6 +118,7 @@ def profile(user_id):
         unique_set_names=Card.query.distinct(Card.set_name).all(),
         include_location=False,  # Exclude location filter
     )
+
 
 @user_bp.route("/my-cards")
 @login_required
