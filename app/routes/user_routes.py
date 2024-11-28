@@ -215,7 +215,6 @@ def add_to_cart():
     return redirect(url_for("user.view_cards"))
 
 
-
 @user_bp.route("/cart")
 @login_required
 def view_cart():
@@ -232,5 +231,4 @@ def view_cart():
 
     total_price = sum(item.card.price * item.quantity for item in cart_items)
     return render_template("cart.html", grouped_cart=grouped_cart, total_price=total_price)
-
 

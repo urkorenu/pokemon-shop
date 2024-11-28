@@ -6,7 +6,12 @@
     <hr>
     {% if grouped_cart %}
         {% for seller_id, items in grouped_cart.items() %}
-            <h4>Seller: {{ items[0].card.uploader.username }}</h4>
+            <h4>
+                Seller: 
+                <a href="{{ url_for('user.profile', user_id=seller_id) }}" class="text-decoration-none">
+                    {{ items[0].card.uploader.username }}
+                </a>
+            </h4>
             <table class="table">
                 <thead>
                     <tr>
@@ -36,8 +41,33 @@
                             <form method="POST" action="{{ url_for('cart.remove_from_cart', cart_id=item.id) }}" class="d-inline">
                                 <button type="submit" class="btn btn-sm btn-danger">Remove</button>
                             </form>
+                            <button 
+                                type="button" 
+                                class="btn btn-sm btn-primary" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#cardModal{{ item.card.id }}">
+                                View Card
+                            </button>
                         </td>
                     </tr>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="cardModal{{ item.card.id }}" tabindex="-1" aria-labelledby="cardModalLabel{{ item.card.id }}" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="cardModalLabel{{ item.card.id }}">{{ item.card.name }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <img src="{{ item.card.image_url }}" alt="{{ item.card.name }}" class="img-fluid">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     {% endfor %}
                 </tbody>
             </table>
