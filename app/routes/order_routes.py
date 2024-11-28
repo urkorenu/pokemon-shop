@@ -10,16 +10,23 @@ order_bp = Blueprint("order", __name__)
 @login_required
 def place_order(card_id):
     card = Card.query.get_or_404(card_id)
-    if card.seller_id == current_user.id:
+    if card.uploader_id == current_user.id:
         flash("You cannot order your own card.", "error")
         return redirect(url_for("user.view_cards"))
-    
-    order = Order(buyer_id=current_user.id, card_id=card_id)
+
+    # Ensure seller_id is fetched from the card uploader
+    seller_id = card.uploader_id
+    if not seller_id:
+        flash("Seller information is missing for this card.", "error")
+        return redirect(url_for("user.view_cards"))
+
+    # Create the order with the seller_id
+    order = Order(buyer_id=current_user.id, seller_id=seller_id, status="Pending")
     db.session.add(order)
     db.session.commit()
 
     # Notify seller by email
-    seller = User.query.get(card.seller_id)
+    seller = User.query.get(seller_id)
     buyer = current_user
     send_email(
         recipient=seller.email,
@@ -33,6 +40,7 @@ def place_order(card_id):
 
     flash("Order placed successfully! The seller will contact you soon.", "success")
     return redirect(url_for("user.view_cards"))
+
 
 @order_bp.route("/confirm-order/<int:order_id>", methods=["POST"])
 @login_required
@@ -114,7 +122,40 @@ def submit_feedback(order_id):
 @login_required
 def my_orders():
     orders = Order.query.filter_by(buyer_id=current_user.id).all()
-    return render_template("my_orders.html", orders=orders)
+
+    orders_with_details = []
+    for order in orders:
+        # Query cards in the order using the order_cards table
+        cards = db.session.execute(
+            """
+            SELECT card.id, card.name, card.set_name, card.number, card.is_graded, card.grade, card.price
+            FROM card
+            INNER JOIN order_cards ON card.id = order_cards.card_id
+            WHERE order_cards.order_id = :order_id
+            """,
+            {"order_id": order.id},
+        ).fetchall()
+
+        # Calculate total price
+        total_price = sum(card.price for card in cards)
+
+        # Add seller and other details
+        seller = User.query.get(order.seller_id)
+
+        orders_with_details.append({
+            "id": order.id,
+            "seller": seller,
+            "seller_id": seller.id,
+            "created_at": order.created_at,
+            "cards": cards,
+            "total_price": total_price,
+            "status": order.status,
+            "feedback": order.feedback,
+            "rating": order.rating,
+        })
+
+    return render_template("my_orders.html", orders=orders_with_details)
+
 
 
 @order_bp.route("/pending-orders")
@@ -141,11 +182,15 @@ def pending_orders():
             {"order_id": order.id},
         ).fetchall()
 
+        # Calculate total price
+        total_price = sum(card.price for card in cards)
+
         orders_with_details.append({
             "id": order.id,
             "buyer": order.buyer,
             "created_at": order.created_at,
             "cards": cards,  # Contains the card details
+            "total_price": total_price,  # Pass total price
         })
 
     return render_template("pending_orders.html", orders=orders_with_details)
