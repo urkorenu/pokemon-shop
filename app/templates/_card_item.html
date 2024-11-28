@@ -31,7 +31,7 @@
             <div class="badge bg-info text-dark d-inline-block mb-2 px-3 py-2 rounded">
                 TCGPlayer Price: ${{ card.tcg_price if card.tcg_price else "N/A" }}
             </div>
-            <form method="POST" action="{{ url_for('cart.add_to_cart') }}">
+            <form method="POST" action="{{ url_for('user.add_to_cart') }}">
                 <input type="hidden" name="card_id" value="{{ card.id }}">
                 <button type="submit" class="btn btn-primary btn-sm w-100">Add to Cart</button>
             </form>

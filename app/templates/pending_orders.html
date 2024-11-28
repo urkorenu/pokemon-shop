@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Pending Orders</h2>
+    <hr>
+    {% if orders %}
+        {% for order in orders %}
+            <h4>Order ID: {{ order.id }}</h4>
+            <p>
+                <strong>Buyer:</strong>
+                <a href="{{ url_for('user.profile', user_id=order.buyer.id) }}">{{ order.buyer.username }}</a>
+            </p>
+            <p><strong>Date:</strong> {{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Card</th>
+                        <th>Set</th>
+                        <th>Card Number</th>
+                        <th>Grade</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% set total_price = 0 %}
+                    {% for card in order.cards %}
+                    <tr>
+                        <td>{{ card.name }}</td>
+                        <td>{{ card.set_name }}</td>
+                        <td>{{ card.number }}</td>
+                        <td>
+                            {% if card.is_graded %}
+                                {{ card.grade }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>{{ card.price }} ILS</td>
+                        {% set total_price = total_price + card.price %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <p class="text-end"><strong>Total Amount: {{ total_price }} ILS</strong></p>
+            <div class="text-end">
+                <form method="POST" action="{{ url_for('order.confirm_order', order_id=order.id) }}" class="d-inline">
+                    <button type="submit" class="btn btn-success">Confirm</button>
+                </form>
+                <form method="POST" action="{{ url_for('order.reject_order', order_id=order.id) }}" class="d-inline">
+                    <button type="submit" class="btn btn-danger">Reject</button>
+                </form>
+            </div>
+            <hr>
+        {% endfor %}
+    {% else %}
+        <p>No pending orders available.</p>
+    {% endif %}
+</div>
+{% endblock %}
+

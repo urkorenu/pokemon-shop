@@ -16,6 +16,13 @@
         <option value="{{ city }}">{{ city }}</option>
         {% endfor %}
     </select>
+    <label for="contact_preference">Contact Preference:</label>
+    <select id="contact_preference" name="contact_preference" required>
+        <option value="phone">Phone</option>
+        <option value="facebook">Facebook</option>
+    </select>
+    <label for="contact_details">Phone Number or Facebook Link:</label>
+    <input type="text" id="contact_details" name="contact_details" required>
     <button type="submit">Register</button>
 </form>
 {% endblock %}

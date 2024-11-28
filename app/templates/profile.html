@@ -5,6 +5,12 @@
     <h2 class="text-center mb-4">{{ user.username }}'s Profile</h2>
     <p><strong>Email:</strong> {{ user.email }}</p>
     <p><strong>Location:</strong> {{ user.location if user.location else "N/A" }}</p>
+    <h3>Feedback:</h3>
+    <ul>
+        {% for order in user.cards | map(attribute="orders") | selectattr("status", "equalto", "Completed") %}
+        <li>{{ order.feedback }} - Rating: {{ order.rating }}</li>
+        {% endfor %}
+    </ul>
 
     <!-- Include the Search Form -->
     {% include "_search_form.html" %}

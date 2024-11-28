@@ -6,9 +6,6 @@ __pycache__/
 env/
 .venv/
 
-# Flask-Migrate files
-migrations/
-
 # Docker
 *.log
 *.pid
