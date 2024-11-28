@@ -15,16 +15,32 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.10.12
+
       - name: Install Dependencies
         run: |
-          pip install flake8
-      - name: Run Linting
+          pip install flake8 black
+
+      - name: Run Black (Apply Formatting)
+        run: |
+          black .
+
+      - name: Run Flake8 (Linting)
         run: |
           flake8 --exit-zero .
+
+      - name: Commit and Push Changes
+        if: success() && github.event_name == 'pull_request'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Apply black formatting via GitHub Actions" || echo "No changes to commit"
+          git push origin HEAD:${{ github.head_ref }}
 
   test:
     name: Run Tests
