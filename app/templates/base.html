@@ -153,6 +153,21 @@
         {% endwith %}
     </div>
 
+    <!-- Card View Modal -->
+    <div class="modal fade" id="cardViewModal" tabindex="-1" aria-labelledby="cardViewModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+	<div class="modal-content">
+	  <div class="modal-header">
+	    <h5 class="modal-title" id="cardViewModalLabel">Card Preview</h5>
+	    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	  </div>
+	  <div class="modal-body text-center">
+	    <img id="cardImage" src="" alt="Card Image" class="img-fluid">
+	  </div>
+	</div>
+      </div>
+    </div>
+
     <!-- Main Content -->
     <div class="container">
         {% block content %}
@@ -169,6 +184,13 @@
     <script>
         const darkModeSwitch = document.getElementById('darkModeSwitch');
         const darkModeLabel = document.getElementById('darkModeLabel');
+
+	  // JavaScript to set the modal's image source
+	function showCardImage(imageUrl) {
+	    document.getElementById('cardImage').src = imageUrl;
+	    const modal = new bootstrap.Modal(document.getElementById('cardViewModal'));
+	    modal.show();
+	  }
 
         function applyTheme(theme) {
             document.body.classList.toggle('bg-dark', theme === 'dark');

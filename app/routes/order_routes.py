@@ -1,7 +1,7 @@
 # order_routes.py
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_required, current_user
-from ..models import db, Order, Card, User
+from ..models import db, Order, Card, User, order_cards
 from ..mail_service import send_email
 
 order_bp = Blueprint("order", __name__)
@@ -118,6 +118,7 @@ def submit_feedback(order_id):
     flash("Thank you for your feedback!", "success")
     return redirect(url_for("order.my_orders"))
 
+
 @order_bp.route("/my-orders")
 @login_required
 def my_orders():
@@ -125,16 +126,13 @@ def my_orders():
 
     orders_with_details = []
     for order in orders:
-        # Query cards in the order using the order_cards table
-        cards = db.session.execute(
-            """
-            SELECT card.id, card.name, card.set_name, card.number, card.is_graded, card.grade, card.price
-            FROM card
-            INNER JOIN order_cards ON card.id = order_cards.card_id
-            WHERE order_cards.order_id = :order_id
-            """,
-            {"order_id": order.id},
-        ).fetchall()
+        # Fetch cards in the order using ORM relationships
+        cards = (
+            db.session.query(Card)
+            .join(order_cards, Card.id == order_cards.c.card_id)
+            .filter(order_cards.c.order_id == order.id)
+            .all()
+        )
 
         # Calculate total price
         total_price = sum(card.price for card in cards)
@@ -147,7 +145,7 @@ def my_orders():
             "seller": seller,
             "seller_id": seller.id,
             "created_at": order.created_at,
-            "cards": cards,
+            "cards": cards,  # ORM objects with attributes
             "total_price": total_price,
             "status": order.status,
             "feedback": order.feedback,
@@ -155,7 +153,6 @@ def my_orders():
         })
 
     return render_template("my_orders.html", orders=orders_with_details)
-
 
 
 @order_bp.route("/pending-orders")
@@ -168,19 +165,15 @@ def pending_orders():
     # Fetch pending orders for the current seller
     pending_orders = Order.query.filter_by(seller_id=current_user.id, status="Pending").all()
 
-    # Process orders for template
     orders_with_details = []
     for order in pending_orders:
-        # Query cards in the order using the order_cards table
-        cards = db.session.execute(
-            """
-            SELECT card.id, card.name, card.set_name, card.number, card.is_graded, card.grade, card.price
-            FROM card
-            INNER JOIN order_cards ON card.id = order_cards.card_id
-            WHERE order_cards.order_id = :order_id
-            """,
-            {"order_id": order.id},
-        ).fetchall()
+        # Fetch cards in the order using ORM relationships
+        cards = (
+            db.session.query(Card)
+            .join(order_cards, Card.id == order_cards.c.card_id)
+            .filter(order_cards.c.order_id == order.id)
+            .all()
+        )
 
         # Calculate total price
         total_price = sum(card.price for card in cards)
@@ -189,8 +182,8 @@ def pending_orders():
             "id": order.id,
             "buyer": order.buyer,
             "created_at": order.created_at,
-            "cards": cards,  # Contains the card details
-            "total_price": total_price,  # Pass total price
+            "cards": cards,  # ORM objects with attributes
+            "total_price": total_price,
         })
 
     return render_template("pending_orders.html", orders=orders_with_details)
