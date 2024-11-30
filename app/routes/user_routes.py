@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from ..models import Card, Cart, db, User
+from ..models import Card, Cart, db, User, Order
 from flask_login import login_required, current_user
 from sqlalchemy.orm import joinedload
 import boto3
@@ -59,7 +59,6 @@ def view_cards():
     )
 
 
-
 @user_bp.route("/profile/<int:user_id>")
 def profile(user_id):
     user = User.query.get_or_404(user_id)
@@ -92,10 +91,19 @@ def profile(user_id):
 
     cards = query.all()
 
+    # Fetch feedback and ratings for the user's completed sales
+    completed_orders = (
+        db.session.query(User.username, Order.feedback, Order.rating)
+        .join(Order, Order.buyer_id == User.id)
+        .filter(Order.seller_id == user_id, Order.status == "Completed")
+        .all()
+    )
+
     return render_template(
         "profile.html",
         user=user,
         cards=cards,
+        feedback=completed_orders,
         unique_set_names=Card.query.distinct(Card.set_name).all(),
         include_location=False,  # Exclude location filter
     )
