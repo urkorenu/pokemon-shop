@@ -34,13 +34,16 @@ jobs:
           flake8 --exit-zero .
 
       - name: Commit and Push Changes
-        if: success() && github.event_name == 'pull_request'
+        if: success()
+        # if: success() && github.event_name == 'pull_request'
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin ${{ github.head_ref }}
+          git rebase origin/${{ github.head_ref }}
           git add .
           git commit -m "Apply black formatting via GitHub Actions" || echo "No changes to commit"
-          git push origin HEAD:${{ github.head_ref }}
+          git push --force-with-lease origin HEAD:${{ github.head_ref }}
 
   test:
     name: Run Tests
