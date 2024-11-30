@@ -52,68 +52,101 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('user.view_cards') }}">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
-                Pika-Card
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
-                    </li>
-                    {% if current_user.is_authenticated %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarUserMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Dashboard
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarUserMenu">
-                            <li><a class="dropdown-item" href="{{ url_for('user.profile', user_id=current_user.id) }}">My Profile</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('order.my_orders') }}">My Orders</a> <span class="badge rounded-pill">{{ orders_without_feedback }}</span></li>
-                            {% if current_user.role in ["uploader", "admin"] %}
-                            <li><a class="dropdown-item" href="{{ url_for('order.pending_orders') }}">Pending Orders</a> <span class="badge rounded-pill">{{ pending_orders }}</span></li>
-                            <li><a class="dropdown-item" href="{{ url_for('user.my_cards') }}">My Cards</a></li>
-                            <li><a class="dropdown-item" href="/admin/upload">Upload</a></li>
-                            {% endif %}
-                        </ul>
-                    </li>
-                    {% endif %}
-                </ul>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+	    <div class="container-fluid">
+		<!-- Brand -->
+		<a class="navbar-brand" href="{{ url_for('user.view_cards') }}">
+		    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="width: 40px;">
+		    Pika-Card
+		</a>
 
-                <ul class="navbar-nav ms-auto">
-                    {% if current_user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/cart">
-                            Cart <span class="badge rounded-pill">{{ cart_items_count }}</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <span class="nav-link disabled">Welcome, {{ current_user.username }}!</span>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/auth/logout">Logout</a>
-                    </li>
-                    {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/auth/register">Register</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/auth/login">Login</a>
-                    </li>
-                    {% endif %}
-                </ul>
+		<!-- Toggler Button for Mobile -->
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+		    <span class="navbar-toggler-icon"></span>
+		</button>
 
-                <button id="darkModeSwitch" class="btn btn-outline-primary ms-3">
-                    <i class="bi bi-moon"></i>
-                </button>
-            </div>
-        </div>
-    </nav>
+		<!-- Navbar Content -->
+		<div class="collapse navbar-collapse" id="navbarNav">
+		    <!-- Left-Aligned Links -->
+		    <ul class="navbar-nav me-auto">
+			<li class="nav-item">
+			    <a class="nav-link" href="/">Home</a>
+			</li>
+			{% if current_user.is_authenticated %}
+			<li class="nav-item dropdown">
+			    <a class="nav-link dropdown-toggle" href="#" id="navbarUserMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+				Dashboard
+			    </a>
+			    <ul class="dropdown-menu" aria-labelledby="navbarUserMenu">
+				<li>
+				    <a class="dropdown-item" href="{{ url_for('user.profile', user_id=current_user.id) }}">
+					My Profile
+				    </a>
+				</li>
+				<li>
+				    <a class="dropdown-item" href="{{ url_for('auth.account') }}">
+					My Account
+				    </a>
+				</li>
+				<li>
+				<li>
+				    <a class="dropdown-item" href="{{ url_for('order.my_orders') }}">
+					My Orders 
+					<span class="badge bg-warning text-dark rounded-pill">{{ orders_without_feedback }}</span>
+				    </a>
+				</li>
+				{% if current_user.role in ["uploader", "admin"] %}
+				<li>
+				    <a class="dropdown-item" href="{{ url_for('order.pending_orders') }}">
+					Pending Orders 
+					<span class="badge bg-danger rounded-pill">{{ pending_orders }}</span>
+				    </a>
+				</li>
+				<li>
+				    <a class="dropdown-item" href="{{ url_for('user.my_cards') }}">My Cards</a>
+				</li>
+				<li>
+				    <a class="dropdown-item" href="/admin/upload">Upload</a>
+				</li>
+				{% endif %}
+			    </ul>
+			</li>
+			{% endif %}
+		    </ul>
+
+		    <!-- Right-Aligned Links -->
+		    <ul class="navbar-nav ms-auto">
+			{% if current_user.is_authenticated %}
+			<li class="nav-item">
+			    <a class="nav-link" href="/cart">
+				<i class="bi bi-cart-fill"></i> Cart 
+				<span class="badge bg-success rounded-pill">{{ cart_items_count }}</span>
+			    </a>
+			</li>
+			<li class="nav-item">
+			    <span class="nav-link disabled">Welcome, {{ current_user.username }}!</span>
+			</li>
+			<li class="nav-item">
+			    <a class="nav-link" href="/auth/logout">Logout</a>
+			</li>
+			{% else %}
+			<li class="nav-item">
+			    <a class="nav-link" href="/auth/register">Register</a>
+			</li>
+			<li class="nav-item">
+			    <a class="nav-link" href="/auth/login">Login</a>
+			</li>
+			{% endif %}
+		    </ul>
+
+		    <!-- Dark Mode Toggle -->
+		    <button id="darkModeSwitch" class="btn btn-outline-primary ms-3">
+			<i class="bi bi-moon"></i>
+		    </button>
+		</div>
+	    </div>
+	</nav>
+
 
     <!-- Flash Messages -->
     <div class="container mt-3">
