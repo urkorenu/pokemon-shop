@@ -6,7 +6,12 @@
     <hr>
     {% if grouped_cart %}
         {% for seller_id, items in grouped_cart.items() %}
-            <h4>Seller: {{ items[0].card.uploader.username }}</h4>
+            <h4>
+                Seller:
+                <a href="{{ url_for('user.profile', user_id=seller_id) }}" class="text-decoration-none">
+                    {{ items[0].card.uploader.username }}
+                </a>
+            </h4>
             <table class="table">
                 <thead>
                     <tr>
@@ -36,6 +41,12 @@
                             <form method="POST" action="{{ url_for('cart.remove_from_cart', cart_id=item.id) }}" class="d-inline">
                                 <button type="submit" class="btn btn-sm btn-danger">Remove</button>
                             </form>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-primary"
+                                onclick="showCardImage('{{ item.card.image_url }}', '{{ item.card.name }}')">
+                                View Card
+                            </button>
                         </td>
                     </tr>
                     {% endfor %}

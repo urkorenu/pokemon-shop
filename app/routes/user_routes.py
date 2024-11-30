@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from ..models import Card, Cart, db, User
+from ..models import Card, Cart, db, User, Order
 from flask_login import login_required, current_user
 from sqlalchemy.orm import joinedload
 import boto3
@@ -59,7 +59,6 @@ def view_cards():
     )
 
 
-
 @user_bp.route("/profile/<int:user_id>")
 def profile(user_id):
     user = User.query.get_or_404(user_id)
@@ -92,10 +91,19 @@ def profile(user_id):
 
     cards = query.all()
 
+    # Fetch feedback and ratings for the user's completed sales
+    completed_orders = (
+        db.session.query(User.username, Order.feedback, Order.rating)
+        .join(Order, Order.buyer_id == User.id)
+        .filter(Order.seller_id == user_id, Order.status == "Completed")
+        .all()
+    )
+
     return render_template(
         "profile.html",
         user=user,
         cards=cards,
+        feedback=completed_orders,
         unique_set_names=Card.query.distinct(Card.set_name).all(),
         include_location=False,  # Exclude location filter
     )
@@ -187,12 +195,33 @@ def delete_card(card_id):
 @login_required
 def add_to_cart():
     card_id = request.form.get("card_id")
-    user_id = current_user.id
-    quantity = request.form.get("quantity", 1)
-    cart_item = Cart(user_id=user_id, card_id=card_id, quantity=quantity)
-    db.session.add(cart_item)
-    db.session.commit()
+    card = Card.query.get_or_404(card_id)
+
+    # Check if the card is already in the cart
+    cart_item = Cart.query.filter_by(user_id=current_user.id, card_id=card.id).first()
+
+    if cart_item:
+        # Check if adding more exceeds the available amount
+        if cart_item.quantity < card.amount:
+            cart_item.quantity += 1
+            db.session.commit()
+            flash(f"{card.name} has been added to your cart.", "success")
+        else:
+            flash(
+                f"You cannot add more {card.name} cards. Only {card.amount} available.",
+                "danger",
+            )
+    else:
+        if card.amount > 0:
+            cart_item = Cart(user_id=current_user.id, card_id=card.id, quantity=1)
+            db.session.add(cart_item)
+            db.session.commit()
+            flash(f"{card.name} has been added to your cart.", "success")
+        else:
+            flash(f"{card.name} is out of stock.", "danger")
+
     return redirect(url_for("user.view_cards"))
+
 
 @user_bp.route("/cart")
 @login_required
@@ -210,5 +239,4 @@ def view_cart():
 
     total_price = sum(item.card.price * item.quantity for item in cart_items)
     return render_template("cart.html", grouped_cart=grouped_cart, total_price=total_price)
-
 

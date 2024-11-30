@@ -1,16 +1,36 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-    <h2 class="text-center mb-4">{{ user.username }}'s Profile</h2>
-    <p><strong>Email:</strong> {{ user.email }}</p>
-    <p><strong>Location:</strong> {{ user.location if user.location else "N/A" }}</p>
-    <h3>Feedback:</h3>
-    <ul>
-        {% for order in user.cards | map(attribute="orders") | selectattr("status", "equalto", "Completed") %}
-        <li>{{ order.feedback }} - Rating: {{ order.rating }}</li>
-        {% endfor %}
-    </ul>
+<div class="container mt-4">
+    <!-- User Info Section -->
+    <div class="row align-items-center mb-4">
+        <div class="col-md-9">
+            <h2>{{ user.username }}</h2>
+            <p><i class="bi bi-geo-alt-fill"></i> <strong>Location:</strong> {{ user.location if user.location else "N/A" }}</p>
+            <p><i class="bi bi-star-fill text-warning"></i> <strong>Rating:</strong> {{ "%.1f" | format(user.rating) if user.rating else "No ratings yet" }} ({{ user.feedback_count }} feedback)</p>
+        </div>
+    </div>
+
+    <!-- Feedback Section -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0"><i class="bi bi-chat-dots-fill"></i> Feedbacks</h3>
+        </div>
+        <div class="card-body">
+            {% if feedback %}
+                <ul class="list-group list-group-flush">
+                    {% for item in feedback %}
+                    <li class="list-group-item">
+                        <p class="mb-1"><strong>{{ item.username }}:</strong> {{ item.feedback }}</p>
+                        <p class="mb-0"><i class="bi bi-star-fill text-warning"></i> Rating: {{ item.rating }}</p>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">No feedback available yet.</p>
+            {% endif %}
+        </div>
+    </div>
 
     <!-- Include the Search Form -->
     {% include "_search_form.html" %}

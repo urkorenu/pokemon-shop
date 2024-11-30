@@ -2,7 +2,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 from flask_caching import Cache
 
 # Initialize extensions
@@ -21,15 +21,47 @@ def create_app():
     login_manager.init_app(app)
     cache.init_app(app)
 
-    # User loader function for Flask-Login
-    from app.models import User  # Import models here to avoid circular imports
+    # Import models after db is initialized to avoid circular imports
+    from app.models import Cart, Order, User  # Import models here
 
+    # User loader function for Flask-Login
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
 
     login_manager.login_view = "auth.login"
     login_manager.login_message = "Please log in to access this page."
+
+    # Context processor for injecting counts
+    @app.context_processor
+    def inject_counts():
+        if current_user.is_authenticated:
+            user_id = current_user.id
+            cart_items_count = cache.get(f"cart_count_{user_id}")
+            pending_orders = cache.get(f"pending_orders_{user_id}")
+            orders_without_feedback = cache.get(f"orders_without_feedback_{user_id}")
+
+            if cart_items_count is None:
+                cart_items_count = Cart.query.filter_by(user_id=user_id).count()
+                cache.set(f"cart_count_{user_id}", cart_items_count, timeout=60)  # Cache for 60 seconds
+
+            if pending_orders is None and current_user.role in ["uploader", "admin"]:
+                pending_orders = Order.query.filter_by(seller_id=user_id, status="Pending").count()
+                cache.set(f"pending_orders_{user_id}", pending_orders, timeout=60)
+
+            if orders_without_feedback is None:
+                orders_without_feedback = Order.query.filter_by(buyer_id=user_id, status="Confirmed", feedback=None).count()
+                cache.set(f"orders_without_feedback_{user_id}", orders_without_feedback, timeout=60)
+        else:
+            cart_items_count = 0
+            pending_orders = 0
+            orders_without_feedback = 0
+
+        return {
+            "cart_items_count": cart_items_count,
+            "pending_orders": pending_orders,
+            "orders_without_feedback": orders_without_feedback,
+        }
 
     # Register blueprints
     from app.routes.user_routes import user_bp

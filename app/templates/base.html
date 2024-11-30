@@ -12,7 +12,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.9.1/font/bootstrap-icons.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <style>
-        /* Ensure the body stretches to fill the viewport */
         html, body {
             height: 100%;
             margin: 0;
@@ -23,7 +22,6 @@
             font-family: Arial, sans-serif;
         }
 
-        /* Navbar styling */
         .navbar {
             margin-bottom: 0;
         }
@@ -33,109 +31,122 @@
             height: auto;
         }
 
-        /* Main content takes up remaining space */
         .container {
             flex: 1;
             padding-top: 20px;
         }
 
-        /* Footer styling */
         .footer {
             background-color: #343a40;
             color: white;
             padding: 20px 0;
             text-align: center;
-            margin-top: auto; 
+            margin-top: auto;
         }
 
-        /* Card styling */
-        .card {
-            border: none;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .card-img-top {
-            border-bottom: 1px solid #ddd;
-            object-fit: cover;
-        }
-
-        #darkModeLabel {
-            font-weight: 500; 
+        .nav-item .badge {
+            background-color: #f44336;
+            font-size: 0.8rem;
+            vertical-align: top;
         }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('user.view_cards') }}">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
-                Pika-Card
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-		<ul class="navbar-nav me-auto mb-2 mb-lg-0">
-		    <li class="nav-item">
-			<a class="nav-link" href="/">Home</a>
-		    </li>
-		    {% if current_user.is_authenticated and current_user.role in ["admin", "uploader"] %}
-		    <li class="nav-item">
-			<a class="nav-link" href="/admin/upload">Upload</a>
-		    </li>
-		    <li class="nav-item">
-			<a class="nav-link" href="{{ url_for('user.my_cards') }}">My Cards</a>
-		    </li>
-		    {% endif %}
-		    {% if current_user.is_authenticated %}
-		    <li class="nav-item">
-			<a class="nav-link" href="{{ url_for('order.my_orders') }}">My Orders</a>
-		    </li>
-		    {% if current_user.role in ["uploader", "admin"] %}
-		    <li class="nav-item">
-			<a class="nav-link" href="{{ url_for('order.pending_orders') }}">Pending Orders</a>
-		    </li>
-		    {% endif %}
-		    {% endif %}
-		</ul>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+	    <div class="container-fluid">
+		<!-- Brand -->
+		<a class="navbar-brand" href="{{ url_for('user.view_cards') }}">
+		    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="width: 40px;">
+		    Pika-Card
+		</a>
 
-		<ul class="navbar-nav ms-auto align-items-center">
-		    {% if current_user.is_authenticated %}
+		<!-- Toggler Button for Mobile -->
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+		    <span class="navbar-toggler-icon"></span>
+		</button>
+
+		<!-- Navbar Content -->
+		<div class="collapse navbar-collapse" id="navbarNav">
+		    <!-- Left-Aligned Links -->
+		    <ul class="navbar-nav me-auto">
+			<li class="nav-item">
+			    <a class="nav-link" href="/">Home</a>
+			</li>
+			{% if current_user.is_authenticated %}
+			<li class="nav-item dropdown">
+			    <a class="nav-link dropdown-toggle" href="#" id="navbarUserMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+				Dashboard
+			    </a>
+			    <ul class="dropdown-menu" aria-labelledby="navbarUserMenu">
+				<li>
+				    <a class="dropdown-item" href="{{ url_for('user.profile', user_id=current_user.id) }}">
+					My Profile
+				    </a>
+				</li>
+				<li>
+				    <a class="dropdown-item" href="{{ url_for('auth.account') }}">
+					My Account
+				    </a>
+				</li>
+				<li>
+				<li>
+				    <a class="dropdown-item" href="{{ url_for('order.my_orders') }}">
+					My Orders 
+					<span class="badge bg-warning text-dark rounded-pill">{{ orders_without_feedback }}</span>
+				    </a>
+				</li>
+				{% if current_user.role in ["uploader", "admin"] %}
+				<li>
+				    <a class="dropdown-item" href="{{ url_for('order.pending_orders') }}">
+					Pending Orders 
+					<span class="badge bg-danger rounded-pill">{{ pending_orders }}</span>
+				    </a>
+				</li>
+				<li>
+				    <a class="dropdown-item" href="{{ url_for('user.my_cards') }}">My Cards</a>
+				</li>
+				<li>
+				    <a class="dropdown-item" href="/admin/upload">Upload</a>
+				</li>
+				{% endif %}
+			    </ul>
+			</li>
+			{% endif %}
+		    </ul>
+
+		    <!-- Right-Aligned Links -->
+		    <ul class="navbar-nav ms-auto">
+			{% if current_user.is_authenticated %}
+			<li class="nav-item">
+			    <a class="nav-link" href="/cart">
+				<i class="bi bi-cart-fill"></i> Cart 
+				<span class="badge bg-success rounded-pill">{{ cart_items_count }}</span>
+			    </a>
+			</li>
 			<li class="nav-item">
 			    <span class="nav-link disabled">Welcome, {{ current_user.username }}!</span>
 			</li>
 			<li class="nav-item">
 			    <a class="nav-link" href="/auth/logout">Logout</a>
 			</li>
-			<li class="nav-item">
-			    <a class="nav-link" href="/auth/account">My Account</a>
-			</li>
-		    {% else %}
+			{% else %}
 			<li class="nav-item">
 			    <a class="nav-link" href="/auth/register">Register</a>
 			</li>
 			<li class="nav-item">
 			    <a class="nav-link" href="/auth/login">Login</a>
 			</li>
-		    {% endif %}
-		    <li class="nav-item">
-			<a class="nav-link btn btn-outline-primary" href="/cart">Cart</a>
-		    </li>
-		</ul>
+			{% endif %}
+		    </ul>
 
-                <div class="d-flex align-items-center ms-3">
-                    <button id="darkModeSwitch" class="btn btn-outline-primary">
-                        <i class="bi bi-moon"></i>
-                    </button>
-                    <span id="darkModeLabel" class="text-primary ms-2">Dark Mode</span>
-                </div>
-            </div>
-        </div>
-    </nav>
+		    <!-- Dark Mode Toggle -->
+		    <button id="darkModeSwitch" class="btn btn-outline-primary ms-3">
+			<i class="bi bi-moon"></i>
+		    </button>
+		</div>
+	    </div>
+	</nav>
+
 
     <!-- Flash Messages -->
     <div class="container mt-3">
@@ -175,7 +186,6 @@
             document.body.classList.toggle('text-light', theme === 'dark');
             darkModeSwitch.classList.toggle('btn-primary', theme === 'dark');
             darkModeSwitch.classList.toggle('btn-outline-primary', theme === 'light');
-            darkModeLabel.textContent = theme === 'dark' ? 'Dark Mode' : 'Light Mode';
             localStorage.setItem('theme', theme);
         }
 
