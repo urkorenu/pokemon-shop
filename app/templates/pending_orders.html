@@ -50,7 +50,7 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <p class="text-end"><strong>Total Amount: {{ total_price }} ILS</strong></p>
+            <p class="text-end"><strong>Total Amount: {{ order.total_price }} ILS</strong></p>
             <div class="text-end">
                 <form method="POST" action="{{ url_for('order.confirm_order', order_id=order.id) }}" class="d-inline">
                     <button type="submit" class="btn btn-success">Confirm</button>
