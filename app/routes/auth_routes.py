@@ -17,7 +17,7 @@ def register():
         contact_preference = request.form.get("contact_preference")
         contact_details = request.form.get("contact_details")
 
-        if contact_preference not in ['phone', 'facebook'] or not contact_details:
+        if contact_preference not in ["phone", "facebook"] or not contact_details:
             flash("Invalid contact preference or details.", "error")
             return redirect(url_for("auth.register"))
 
@@ -37,8 +37,14 @@ def register():
             return redirect(url_for("auth.login"))
 
         # Create the new user
-        user = User(username=username, email=email, location=location, role="norma", contact_preference=contact_preference,
-    contact_details=contact_details)
+        user = User(
+            username=username,
+            email=email,
+            location=location,
+            role="norma",
+            contact_preference=contact_preference,
+            contact_details=contact_details,
+        )
         user.set_password(password)
         db.session.add(user)
 
