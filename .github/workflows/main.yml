@@ -33,9 +33,8 @@ jobs:
         run: |
           flake8 --exit-zero .
 
-        # if: success() && github.event_name == 'pull_request'
       - name: Commit and Push Changes
-        if: success()
+        if: success() && github.event_name == 'pull_request'
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
