@@ -191,6 +191,7 @@ def delete_card(card_id):
     flash("Card deleted successfully!", "success")
     return redirect(url_for("user.my_cards"))
 
+
 @user_bp.route("/cart", methods=["POST"])
 @login_required
 def add_to_cart():
@@ -238,5 +239,6 @@ def view_cart():
         grouped_cart[seller_id].append(item)
 
     total_price = sum(item.card.price * item.quantity for item in cart_items)
-    return render_template("cart.html", grouped_cart=grouped_cart, total_price=total_price)
-
+    return render_template(
+        "cart.html", grouped_cart=grouped_cart, total_price=total_price
+    )

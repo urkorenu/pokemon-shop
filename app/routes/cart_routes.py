@@ -5,6 +5,7 @@ from ..mail_service import send_email
 
 cart_bp = Blueprint("cart", __name__)
 
+
 @cart_bp.route("/view")
 @login_required
 def view_cart():
@@ -18,7 +19,9 @@ def view_cart():
         grouped_cart[seller_id].append(item)
 
     total_price = sum(item.card.price * item.quantity for item in cart_items)
-    return render_template("cart.html", grouped_cart=grouped_cart, total_price=total_price)
+    return render_template(
+        "cart.html", grouped_cart=grouped_cart, total_price=total_price
+    )
 
 
 @cart_bp.route("/remove/<int:cart_id>", methods=["POST"])
@@ -33,6 +36,7 @@ def remove_from_cart(cart_id):
     db.session.commit()
     flash("Item removed from cart.", "success")
     return redirect(url_for("cart.view_cart"))
+
 
 @cart_bp.route("/checkout", methods=["POST"])
 @login_required
@@ -65,7 +69,11 @@ def checkout():
             )
             db.session.execute(
                 insert_stmt,
-                {"order_id": order.id, "card_id": item.card_id, "quantity": item.quantity},
+                {
+                    "order_id": order.id,
+                    "card_id": item.card_id,
+                    "quantity": item.quantity,
+                },
             )
 
             # Notify the seller
@@ -73,11 +81,11 @@ def checkout():
             send_email(
                 recipient=seller.email,
                 subject="New Order Received",
-                body=f"You have received a new order containing the following cards:\n" +
-                     "\n".join(f"- {item.card.name} (x{item.quantity})" for item in items) +
-                     f"\n\nBuyer Details:\nName: {current_user.username}\n"
-                     f"Contact: {current_user.contact_details} ({current_user.contact_preference})\n"
-                     f"Please confirm the order in your dashboard."
+                body=f"You have received a new order containing the following cards:\n"
+                + "\n".join(f"- {item.card.name} (x{item.quantity})" for item in items)
+                + f"\n\nBuyer Details:\nName: {current_user.username}\n"
+                f"Contact: {current_user.contact_details} ({current_user.contact_preference})\n"
+                f"Please confirm the order in your dashboard.",
             )
 
     # Clear the cart
@@ -85,5 +93,3 @@ def checkout():
     db.session.commit()
     flash("Orders placed successfully! Sellers have been notified.", "success")
     return redirect(url_for("cart.view_cart"))
-
-

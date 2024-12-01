@@ -11,6 +11,7 @@ migrate = Migrate()
 login_manager = LoginManager()
 cache = Cache()
 
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object("config.Config")
@@ -43,15 +44,25 @@ def create_app():
 
             if cart_items_count is None:
                 cart_items_count = Cart.query.filter_by(user_id=user_id).count()
-                cache.set(f"cart_count_{user_id}", cart_items_count, timeout=60)  # Cache for 60 seconds
+                cache.set(
+                    f"cart_count_{user_id}", cart_items_count, timeout=60
+                )  # Cache for 60 seconds
 
             if pending_orders is None and current_user.role in ["uploader", "admin"]:
-                pending_orders = Order.query.filter_by(seller_id=user_id, status="Pending").count()
+                pending_orders = Order.query.filter_by(
+                    seller_id=user_id, status="Pending"
+                ).count()
                 cache.set(f"pending_orders_{user_id}", pending_orders, timeout=60)
 
             if orders_without_feedback is None:
-                orders_without_feedback = Order.query.filter_by(buyer_id=user_id, status="Confirmed", feedback=None).count()
-                cache.set(f"orders_without_feedback_{user_id}", orders_without_feedback, timeout=60)
+                orders_without_feedback = Order.query.filter_by(
+                    buyer_id=user_id, status="Confirmed", feedback=None
+                ).count()
+                cache.set(
+                    f"orders_without_feedback_{user_id}",
+                    orders_without_feedback,
+                    timeout=60,
+                )
         else:
             cart_items_count = 0
             pending_orders = 0
@@ -77,4 +88,3 @@ def create_app():
     app.register_blueprint(order_bp, url_prefix="/order")
 
     return app
-

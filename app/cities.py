@@ -1,3 +1,1 @@
-CITIES_IN_ISRAEL = [
-        "Center", "North", "South", "Haifa", "Jerusalem"
-]
+CITIES_IN_ISRAEL = ["Center", "North", "South", "Haifa", "Jerusalem"]

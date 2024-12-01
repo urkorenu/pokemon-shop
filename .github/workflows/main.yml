@@ -34,16 +34,32 @@ jobs:
           flake8 --exit-zero .
 
       - name: Commit and Push Changes
-        if: success()
-        # if: success() && github.event_name == 'pull_request'
+        if: success() && github.event_name == 'pull_request'
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch origin ${{ github.head_ref }}
-          git rebase origin/${{ github.head_ref }}
+          
+          # Define the branch name
+          BRANCH_NAME=${{ github.head_ref || github.ref_name }}
+      
+          # Stash any unstaged changes to ensure a clean rebase
+          git stash --include-untracked
+      
+          # Fetch and rebase the branch
+          git fetch origin $BRANCH_NAME
+          git rebase origin/$BRANCH_NAME
+      
+          # Reapply the stashed changes
+          git stash pop || echo "No stashed changes to apply"
+      
+          # Add and commit changes
           git add .
           git commit -m "Apply black formatting via GitHub Actions" || echo "No changes to commit"
-          git push --force-with-lease origin HEAD:${{ github.head_ref }}
+          
+          # Push changes
+          git push --force-with-lease origin HEAD:$BRANCH_NAME
+
+
 
   test:
     name: Run Tests

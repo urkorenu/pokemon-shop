@@ -1,6 +1,7 @@
 import boto3
 from botocore.exceptions import ClientError
 
+
 # Set up the SES client
 def send_email(subject, body, recipient, sender="orders@pika-card.store"):
     ses = boto3.client("ses", region_name="eu-north-1")  # Change to your SES region
@@ -20,5 +21,6 @@ def send_email(subject, body, recipient, sender="orders@pika-card.store"):
         print("Email sent! Message ID:", response["MessageId"])
     except ClientError as e:
         print("Error sending email:", e.response["Error"]["Message"])
+
 
 send_email("test", "this is a test mail", "ork14790@gmail.com")

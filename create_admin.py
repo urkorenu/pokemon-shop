@@ -11,7 +11,7 @@ with app.app_context():
 
     # Default contact information for admin
     contact_preference = "email"  # Assuming "email" as the default preference
-    contact_details = email       # Using the admin email as contact details
+    contact_details = email  # Using the admin email as contact details
 
     if not User.query.filter_by(email=email).first():
         admin = User(
@@ -19,7 +19,7 @@ with app.app_context():
             email=email,
             role="admin",
             contact_preference=contact_preference,
-            contact_details=contact_details
+            contact_details=contact_details,
         )
         admin.set_password(password)
         db.session.add(admin)
@@ -27,4 +27,3 @@ with app.app_context():
         print(f"Admin user {username} created successfully.")
     else:
         print(f"Admin user with email {email} already exists.")
-
