@@ -143,7 +143,7 @@ jobs:
           chmod -R 777 ./test-results
           ls -la ./test-results
 
-    - name: Debug: Check Test Results on EC2
+    - name:
       uses: appleboy/ssh-action@v0.1.10
       with:
         host: ${{ env.PUBLIC_IP }}
