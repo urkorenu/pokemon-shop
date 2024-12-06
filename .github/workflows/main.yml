@@ -62,7 +62,6 @@ jobs:
           # Push changes
           git push --force-with-lease origin HEAD:$BRANCH_NAME
 
-
   test:
     name: Run Tests on Dynamic EC2 Agent
     runs-on: ubuntu-latest
@@ -136,7 +135,7 @@ jobs:
 
           docker-compose --env-file <(printenv) up --build test
 
-          sudo chown -R ec2-user:ec2-user ./test-results
+          sudo chmod -R 755 ./test-results
           ls -la ./test-results
 
     - name: Check Test Results on EC2
@@ -185,6 +184,7 @@ jobs:
         aws ec2 terminate-instances --instance-ids ${{ env.INSTANCE_ID }}
         aws ec2 wait instance-terminated --instance-ids ${{ env.INSTANCE_ID }}
         echo "EC2 instance terminated."
+
 
 
   build:
