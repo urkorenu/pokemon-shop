@@ -115,7 +115,7 @@ jobs:
         script: |
           set -e
           echo "Starting test setup and execution..."
-
+          
           mkdir -p /home/ec2-user/git
           cd /home/ec2-user/git
           if [ -d "pokemon-shop" ]; then
@@ -124,9 +124,9 @@ jobs:
           fi
           git clone --branch dev2 https://github.com/urkorenu/pokemon-shop.git
           cd pokemon-shop
-
+          
           mkdir -p ./test-results
-
+          
           export DB_USERNAME=${{ secrets.DB_USERNAME }}
           export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
           export DB_HOST=${{ secrets.DB_HOST }}
@@ -136,14 +136,14 @@ jobs:
           export AWS_REGION=${{ secrets.AWS_REGION }}
           export S3_BUCKET=${{ secrets.S3_BUCKET }}
           export API_KEY=${{ secrets.API_KEY }}
-
+          
           docker-compose --env-file <(printenv) up --build test
-
-          # Fix permissions to ensure SCP works
-          chmod -R 777 ./test-results
+          
+          # Fix ownership to allow access by ec2-user
+          sudo chown -R ec2-user:ec2-user ./test-results
           ls -la ./test-results
 
-    - name:
+    - name: Check Test Results on EC2
       uses: appleboy/ssh-action@v0.1.10
       with:
         host: ${{ env.PUBLIC_IP }}
@@ -189,6 +189,7 @@ jobs:
         aws ec2 terminate-instances --instance-ids ${{ env.INSTANCE_ID }}
         aws ec2 wait instance-terminated --instance-ids ${{ env.INSTANCE_ID }}
         echo "EC2 instance terminated."
+    
 
   build:
     name: Build and Push Docker Image
