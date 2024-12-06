@@ -106,6 +106,10 @@ jobs:
         echo "PUBLIC_IP=${PUBLIC_IP}" >> $GITHUB_ENV
         echo "EC2 instance public IP: $PUBLIC_IP"
 
+    - name: Debug SSH Connection
+      run: |
+        ssh -i ${{ secrets.EC2_PRIVATE_KEY }} ec2-user@${{ env.PUBLIC_IP }} "echo 'SSH connection successful.'"
+
     - name: Run Tests on EC2
       uses: appleboy/ssh-action@v0.1.10
       with:
@@ -114,11 +118,17 @@ jobs:
         key: ${{ secrets.EC2_PRIVATE_KEY }}
         script: |
           set -e
+          echo "Starting test setup and execution..."
+
+          # Ensure Docker and dependencies are available
+          docker --version
+          docker-compose --version
 
           # Clone repository
           mkdir -p /home/ec2-user/git
           cd /home/ec2-user/git
           if [ -d "pokemon-shop" ]; then
+            echo "Removing existing repository directory..."
             rm -rf pokemon-shop
           fi
           git clone --branch dev2 https://github.com/urkorenu/pokemon-shop.git
@@ -126,8 +136,10 @@ jobs:
 
           # Create test-results directory
           mkdir -p ./test-results
+          ls -la ./test-results
 
           # Export environment variables for Docker Compose
+          echo "Setting environment variables..."
           export DB_USERNAME=${{ secrets.DB_USERNAME }}
           export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
           export DB_HOST=${{ secrets.DB_HOST }}
@@ -138,10 +150,12 @@ jobs:
           export S3_BUCKET=${{ secrets.S3_BUCKET }}
           export API_KEY=${{ secrets.API_KEY }}
 
-          # Pass environment variables dynamically to Docker Compose
+          # Run tests using Docker Compose
+          echo "Running tests using Docker Compose..."
           docker-compose --env-file <(printenv) up --build test
 
-          # Ensure test results are created
+          # Verify test results
+          echo "Verifying test results directory..."
           if [ ! -d "./test-results" ]; then
             echo "Test results directory does not exist."
             exit 1
@@ -151,6 +165,7 @@ jobs:
             exit 1
           fi
           echo "Test results are ready."
+          ls -la ./test-results
 
     - name: Download Test Results from EC2
       uses: appleboy/scp-action@v0.1.2
@@ -163,6 +178,7 @@ jobs:
 
     - name: Verify Test Results on Runner
       run: |
+        echo "Verifying downloaded test results on the runner..."
         if [ ! -d "./test-results" ]; then
           echo "Test results directory does not exist on the runner."
           exit 1
@@ -172,6 +188,7 @@ jobs:
           exit 1
         fi
         echo "Test results successfully downloaded."
+        ls -la ./test-results
 
     - name: Upload Test Results
       uses: actions/upload-artifact@v3
@@ -185,6 +202,7 @@ jobs:
         aws ec2 terminate-instances --instance-ids ${{ env.INSTANCE_ID }}
         aws ec2 wait instance-terminated --instance-ids ${{ env.INSTANCE_ID }}
         echo "EC2 instance terminated."
+
  
 
 
