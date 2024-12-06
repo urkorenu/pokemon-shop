@@ -64,54 +64,61 @@ jobs:
 
 
   test:
-      name: Run Tests on Dynamic EC2 Agent
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout Code
-          uses: actions/checkout@v3
+    name: Run Tests on Dynamic EC2 Agent
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-        - name: Set up AWS CLI
-          uses: aws-actions/configure-aws-credentials@v2
-          with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: eu-north-1
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-north-1
 
+      - name: Launch EC2 Instance
+        id: launch-ec2
+        run: |
+          INSTANCE_ID=$(aws ec2 run-instances \
+            --image-id ami-0fcbdd3ee4f67a0a0 \
+            --instance-type t3.micro \
+            --key-name kafka \
+            --security-group-ids sg-0010efc35354a2f24 \
+            --subnet-id subnet-01b84be40c8c42cfc \
+            --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=Test-Agent}]' \
+            --query 'Instances[0].InstanceId' \
+            --output text)
+          echo "INSTANCE_ID=${INSTANCE_ID}" >> $GITHUB_ENV
+          echo "EC2 instance launched: $INSTANCE_ID"
 
-        - name: Launch EC2 Instance
-          id: launch-ec2
-          run: |
-            INSTANCE_ID=$(aws ec2 run-instances \
-              --image-id ami-0fcbdd3ee4f67a0a0 \
-              --instance-type t3.micro \
-              --key-name kafka \
-              --security-group-ids sg-0010efc35354a2f24 \
-              --subnet-id subnet-01b84be40c8c42cfc \
-              --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=Test-Agent}]' \
-              --user-data file://ec2-user-data.sh \
-              --query 'Instances[0].InstanceId' \
-              --output text)
-            echo "INSTANCE_ID=${INSTANCE_ID}" >> $GITHUB_ENV
-            echo "EC2 instance launched: $INSTANCE_ID"
+      - name: Wait for Instance to be Running
+        run: |
+          aws ec2 wait instance-running --instance-ids ${{ env.INSTANCE_ID }}
+          echo "EC2 instance is running."
 
-        - name: Wait for Instance to be Running
-          run: |
-            aws ec2 wait instance-running --instance-ids ${{ env.INSTANCE_ID }}
-            echo "EC2 instance is running."
+      - name: Get Public IP Address
+        run: |
+          PUBLIC_IP=$(aws ec2 describe-instances \
+            --instance-ids ${{ env.INSTANCE_ID }} \
+            --query 'Reservations[0].Instances[0].PublicIpAddress' \
+            --output text)
+          echo "PUBLIC_IP=${PUBLIC_IP}" >> $GITHUB_ENV
+          echo "EC2 instance public IP: $PUBLIC_IP"
 
-        - name: Get Public IP Address
-          run: |
-            PUBLIC_IP=$(aws ec2 describe-instances \
-              --instance-ids ${{ env.INSTANCE_ID }} \
-              --query 'Reservations[0].Instances[0].PublicIpAddress' \
-              --output text)
-            echo "PUBLIC_IP=${PUBLIC_IP}" >> $GITHUB_ENV
-            echo "EC2 instance public IP: $PUBLIC_IP"
+      - name: Run Tests on EC2
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ env.PUBLIC_IP }}
+          username: ec2-user
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |
+            mkdir /home/ec2-user/git
+            cd /home/ec2-user/git/
+            git clone --branch dev2 https://github.com/urkorenu/pokemon-shop.git
+            cd pokemon-shop
 
-        - name: Generate User Data Script
-          run: |
-            cat <<EOF > ec2-user-data.sh
-            #!/bin/bash
+            # Export environment variables for Docker Compose
             export DB_USERNAME=${{ secrets.DB_USERNAME }}
             export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             export DB_HOST=${{ secrets.DB_HOST }}
@@ -122,50 +129,16 @@ jobs:
             export S3_BUCKET=${{ secrets.S3_BUCKET }}
             export API_KEY=${{ secrets.API_KEY }}
 
-            echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> /etc/environment
-            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> /etc/environment
-            echo "DB_HOST=${{ secrets.DB_HOST }}" >> /etc/environment
-            echo "DB_NAME=${{ secrets.DB_NAME }}" >> /etc/environment
-            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> /etc/environment
-            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> /etc/environment
-            echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> /etc/environment
-            echo "S3_BUCKET=${{ secrets.S3_BUCKET }}" >> /etc/environment
-            echo "API_KEY=${{ secrets.API_KEY }}" >> /etc/environment
+            # Pass environment variables dynamically to Docker Compose
+            docker-compose --env-file <(printenv) up --build test
 
-            touch /home/ec2-user/setup.log
-            EOF
+      - name: Terminate EC2 Instance
+        if: always()
+        run: |
+          aws ec2 terminate-instances --instance-ids ${{ env.INSTANCE_ID }}
+          aws ec2 wait instance-terminated --instance-ids ${{ env.INSTANCE_ID }}
+          echo "EC2 instance terminated."
 
-        - name: Wait for User Data Script Completion
-          run: sleep 30
-
-        - name: Run Tests on EC2
-          uses: appleboy/ssh-action@v0.1.10
-          with:
-            host: ${{ env.PUBLIC_IP }}
-            username: ec2-user
-            key: ${{ secrets.EC2_PRIVATE_KEY }}
-            script: |
-              cd /home/ec2-user/
-              if [ ! -f setup.log ]; then
-                echo "User data script did not complete yet"
-                sleep 30
-              fi
-              if [ ! -f setup.log ]; then
-                echo "User data script did not complete"
-                exit 1
-              fi
-              
-              git clone --branch dev2 https://github.com/urkorenu/pokemon-shop.git
-              cd pokemon-shop
-              docker-compose up --build test
-
-
-        - name: Terminate EC2 Instance
-          if: always()
-          run: |
-            aws ec2 terminate-instances --instance-ids ${{ env.INSTANCE_ID }}
-            aws ec2 wait instance-terminated --instance-ids ${{ env.INSTANCE_ID }}
-            echo "EC2 instance terminated."
 
 
 
