@@ -171,7 +171,7 @@ jobs:
                 exit 1
               fi
               
-              git clone --branch dev https://github.com/urkorenu/pokemon-shop.git
+              git clone --branch dev2 https://github.com/urkorenu/pokemon-shop.git
               cd pokemon-shop
               docker-compose up --build test
 
