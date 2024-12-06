@@ -31,5 +31,5 @@ services:
       S3_BUCKET: "${S3_BUCKET}"
       API_KEY: "${API_KEY}"
       PYTHONPATH: "./"
-    command: pytest --maxfail=5 --disable-warnings -q
+    command: pytest --disable-warnings -q
 
