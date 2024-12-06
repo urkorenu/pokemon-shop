@@ -77,55 +77,12 @@ jobs:
             aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
             aws-region: eu-north-1
 
-        - name: Generate User Data Script
-          run: |
-            cat <<EOF > ec2-user-data.sh
-            #!/bin/bash
-            exec > >(tee /var/log/user-data.log|logger -t user-data) 2>&1
-            yum update -y
-            yum install -y git docker
-
-            systemctl start docker
-            systemctl enable docker
-
-            DOCKER_COMPOSE_VERSION=2.22.0
-            curl -L "https://github.com/docker/compose/releases/download/v$DOCKER_COMPOSE_VERSION/docker-compose-\$(uname -s)-\$(uname -m)" -o /usr/local/bin/docker-compose
-            chmod +x /usr/local/bin/docker-compose
-
-            export DB_USERNAME=${{ secrets.DB_USERNAME }}
-            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            export DB_HOST=${{ secrets.DB_HOST }}
-            export DB_NAME=${{ secrets.DB_NAME }}
-            export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-            export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            export AWS_REGION=${{ secrets.AWS_REGION }}
-            export S3_BUCKET=${{ secrets.S3_BUCKET }}
-            export API_KEY=${{ secrets.API_KEY }}
-
-            echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> /etc/environment
-            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> /etc/environment
-            echo "DB_HOST=${{ secrets.DB_HOST }}" >> /etc/environment
-            echo "DB_NAME=${{ secrets.DB_NAME }}" >> /etc/environment
-            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> /etc/environment
-            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> /etc/environment
-            echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> /etc/environment
-            echo "S3_BUCKET=${{ secrets.S3_BUCKET }}" >> /etc/environment
-            echo "API_KEY=${{ secrets.API_KEY }}" >> /etc/environment
-
-            touch /home/ec2-user/setup.log
-            EOF
 
         - name: Launch EC2 Instance
           id: launch-ec2
           run: |
-            AMI_ID=$(aws ec2 describe-images \
-            --owners amazon \
-            --filters "Name=name,Values=amzn2-ami-hvm-2.*-x86_64-gp2" \
-            --query "Images[0].ImageId" \
-            --output text)
-            
             INSTANCE_ID=$(aws ec2 run-instances \
-              --image-id ${AMI_ID} \
+              --image-id ami-0fcbdd3ee4f67a0a0 \
               --instance-type t3.micro \
               --key-name kafka \
               --security-group-ids sg-0010efc35354a2f24 \
@@ -151,8 +108,35 @@ jobs:
             echo "PUBLIC_IP=${PUBLIC_IP}" >> $GITHUB_ENV
             echo "EC2 instance public IP: $PUBLIC_IP"
 
+        - name: Generate User Data Script
+          run: |
+            cat <<EOF > ec2-user-data.sh
+            #!/bin/bash
+            export DB_USERNAME=${{ secrets.DB_USERNAME }}
+            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            export DB_HOST=${{ secrets.DB_HOST }}
+            export DB_NAME=${{ secrets.DB_NAME }}
+            export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            export AWS_REGION=${{ secrets.AWS_REGION }}
+            export S3_BUCKET=${{ secrets.S3_BUCKET }}
+            export API_KEY=${{ secrets.API_KEY }}
+
+            echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" >> /etc/environment
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> /etc/environment
+            echo "DB_HOST=${{ secrets.DB_HOST }}" >> /etc/environment
+            echo "DB_NAME=${{ secrets.DB_NAME }}" >> /etc/environment
+            echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> /etc/environment
+            echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> /etc/environment
+            echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> /etc/environment
+            echo "S3_BUCKET=${{ secrets.S3_BUCKET }}" >> /etc/environment
+            echo "API_KEY=${{ secrets.API_KEY }}" >> /etc/environment
+
+            touch /home/ec2-user/setup.log
+            EOF
+
         - name: Wait for User Data Script Completion
-          run: sleep 60
+          run: sleep 30
 
         - name: Run Tests on EC2
           uses: appleboy/ssh-action@v0.1.10
