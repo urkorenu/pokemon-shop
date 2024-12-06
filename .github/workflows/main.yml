@@ -117,6 +117,7 @@ jobs:
             cd /home/ec2-user/git/
             git clone --branch dev2 https://github.com/urkorenu/pokemon-shop.git
             cd pokemon-shop
+            mkdir ./app/test-results
 
             # Export environment variables for Docker Compose
             export DB_USERNAME=${{ secrets.DB_USERNAME }}
