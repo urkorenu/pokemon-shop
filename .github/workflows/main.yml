@@ -133,10 +133,27 @@ jobs:
             # Pass environment variables dynamically to Docker Compose
             docker-compose --env-file <(printenv) up --build test
 
+      - name: Ensure Test Results Exist
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ env.PUBLIC_IP }}
+          username: ec2-user
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |
+            if [ ! -d "/home/ec2-user/pokemon-shop/test-results" ]; then
+              echo "Test results directory does not exist."
+              exit 1
+            fi
+            if [ -z "$(ls -A /home/ec2-user/pokemon-shop/test-results)" ]; then
+              echo "Test results directory is empty."
+              exit 1
+            fi
+
+
       - name: Download Test Results from EC2
         uses: appleboy/scp-action@v0.1.2
         with:
-          source: /home/ec2-user/pokemon-shop/test-results/
+          source: /home/ec2-user/pokemon-shop/test-results/*
           target: ./test-results/
           host: ${{ env.PUBLIC_IP }}
           username: ec2-user
