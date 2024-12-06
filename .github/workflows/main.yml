@@ -132,6 +132,21 @@ jobs:
             # Pass environment variables dynamically to Docker Compose
             docker-compose --env-file <(printenv) up --build test
 
+      - name: Download Test Results from EC2
+        uses: appleboy/scp-action@v0.1.2
+        with:
+          source: /home/ec2-user/pokemon-shop/test-results/
+          target: ./test-results/
+          host: ${{ env.PUBLIC_IP }}
+          username: ec2-user
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: ./test-results/
+
       - name: Terminate EC2 Instance
         if: always()
         run: |

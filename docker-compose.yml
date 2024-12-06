@@ -31,5 +31,7 @@ services:
       S3_BUCKET: "${S3_BUCKET}"
       API_KEY: "${API_KEY}"
       PYTHONPATH: "./"
-    command: pytest --disable-warnings -q
+    volumes:
+      - ./test-results:/app/test-results
+    command: pytest --disable-warnings --junitxml=/app/test-results/results.xml -q
 
