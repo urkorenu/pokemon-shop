@@ -116,11 +116,6 @@ jobs:
           set -e
           echo "Starting test setup and execution..."
 
-          # Ensure Docker and dependencies are available
-          docker --version
-          docker-compose --version
-
-          # Clone repository
           mkdir -p /home/ec2-user/git
           cd /home/ec2-user/git
           if [ -d "pokemon-shop" ]; then
@@ -130,12 +125,8 @@ jobs:
           git clone --branch dev2 https://github.com/urkorenu/pokemon-shop.git
           cd pokemon-shop
 
-          # Create test-results directory
           mkdir -p ./test-results
-          ls -la ./test-results
 
-          # Export environment variables for Docker Compose
-          echo "Setting environment variables..."
           export DB_USERNAME=${{ secrets.DB_USERNAME }}
           export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
           export DB_HOST=${{ secrets.DB_HOST }}
@@ -146,22 +137,21 @@ jobs:
           export S3_BUCKET=${{ secrets.S3_BUCKET }}
           export API_KEY=${{ secrets.API_KEY }}
 
-          # Run tests using Docker Compose
-          echo "Running tests using Docker Compose..."
           docker-compose --env-file <(printenv) up --build test
 
-          # Verify test results
-          echo "Verifying test results directory..."
-          if [ ! -d "./test-results" ]; then
-            echo "Test results directory does not exist."
-            exit 1
-          fi
-          if [ -z "$(ls -A ./test-results)" ]; then
-            echo "Test results directory is empty."
-            exit 1
-          fi
-          echo "Test results are ready."
+          # Fix permissions to ensure SCP works
+          chmod -R 777 ./test-results
           ls -la ./test-results
+
+    - name: Debug: Check Test Results on EC2
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: ${{ env.PUBLIC_IP }}
+        username: ec2-user
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        script: |
+          echo "Debugging test-results directory on EC2..."
+          ls -la /home/ec2-user/git/pokemon-shop/test-results/
 
     - name: Download Test Results from EC2
       uses: appleboy/scp-action@v0.1.2
@@ -171,6 +161,7 @@ jobs:
         host: ${{ env.PUBLIC_IP }}
         username: ec2-user
         key: ${{ secrets.EC2_PRIVATE_KEY }}
+        rm: true # Remove files after download for cleanup
 
     - name: Verify Test Results on Runner
       run: |
@@ -198,9 +189,6 @@ jobs:
         aws ec2 terminate-instances --instance-ids ${{ env.INSTANCE_ID }}
         aws ec2 wait instance-terminated --instance-ids ${{ env.INSTANCE_ID }}
         echo "EC2 instance terminated."
-
- 
-
 
   build:
     name: Build and Push Docker Image
