@@ -185,6 +185,7 @@ jobs:
         aws ec2 terminate-instances --instance-ids ${{ env.INSTANCE_ID }}
         aws ec2 wait instance-terminated --instance-ids ${{ env.INSTANCE_ID }}
         echo "EC2 instance terminated."
+ 
 
 
   build:
