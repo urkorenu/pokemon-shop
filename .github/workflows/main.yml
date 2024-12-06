@@ -62,6 +62,7 @@ jobs:
           # Push changes
           git push --force-with-lease origin HEAD:$BRANCH_NAME
 
+
   test:
     name: Run Tests on Dynamic EC2 Agent
     runs-on: ubuntu-latest
@@ -135,10 +136,20 @@ jobs:
 
           docker-compose --env-file <(printenv) up --build test
 
-          # Fix permissions and ownership for the test results
-          sudo chown ec2-user:ec2-user ./test-results/results.xml
-          sudo chmod 644 ./test-results/results.xml
+          echo "Test results directory contents:"
           ls -la ./test-results
+
+    - name: Ensure Test Results Exist
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: ${{ env.PUBLIC_IP }}
+        username: ec2-user
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        script: |
+          if [ ! -f "/home/ec2-user/git/pokemon-shop/test-results/results.xml" ]; then
+            echo "Test results file does not exist."
+            exit 1
+          fi
 
     - name: Check Test Results on EC2
       uses: appleboy/ssh-action@v0.1.10
