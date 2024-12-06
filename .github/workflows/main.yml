@@ -67,108 +67,125 @@ jobs:
     name: Run Tests on Dynamic EC2 Agent
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+    - name: Checkout Code
+      uses: actions/checkout@v3
 
-      - name: Set up AWS CLI
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-north-1
+    - name: Set up AWS CLI
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-north-1
 
-      - name: Launch EC2 Instance
-        id: launch-ec2
-        run: |
-          INSTANCE_ID=$(aws ec2 run-instances \
-            --image-id ami-0fcbdd3ee4f67a0a0 \
-            --instance-type t3.micro \
-            --key-name kafka \
-            --security-group-ids sg-0010efc35354a2f24 \
-            --subnet-id subnet-01b84be40c8c42cfc \
-            --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=Test-Agent}]' \
-            --query 'Instances[0].InstanceId' \
-            --output text)
-          echo "INSTANCE_ID=${INSTANCE_ID}" >> $GITHUB_ENV
-          echo "EC2 instance launched: $INSTANCE_ID"
+    - name: Launch EC2 Instance
+      id: launch-ec2
+      run: |
+        INSTANCE_ID=$(aws ec2 run-instances \
+          --image-id ami-0fcbdd3ee4f67a0a0 \
+          --instance-type t3.micro \
+          --key-name kafka \
+          --security-group-ids sg-0010efc35354a2f24 \
+          --subnet-id subnet-01b84be40c8c42cfc \
+          --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=Test-Agent}]' \
+          --query 'Instances[0].InstanceId' \
+          --output text)
+        echo "INSTANCE_ID=${INSTANCE_ID}" >> $GITHUB_ENV
+        echo "EC2 instance launched: $INSTANCE_ID"
 
-      - name: Wait for Instance to be Running
-        run: |
-          aws ec2 wait instance-running --instance-ids ${{ env.INSTANCE_ID }}
-          echo "EC2 instance is running."
+    - name: Wait for Instance to be Running
+      run: |
+        aws ec2 wait instance-running --instance-ids ${{ env.INSTANCE_ID }}
+        echo "EC2 instance is running."
 
-      - name: Get Public IP Address
-        run: |
-          PUBLIC_IP=$(aws ec2 describe-instances \
-            --instance-ids ${{ env.INSTANCE_ID }} \
-            --query 'Reservations[0].Instances[0].PublicIpAddress' \
-            --output text)
-          echo "PUBLIC_IP=${PUBLIC_IP}" >> $GITHUB_ENV
-          echo "EC2 instance public IP: $PUBLIC_IP"
+    - name: Get Public IP Address
+      run: |
+        PUBLIC_IP=$(aws ec2 describe-instances \
+          --instance-ids ${{ env.INSTANCE_ID }} \
+          --query 'Reservations[0].Instances[0].PublicIpAddress' \
+          --output text)
+        echo "PUBLIC_IP=${PUBLIC_IP}" >> $GITHUB_ENV
+        echo "EC2 instance public IP: $PUBLIC_IP"
 
-      - name: Run Tests on EC2
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ env.PUBLIC_IP }}
-          username: ec2-user
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          script: |
-            mkdir -p /home/ec2-user/git
-            cd /home/ec2-user/git/
-            if [ -d "pokemon-shop" ]; then
-              rm -rf pokemon-shop
-            fi
-            git clone --branch dev2 https://github.com/urkorenu/pokemon-shop.git
-            cd pokemon-shop
+    - name: Run Tests on EC2
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: ${{ env.PUBLIC_IP }}
+        username: ec2-user
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        script: |
+          set -e
 
-            # Create the test-results directory
-            mkdir -p ./test-results
+          # Clone repository
+          mkdir -p /home/ec2-user/git
+          cd /home/ec2-user/git
+          if [ -d "pokemon-shop" ]; then
+            rm -rf pokemon-shop
+          fi
+          git clone --branch dev2 https://github.com/urkorenu/pokemon-shop.git
+          cd pokemon-shop
 
-            # Export environment variables for Docker Compose
-            export DB_USERNAME=${{ secrets.DB_USERNAME }}
-            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            export DB_HOST=${{ secrets.DB_HOST }}
-            export DB_NAME=${{ secrets.DB_NAME }}
-            export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-            export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            export AWS_REGION=${{ secrets.AWS_REGION }}
-            export S3_BUCKET=${{ secrets.S3_BUCKET }}
-            export API_KEY=${{ secrets.API_KEY }}
+          # Create test-results directory
+          mkdir -p ./test-results
 
-            # Pass environment variables dynamically to Docker Compose
-            docker-compose --env-file <(printenv) up --build test
+          # Export environment variables for Docker Compose
+          export DB_USERNAME=${{ secrets.DB_USERNAME }}
+          export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          export DB_HOST=${{ secrets.DB_HOST }}
+          export DB_NAME=${{ secrets.DB_NAME }}
+          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          export AWS_REGION=${{ secrets.AWS_REGION }}
+          export S3_BUCKET=${{ secrets.S3_BUCKET }}
+          export API_KEY=${{ secrets.API_KEY }}
 
-            # Ensure test results are written
-            if [ ! -d "./test-results" ]; then
-              echo "Test results directory does not exist."
-              exit 1
-            fi
-            if [ -z "$(ls -A ./test-results)" ]; then
-              echo "Test results directory is empty."
-              exit 1
-            fi
+          # Pass environment variables dynamically to Docker Compose
+          docker-compose --env-file <(printenv) up --build test
 
-      - name: Download Test Results from EC2
-        uses: appleboy/scp-action@v0.1.2
-        with:
-          source: /home/ec2-user/git/pokemon-shop/test-results/*
-          target: ./test-results/
-          host: ${{ env.PUBLIC_IP }}
-          username: ec2-user
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          # Ensure test results are created
+          if [ ! -d "./test-results" ]; then
+            echo "Test results directory does not exist."
+            exit 1
+          fi
+          if [ -z "$(ls -A ./test-results)" ]; then
+            echo "Test results directory is empty."
+            exit 1
+          fi
+          echo "Test results are ready."
 
-      - name: Upload Test Results
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-results
-          path: ./test-results/
+    - name: Download Test Results from EC2
+      uses: appleboy/scp-action@v0.1.2
+      with:
+        source: /home/ec2-user/git/pokemon-shop/test-results/*
+        target: ./test-results/
+        host: ${{ env.PUBLIC_IP }}
+        username: ec2-user
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
 
-      - name: Terminate EC2 Instance
-        if: always()
-        run: |
-          aws ec2 terminate-instances --instance-ids ${{ env.INSTANCE_ID }}
-          aws ec2 wait instance-terminated --instance-ids ${{ env.INSTANCE_ID }}
-          echo "EC2 instance terminated."
+    - name: Verify Test Results on Runner
+      run: |
+        if [ ! -d "./test-results" ]; then
+          echo "Test results directory does not exist on the runner."
+          exit 1
+        fi
+        if [ -z "$(ls -A ./test-results)" ]; then
+          echo "Test results directory is empty on the runner."
+          exit 1
+        fi
+        echo "Test results successfully downloaded."
+
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: ./test-results/
+
+    - name: Terminate EC2 Instance
+      if: always()
+      run: |
+        aws ec2 terminate-instances --instance-ids ${{ env.INSTANCE_ID }}
+        aws ec2 wait instance-terminated --instance-ids ${{ env.INSTANCE_ID }}
+        echo "EC2 instance terminated."
+
 
   build:
     name: Build and Push Docker Image
