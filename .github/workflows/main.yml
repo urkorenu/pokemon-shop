@@ -117,7 +117,7 @@ jobs:
             cd /home/ec2-user/git/
             git clone --branch dev2 https://github.com/urkorenu/pokemon-shop.git
             cd pokemon-shop
-            mkdir ./app/test-results
+            mkdir -p ./test-results
 
             # Export environment variables for Docker Compose
             export DB_USERNAME=${{ secrets.DB_USERNAME }}
@@ -133,31 +133,15 @@ jobs:
             # Pass environment variables dynamically to Docker Compose
             docker-compose --env-file <(printenv) up --build test
 
-      - name: Ensure Test Results Exist
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ env.PUBLIC_IP }}
-          username: ec2-user
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          script: |
-            if [ ! -d "/home/ec2-user/pokemon-shop/test-results" ]; then
-              echo "Test results directory does not exist."
-              exit 1
-            fi
-            if [ -z "$(ls -A /home/ec2-user/pokemon-shop/test-results)" ]; then
-              echo "Test results directory is empty."
-              exit 1
-            fi
-
-
       - name: Download Test Results from EC2
         uses: appleboy/scp-action@v0.1.2
         with:
-          source: /home/ec2-user/pokemon-shop/test-results/*
+          source: /home/ec2-user/git/pokemon-shop/test-results/*
           target: ./test-results/
           host: ${{ env.PUBLIC_IP }}
           username: ec2-user
           key: ${{ secrets.EC2_PRIVATE_KEY }}
+
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v3

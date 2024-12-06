@@ -32,6 +32,6 @@ services:
       API_KEY: "${API_KEY}"
       PYTHONPATH: "./"
     volumes:
-      - ./test-results:/app/test-results
+      - /home/ec2-user/git/pokemon-shop/test-results:/app/test-results
     command: pytest --disable-warnings --junitxml=/app/test-results/results.xml -q
 
