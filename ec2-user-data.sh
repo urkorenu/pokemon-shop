@@ -19,18 +19,15 @@ chmod +x /usr/local/bin/docker-compose
 # Add ec2-user to the docker group
 usermod -aG docker ec2-user
 
-# Create an environment variables file
-cat <<EOF > /home/ec2-user/.env
-DB_USERNAME=${DB_USERNAME}
-DB_PASSWORD=${DB_PASSWORD}
-DB_HOST=${DB_HOST}
-DB_NAME=${DB_NAME}
-AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-AWS_REGION=${AWS_REGION}
-S3_BUCKET=${S3_BUCKET}
-API_KEY=${API_KEY}
-EOF
+export DB_USERNAME=${DB_USERNAME}
+export DB_PASSWORD=${DB_PASSWORD}
+export DB_HOST=${DB_HOST}
+export DB_NAME=${DB_NAME}
+export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+export AWS_REGION=${AWS_REGION}
+export S3_BUCKET=${S3_BUCKET}
+export API_KEY=${API_KEY}
 
 # Ensure the ec2-user owns the .env file
 chown ec2-user:ec2-user /home/ec2-user/.env
