@@ -1,6 +1,5 @@
 from flask_login import UserMixin
 from datetime import datetime
-from sqlalchemy import Table, Column, Integer, ForeignKey
 from app import db
 
 
