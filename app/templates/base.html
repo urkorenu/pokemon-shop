@@ -13,7 +13,7 @@
     <!-- Custom CSS -->
     <style>
         html, body {
-            height: 100%;
+            height: 100vh;
             margin: 0;
             padding: 0;
             display: flex;
@@ -48,6 +48,10 @@
             background-color: #f44336;
             font-size: 0.8rem;
             vertical-align: top;
+        }
+
+        .form-element {
+            margin-bottom: 5px;
         }
     </style>
 </head>
@@ -147,6 +151,11 @@
 	    </div>
 	</nav>
 
+    <!-- Main Content -->
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
 
     <!-- Flash Messages -->
     <div class="container mt-3">
@@ -162,12 +171,6 @@
         </div>
         {% endif %}
         {% endwith %}
-    </div>
-
-    <!-- Main Content -->
-    <div class="container">
-        {% block content %}
-        {% endblock %}
     </div>
 
     <!-- Footer -->

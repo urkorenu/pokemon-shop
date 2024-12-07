@@ -31,5 +31,7 @@ services:
       S3_BUCKET: "${S3_BUCKET}"
       API_KEY: "${API_KEY}"
       PYTHONPATH: "./"
-    command: pytest --maxfail=5 --disable-warnings -q
+    volumes:
+      - /home/ec2-user/git/pokemon-shop/test-results:/app/test-results
+    command: pytest --junitxml=/app/test-results/results.xml -q
 

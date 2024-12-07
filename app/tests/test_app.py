@@ -12,6 +12,7 @@ def test_app():
     app.config["TESTING"] = True
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
     app.config["SECRET_KEY"] = "test_secret"
+    app.config["CACHE_TYPE"] = "flask_caching.backends.NullCache"
 
     with app.app_context():
         db.create_all()  # Creates tables for the test
