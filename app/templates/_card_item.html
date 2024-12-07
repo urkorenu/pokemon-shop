@@ -1,16 +1,25 @@
 <div class="col-md-3 mb-4">
-    <div class="card shadow-sm position-relative">
+    <div class="card shadow-sm position-relative" id="card-{{ card.id }}">
         <!-- Upload Date Label -->
         <span class="badge bg-secondary position-absolute top-0 start-0 m-2">
             Uploaded: {{ card.uploaded_at.strftime('%Y-%m-%d') if card.uploaded_at else "N/A" }}
         </span>
-        <!-- Amount Badge -->
-        <span class="badge bg-primary position-absolute top-0 end-0 m-2">
-            x{{ card.amount }}
-        </span>
+
+        <!-- Admin Delete Button -->
+        {% if current_user.is_authenticated and current_user.role == "admin" %}
+        <form method="POST" action="{{ url_for('user.delete_card', card_id=card.id) }}">
+            <button type="submit" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2">
+                <i class="bi bi-trash"></i>
+            </button>
+        </form>
+        {% endif %}
+
+        <!-- Card Image -->
         <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}"
              style="height: 200px; object-fit: cover; cursor: pointer;"
              data-bs-toggle="modal" data-bs-target="#cardModal{{ card.id }}">
+
+        <!-- Card Body -->
         <div class="card-body">
             <h5 class="card-title">{{ card.name }}</h5>
             <p class="card-text">
@@ -23,22 +32,19 @@
                 <strong>Uploaded By:</strong>
                 <a href="{{ url_for('user.profile', user_id=card.uploader.id) }}">
                     {{ card.uploader.username }}
-                </a><br>
-                <strong>Uploader Location:</strong> {{ card.uploader.location if card.uploader.location else "N/A" }}<br>
+                </a>
                 {% endif %}
             </p>
-            <!-- TCGPlayer Price Badge -->
-            <div class="badge bg-info text-dark d-inline-block mb-2 px-3 py-2 rounded">
-                TCGPlayer Price: ${{ card.tcg_price if card.tcg_price else "N/A" }}
-            </div>
+
+            <!-- Add to Cart Button -->
             <form method="POST" action="{{ url_for('user.add_to_cart') }}">
                 <input type="hidden" name="card_id" value="{{ card.id }}">
-                <button type="submit" class="btn btn-primary btn-sm w-100">Add to Cart</button>
+                <button type="submit" class="btn btn-primary btn-sm w-100 mt-2">Add to Cart</button>
             </form>
         </div>
     </div>
 
-    <!-- Modal for More Details -->
+    <!-- Card Modal -->
     <div class="modal fade" id="cardModal{{ card.id }}" tabindex="-1" aria-labelledby="cardModalLabel{{ card.id }}" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -68,9 +74,56 @@
                         {% endif %}
                         <strong>TCGPlayer Price:</strong> ${{ card.tcg_price if card.tcg_price else "N/A" }}
                     </p>
+
+                    <!-- Report Button -->
+                    <button type="button" class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#reportModal{{ card.id }}">
+                        <i class="bi bi-flag"></i> Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Modal -->
+    <div class="modal fade" id="reportModal{{ card.id }}" tabindex="-1" aria-labelledby="reportModalLabel{{ card.id }}" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Report Card</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ url_for('user.report_card', card_id=card.id) }}">
+                        <label for="report_reason" class="form-label">Reason for report:</label>
+                        <select class="form-select" name="reason" required>
+                            <option value="bad picture">Bad Picture</option>
+                            <option value="misleading">Misleading Information</option>
+                            <option value="fake">Fake Card</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <textarea class="form-control mt-2" name="details" rows="3" placeholder="Additional details (optional)"></textarea>
+                        <button type="submit" class="btn btn-danger mt-3 w-100">Submit Report</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const darkMode = localStorage.getItem("theme") === "dark";
+        const cards = document.querySelectorAll('.card');
+
+        cards.forEach(card => {
+            if (darkMode) {
+                card.style.backgroundColor = "#343a40";
+                card.style.color = "#f8f9fa";
+            } else {
+                card.style.backgroundColor = "#ffffff";
+                card.style.color = "#000000";
+            }
+        });
+    });
+</script>
 

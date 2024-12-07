@@ -7,74 +7,70 @@ from ..cities import CITIES_IN_ISRAEL
 auth_bp = Blueprint("auth", __name__)
 
 
-@auth_bp.route("/register", methods=["GET", "POST"])
-def register():
+@auth_bp.route("/sign-in", methods=["GET", "POST"])
+def auth():
+    form_type = request.form.get("form_type")
+
     if request.method == "POST":
-        username = request.form.get("username")
-        email = request.form.get("email")
-        password = request.form.get("password")
-        location = request.form.get("location")
-        contact_preference = request.form.get("contact_preference")
-        contact_details = request.form.get("contact_details")
+        if form_type == "login":
+            email = request.form.get("email")
+            password = request.form.get("password")
+            user = User.query.filter_by(email=email).first()
 
-        if contact_preference not in ["phone", "facebook"] or not contact_details:
-            flash("Invalid contact preference or details.", "error")
-            return redirect(url_for("auth.register"))
+            if user and user.check_password(password):
+                login_user(user)
+                flash("Login successful!", "success")
+                return redirect(url_for("user.view_cards"))
 
-        # Validate form inputs
-        if not username or not email or not password or not location:
-            flash("All fields are required.", "error")
-            return redirect(url_for("auth.register"))
+            flash("Invalid email or password.", "error")
 
-        # Check if the username is already taken
-        if User.query.filter_by(username=username).first():
-            flash("Username already taken. Please choose a different one.", "error")
-            return redirect(url_for("auth.register"))
+        elif form_type == "register":
+            username = request.form.get("username")
+            email = request.form.get("email")
+            password = request.form.get("password")
+            location = request.form.get("location")
+            contact_preference = request.form.get("contact_preference")
+            contact_details = request.form.get("contact_details")
 
-        # Check if the email is already registered
-        if User.query.filter_by(email=email).first():
-            flash("Email already registered. Please log in.", "error")
-            return redirect(url_for("auth.login"))
+            if not username or not email or not password or not location:
+                flash("All fields are required.", "error")
+                return redirect(url_for("auth.auth"))
 
-        # Create the new user
-        user = User(
-            username=username,
-            email=email,
-            location=location,
-            role="norma",
-            contact_preference=contact_preference,
-            contact_details=contact_details,
-        )
-        user.set_password(password)
-        db.session.add(user)
+            if contact_preference not in ["phone", "facebook"] or not contact_details:
+                flash("Invalid contact preference or details.", "error")
+                return redirect(url_for("auth.auth"))
 
-        try:
-            db.session.commit()
-            flash("Registration successful! Please log in.", "success")
-            return redirect(url_for("auth.login"))
-        except Exception as e:
-            db.session.rollback()  # Roll back the transaction in case of errors
-            flash("An error occurred during registration. Please try again.", "error")
-            print(f"Error during registration: {e}")
+            if User.query.filter_by(username=username).first():
+                flash("Username already taken. Please choose a different one.", "error")
+                return redirect(url_for("auth.auth"))
 
-    return render_template("register.html", cities=CITIES_IN_ISRAEL)
+            if User.query.filter_by(email=email).first():
+                flash("Email already registered. Please log in.", "error")
+                return redirect(url_for("auth.auth"))
 
+            user = User(
+                username=username,
+                email=email,
+                location=location,
+                role="normal",
+                contact_preference=contact_preference,
+                contact_details=contact_details,
+            )
+            user.set_password(password)
+            db.session.add(user)
 
-@auth_bp.route("/login", methods=["GET", "POST"])
-def login():
-    if request.method == "POST":
-        email = request.form.get("email")
-        password = request.form.get("password")
-        user = User.query.filter_by(email=email).first()
+            try:
+                db.session.commit()
+                flash("Registration successful! Please log in.", "success")
+                return redirect(url_for("auth.auth"))
+            except Exception as e:
+                db.session.rollback()
+                flash(
+                    "An error occurred during registration. Please try again.", "error"
+                )
+                print(f"Error during registration: {e}")
 
-        # Check user existence and password
-        if user and user.check_password(password):
-            login_user(user)  # Log in the user
-            flash("Login successful!", "success")
-            return redirect(url_for("user.view_cards"))
-
-        flash("Invalid email or password.", "error")
-    return render_template("login.html")
+    return render_template("auth.html", cities=CITIES_IN_ISRAEL)
 
 
 @auth_bp.route("/logout")
@@ -82,7 +78,7 @@ def login():
 def logout():
     logout_user()
     flash("You have been logged out.", "success")
-    return redirect(url_for("auth.login"))
+    return redirect(url_for("auth.auth"))
 
 
 @auth_bp.route("/account", methods=["GET", "POST"])

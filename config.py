@@ -11,5 +11,6 @@ class Config:
     AWS_REGION = os.getenv("AWS_REGION")
     S3_BUCKET = os.getenv("S3_BUCKET")
     API_KEY = os.getenv("API_KEY")
+    ADMIN_MAIL = os.getenv("ADMIN_MAIL")
     CACHE_TYPE = "flask_caching.backends.SimpleCache"
     SQLALCHEMY_TRACK_MODIFICATIONS = False

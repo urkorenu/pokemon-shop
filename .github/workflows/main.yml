@@ -128,6 +128,7 @@ jobs:
           export AWS_REGION=${{ secrets.AWS_REGION }}
           export S3_BUCKET=${{ secrets.S3_BUCKET }}
           export API_KEY=${{ secrets.API_KEY }}
+          export ADMIN_MAIL=${{ secrets.ADMIN_MAIL }}
 
           docker-compose --env-file <(printenv) up --build test
 
@@ -201,6 +202,7 @@ jobs:
               \"export AWS_REGION=${{ secrets.AWS_REGION }}\",
               \"export S3_BUCKET=${{ secrets.S3_BUCKET }}\",
               \"export API_KEY=${{ secrets.API_KEY }}\",
+              \"export ADMIN_MAIL=${{ secrets.ADMIN_MAIL }}\",
 
               \"docker pull ${{ secrets.DOCKER_USERNAME }}/pokemon-shop:latest\",
 
