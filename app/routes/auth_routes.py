@@ -6,6 +6,7 @@ from ..cities import CITIES_IN_ISRAEL
 
 auth_bp = Blueprint("auth", __name__)
 
+
 @auth_bp.route("/sign-in", methods=["GET", "POST"])
 def auth():
     form_type = request.form.get("form_type")
@@ -64,7 +65,9 @@ def auth():
                 return redirect(url_for("auth.auth"))
             except Exception as e:
                 db.session.rollback()
-                flash("An error occurred during registration. Please try again.", "error")
+                flash(
+                    "An error occurred during registration. Please try again.", "error"
+                )
                 print(f"Error during registration: {e}")
 
     return render_template("auth.html", cities=CITIES_IN_ISRAEL)
@@ -76,6 +79,7 @@ def logout():
     logout_user()
     flash("You have been logged out.", "success")
     return redirect(url_for("auth.auth"))
+
 
 @auth_bp.route("/account", methods=["GET", "POST"])
 @login_required

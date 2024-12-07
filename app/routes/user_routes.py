@@ -193,6 +193,7 @@ def delete_card(card_id):
     flash("Card deleted successfully!", "success")
     return redirect(url_for("user.my_cards"))
 
+
 @user_bp.route("/report_card/<int:card_id>", methods=["POST"])
 @login_required
 def report_card(card_id):
@@ -204,7 +205,8 @@ def report_card(card_id):
     send_email(
         recipient=Config.ADMIN_MAIL,
         subject=f"Report: Card #{card.id} - {reason}",
-        body=f"Card Name: {card.name}\nReason: {reason}\nDetails: {details}\nUser: {current_user.username}")
+        body=f"Card Name: {card.name}\nReason: {reason}\nDetails: {details}\nUser: {current_user.username}",
+    )
 
     flash("Report submitted successfully. Admin will review it.", "success")
     return redirect(url_for("user.view_cards"))
