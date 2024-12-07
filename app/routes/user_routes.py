@@ -204,7 +204,7 @@ def report_card(card_id):
     send_email(
         recipient=Config.ADMIN_MAIL,
         subject=f"Report: Card #{card.id} - {reason}",
-        body=f"Card Name: {card.name}\nReason: {reason}\nDetails: {details}")
+        body=f"Card Name: {card.name}\nReason: {reason}\nDetails: {details}\nUser: {current_user.username}")
 
     flash("Report submitted successfully. Admin will review it.", "success")
     return redirect(url_for("user.view_cards"))
