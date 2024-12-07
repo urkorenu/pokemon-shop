@@ -5,6 +5,7 @@ from sqlalchemy.orm import joinedload
 import boto3
 from config import Config
 from ..cities import CITIES_IN_ISRAEL
+from ..mail_service import send_email
 
 
 user_bp = Blueprint("user", __name__)
@@ -155,7 +156,7 @@ def edit_card(card_id):
 def delete_card(card_id):
     card = Card.query.get_or_404(card_id)
 
-    if card.uploader_id != current_user.id:
+    if card.uploader_id != current_user.id and current_user.role != "admin":
         flash("You do not have permission to delete this card.", "danger")
         return redirect(url_for("user.my_cards"))
 
@@ -186,10 +187,27 @@ def delete_card(card_id):
             flash("Failed to delete the image from S3.", "danger")
 
     # Delete the card from the database
+    Cart.query.filter_by(card_id=card.id).delete()
     db.session.delete(card)
     db.session.commit()
     flash("Card deleted successfully!", "success")
     return redirect(url_for("user.my_cards"))
+
+@user_bp.route("/report_card/<int:card_id>", methods=["POST"])
+@login_required
+def report_card(card_id):
+    card = Card.query.get_or_404(card_id)
+    reason = request.form.get("reason")
+    details = request.form.get("details", "")
+
+    # Send an email to the admin (replace with your mail logic)
+    send_email(
+        recipient="ork14790@gmail.com",
+        subject=f"Report: Card #{card.id} - {reason}",
+        body=f"Card Name: {card.name}\nReason: {reason}\nDetails: {details}")
+
+    flash("Report submitted successfully. Admin will review it.", "success")
+    return redirect(url_for("user.view_cards"))
 
 
 @user_bp.route("/cart", methods=["POST"])
