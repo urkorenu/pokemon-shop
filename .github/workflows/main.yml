@@ -42,24 +42,18 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Define the branch name
           BRANCH_NAME=${{ github.head_ref || github.ref_name }}
       
-          # Stash any unstaged changes to ensure a clean rebase
           git stash --include-untracked
       
-          # Fetch and rebase the branch
           git fetch origin $BRANCH_NAME
           git rebase origin/$BRANCH_NAME
       
-          # Reapply the stashed changes
           git stash pop || echo "No stashed changes to apply"
       
-          # Add and commit changes
           git add .
           git commit -m "Apply black formatting via GitHub Actions" || echo "No changes to commit"
           
-          # Push changes
           git push --force-with-lease origin HEAD:$BRANCH_NAME
 
 
@@ -184,16 +178,46 @@ jobs:
     needs: build
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v0.1.10
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          script: |
-            IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/pokemon-shop:latest"
-            docker pull $IMAGE_NAME
-            docker stop pokemon-shop || true
-            docker rm pokemon-shop || true
-            docker run -d -p 5000:5000 --name pokemon-shop $IMAGE_NAME
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-north-1
+
+      - name: Deploy Using AWS SSM
+        run: |
+          aws ssm send-command \
+            --instance-ids ${{ secrets.EC2_INSTANCE_ID }} \
+            --document-name "AWS-RunShellScript" \
+            --comment "Deploying application" \
+            --parameters commands="[
+              \"export DB_USERNAME=${{ secrets.DB_USERNAME }}\",
+              \"export DB_PASSWORD=${{ secrets.DB_PASSWORD }}\",
+              \"export DB_HOST=${{ secrets.DB_HOST }}\",
+              \"export DB_NAME=${{ secrets.DB_NAME }}\",
+              \"export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}\",
+              \"export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}\",
+              \"export AWS_REGION=${{ secrets.AWS_REGION }}\",
+              \"export S3_BUCKET=${{ secrets.S3_BUCKET }}\",
+              \"export API_KEY=${{ secrets.API_KEY }}\",
+
+              \"docker pull ${{ secrets.DOCKER_USERNAME }}/pokemon-shop:latest\",
+
+              \"cd /home/ec2-user/\",
+              \"if [ -d pokemon-shop ]; then cd pokemon-shop && git pull; else git clone -b main https://github.com/urkorenu/pokemon-shop.git && cd pokemon-shop; fi\",
+
+              \"docker stop pokemon-shop-app-1 || true\",
+              \"docker rm pokemon-shop-app-1 || true\",
+
+              \"docker-compose pull\",
+
+              \"docker-compose --env-file <(printenv) up app -d\",
+
+              \"docker ps --filter name=pokemon-shop-app-1 --format '{{.Status}}'\"
+            ]" \
+            --output text
+
+
+
 
