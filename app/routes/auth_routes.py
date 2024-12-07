@@ -6,7 +6,7 @@ from ..cities import CITIES_IN_ISRAEL
 
 auth_bp = Blueprint("auth", __name__)
 
-@auth_bp.route("/auth", methods=["GET", "POST"])
+@auth_bp.route("/sign-in", methods=["GET", "POST"])
 def auth():
     form_type = request.form.get("form_type")
 
@@ -75,7 +75,7 @@ def auth():
 def logout():
     logout_user()
     flash("You have been logged out.", "success")
-    return redirect(url_for("auth.auth"))
+    return redirect(url_for("auth.sign-in"))
 
 @auth_bp.route("/account", methods=["GET", "POST"])
 @login_required
