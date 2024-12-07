@@ -148,6 +148,22 @@
 	    </div>
 	</nav>
 
+    <!-- Card View Modal -->
+    <div class="modal fade" id="cardViewModal" tabindex="-1" aria-labelledby="cardViewModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+	    <div class="modal-content">
+		<div class="modal-header">
+		    <h5 class="modal-title" id="modalCardTitle">Card</h5>
+		    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		</div>
+		<div class="modal-body text-center">
+		    <img id="cardImage" src="" alt="Card Image" class="img-fluid">
+		</div>
+	    </div>
+	</div>
+    </div>
+
+
     <!-- Main Content -->
     <div class="container">
         {% block content %}
@@ -188,6 +204,14 @@
             darkModeSwitch.classList.toggle('btn-outline-primary', theme === 'light');
             localStorage.setItem('theme', theme);
         }
+
+	function showCardImage(imageUrl, cardName) {
+	    document.getElementById('cardImage').src = imageUrl;
+	    document.getElementById('modalCardTitle').innerText = cardName || "Card";
+	    const modal = new bootstrap.Modal(document.getElementById('cardViewModal'));
+	    modal.show();
+	}
+
 
         const savedTheme = localStorage.getItem('theme') || 'light';
         applyTheme(savedTheme);
