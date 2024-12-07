@@ -202,7 +202,7 @@ def report_card(card_id):
 
     # Send an email to the admin (replace with your mail logic)
     send_email(
-        recipient="ork14790@gmail.com",
+        recipient=Config.ADMIN_MAIL,
         subject=f"Report: Card #{card.id} - {reason}",
         body=f"Card Name: {card.name}\nReason: {reason}\nDetails: {details}")
 

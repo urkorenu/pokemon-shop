@@ -14,6 +14,7 @@ services:
       AWS_REGION: "${AWS_REGION}"
       S3_BUCKET: "${S3_BUCKET}"
       API_KEY: "${API_KEY}"
+      ADMIN_MAIL: "${ADMIN_MAIL}"
       PYTHONPATH: "./"
   test:
     build: .
@@ -30,6 +31,7 @@ services:
       AWS_REGION: "${AWS_REGION}"
       S3_BUCKET: "${S3_BUCKET}"
       API_KEY: "${API_KEY}"
+      ADMIN_MAIL: "${ADMIN_MAIL}"
       PYTHONPATH: "./"
     volumes:
       - /home/ec2-user/git/pokemon-shop/test-results:/app/test-results
