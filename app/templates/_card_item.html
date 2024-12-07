@@ -95,13 +95,17 @@
                 <div class="modal-body">
                     <form method="POST" action="{{ url_for('user.report_card', card_id=card.id) }}">
                         <label for="report_reason" class="form-label">Reason for report:</label>
-                        <select class="form-select" name="reason" required>
-                            <option value="inappropriate">Inappropriate Content</option>
-                            <option value="misleading">Misleading Information</option>
-                            <option value="duplicate">Duplicate Listing</option>
-                            <option value="other">Other</option>
-                        </select>
-                        <textarea class="form-control mt-2" name="details" rows="3" placeholder="Additional details (optional)"></textarea>
+                        <label>
+                            <select class="form-select" name="reason" required>
+                                <option value="bad picture">Bad Picture</option>
+                                <option value="misleading">Misleading Information</option>
+                                <option value="fake">Fake Card</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </label>
+                        <label>
+                            <textarea class="form-control mt-2" name="details" rows="3" placeholder="Additional details (optional)"></textarea>
+                        </label>
                         <button type="submit" class="btn btn-danger mt-3 w-100">Submit Report</button>
                     </form>
                 </div>
