@@ -75,7 +75,7 @@ def auth():
 def logout():
     logout_user()
     flash("You have been logged out.", "success")
-    return redirect(url_for("auth.sign-in"))
+    return redirect(url_for("auth.auth"))
 
 @auth_bp.route("/account", methods=["GET", "POST"])
 @login_required
