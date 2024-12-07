@@ -18,7 +18,6 @@
             padding: 0;
             display: flex;
             flex-direction: column;
-            background-color: #f8f9fa;
             font-family: Arial, sans-serif;
         }
 
@@ -44,174 +43,192 @@
             margin-top: auto;
         }
 
-        .nav-item .badge {
-            background-color: #f44336;
-            font-size: 0.8rem;
-            vertical-align: top;
+        .alert {
+            border-radius: 0.5rem;
         }
 
-        .form-element {
-            margin-bottom: 5px;
+        /* Dark Mode Styles */
+        body.bg-dark {
+            background-color: #121212 !important;
+            color: #e0e0e0 !important;
         }
-	/* General Dark Mode Styles */
-	body.bg-dark {
-	    background-color: #121212 !important; /* Darker background */
-	    color: #e0e0e0 !important; /* Light text */
-	}
 
-	/* Navbar Dark Mode Override */
-	body.bg-dark .navbar {
-	    background-color: #212529 !important; /* Dark navbar */
-	}
+        body.bg-dark .navbar {
+            background-color: #212529 !important;
+        }
 
-	/* Modal Content Dark Mode */
-	body.bg-dark .modal-content {
-	    background-color: #2b2b2b;
-	    color: #f8f9fa;
-	}
+        body.bg-dark .modal-content {
+            background-color: #2b2b2b;
+            color: #f8f9fa;
+        }
 
-	body.bg-dark .modal-header {
-	    border-bottom: 1px solid #444444;
-	}
+        body.bg-dark .modal-header {
+            border-bottom: 1px solid #444444;
+        }
 
-	body.bg-dark .btn-close {
-	    filter: invert(1); /* Ensure close button is visible in dark mode */
-	}
+        body.bg-dark .btn-close {
+            filter: invert(1);
+        }
 
-	/* Flash Messages Dark Mode */
-	.alert {
-	    border-radius: 0.5rem;
-	}
-	body.bg-dark .alert {
-	    background-color: #333333;
-	    color: #f8f9fa;
-	    border-color: #555555;
-	}
+        /* Flash Messages Dark Mode */
+        body.bg-dark .alert {
+            background-color: #333333 !important;
+            color: #f8f9fa !important;
+            border-color: #555555 !important;
+        }
 
-	/* Buttons Override */
-	body.bg-dark .btn {
-	    border: none;
-	}
+        body.bg-dark .alert-success {
+            background-color: #285e27 !important;
+            color: #d4edda !important;
+            border-color: #3b7135 !important;
+        }
 
-	body.bg-dark .btn-warning {
-	    background-color: #f0ad4e;
-	    color: #212529;
-	}
+        body.bg-dark .alert-danger {
+            background-color: #7a1b1b !important;
+            color: #f8d7da !important;
+            border-color: #8b2a2a !important;
+        }
 
-	body.bg-dark .btn-primary {
-	    background-color: #007bff;
-	    color: #f8f9fa;
-	}
+        body.bg-dark .alert-warning {
+            background-color: #846404 !important;
+            color: #ffeeba !important;
+            border-color: #977a05 !important;
+        }
 
-	/* Ensure card modals are styled correctly */
-	body.bg-dark .card {
-	    background-color: #1e1e1e;
-	    color: #f8f9fa;
-	}
+        body.bg-dark .alert-info {
+            background-color: #0c5460 !important;
+            color: #d1ecf1 !important;
+            border-color: #117a8b !important;
+        }
 
-	/* Optional: Badge Styles */
-	body.bg-dark .badge {
-	    background-color: #444444;
-	    color: #f8f9fa;
-	}
+        /* Button Styling */
+        body.bg-dark .btn {
+            border: none;
+        }
 
-	body.bg-dark .modal-footer {
-	    border-top: 1px solid #444444;
-	}
+        body.bg-dark .btn-warning {
+            background-color: #f0ad4e;
+            color: #212529;
+        }
+
+        body.bg-dark .btn-primary {
+            background-color: #007bff;
+            color: #f8f9fa;
+        }
+
+        body.bg-dark .card {
+            background-color: #1e1e1e;
+            color: #f8f9fa;
+        }
+
+        /* Responsive Fixes for Flash Messages */
+        .alert-container {
+            margin-top: 15px;
+            padding: 0 15px;
+        }
+
+        @media (max-width: 768px) {
+            .navbar-nav .nav-link {
+                text-align: center;
+            }
+            .alert-container {
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 <body>
-	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-	    <div class="container-fluid">
-		<!-- Brand -->
-		<a class="navbar-brand" href="{{ url_for('user.view_cards') }}">
-		    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="width: 40px;">
-		    Pika-Card
-		</a>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+	<div class="container-fluid">
+	    <!-- Brand -->
+	    <a class="navbar-brand" href="{{ url_for('user.view_cards') }}">
+		<img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="width: 40px;">
+		Pika-Card
+	    </a>
 
-		<!-- Toggler Button for Mobile -->
-		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-		    <span class="navbar-toggler-icon"></span>
+	    <!-- Toggler Button for Mobile -->
+	    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	    </button>
+
+	    <!-- Navbar Content -->
+	    <div class="collapse navbar-collapse" id="navbarNav">
+		<!-- Left-Aligned Links -->
+		<ul class="navbar-nav me-auto">
+		    <li class="nav-item">
+			<a class="nav-link" href="/">Home</a>
+		    </li>
+		    {% if current_user.is_authenticated %}
+		    <li class="nav-item dropdown">
+			<a class="nav-link dropdown-toggle" href="#" id="navbarUserMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+			    Dashboard
+			</a>
+			<ul class="dropdown-menu" aria-labelledby="navbarUserMenu">
+			    <li>
+				<a class="dropdown-item" href="{{ url_for('user.profile', user_id=current_user.id) }}">
+				    My Profile
+				</a>
+			    </li>
+			    <li>
+				<a class="dropdown-item" href="{{ url_for('auth.account') }}">
+				    My Account
+				</a>
+			    </li>
+			    <li>
+			    <li>
+				<a class="dropdown-item" href="{{ url_for('order.my_orders') }}">
+				    My Orders 
+				    <span class="badge bg-warning text-dark rounded-pill">{{ orders_without_feedback }}</span>
+				</a>
+			    </li>
+			    {% if current_user.role in ["uploader", "admin"] %}
+			    <li>
+				<a class="dropdown-item" href="{{ url_for('order.pending_orders') }}">
+				    Pending Orders 
+				    <span class="badge bg-danger rounded-pill">{{ pending_orders }}</span>
+				</a>
+			    </li>
+			    <li>
+				<a class="dropdown-item" href="{{ url_for('user.my_cards') }}">My Cards</a>
+			    </li>
+			    <li>
+				<a class="dropdown-item" href="/admin/upload">Upload</a>
+			    </li>
+			    {% endif %}
+			</ul>
+		    </li>
+		    {% endif %}
+		</ul>
+
+		<!-- Right-Aligned Links -->
+		<ul class="navbar-nav ms-auto">
+		    {% if current_user.is_authenticated %}
+		    <li class="nav-item">
+			<a class="nav-link" href="/cart">
+			    <i class="bi bi-cart-fill"></i> Cart 
+			    <span class="badge bg-success rounded-pill">{{ cart_items_count }}</span>
+			</a>
+		    </li>
+		    <li class="nav-item">
+			<span class="nav-link disabled">Welcome, {{ current_user.username }}!</span>
+		    </li>
+		    <li class="nav-item">
+			<a class="nav-link" href="/auth/logout">Logout</a>
+		    </li>
+		    {% else %}
+		    <li class="nav-item">
+			<a class="nav-link" href="/auth/sign-in">Sign in</a>
+		    </li>
+		    {% endif %}
+		</ul>
+
+		<!-- Dark Mode Toggle -->
+		<button id="darkModeSwitch" class="btn btn-outline-primary ms-3">
+		    <i class="bi bi-moon"></i>
 		</button>
-
-		<!-- Navbar Content -->
-		<div class="collapse navbar-collapse" id="navbarNav">
-		    <!-- Left-Aligned Links -->
-		    <ul class="navbar-nav me-auto">
-			<li class="nav-item">
-			    <a class="nav-link" href="/">Home</a>
-			</li>
-			{% if current_user.is_authenticated %}
-			<li class="nav-item dropdown">
-			    <a class="nav-link dropdown-toggle" href="#" id="navbarUserMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-				Dashboard
-			    </a>
-			    <ul class="dropdown-menu" aria-labelledby="navbarUserMenu">
-				<li>
-				    <a class="dropdown-item" href="{{ url_for('user.profile', user_id=current_user.id) }}">
-					My Profile
-				    </a>
-				</li>
-				<li>
-				    <a class="dropdown-item" href="{{ url_for('auth.account') }}">
-					My Account
-				    </a>
-				</li>
-				<li>
-				<li>
-				    <a class="dropdown-item" href="{{ url_for('order.my_orders') }}">
-					My Orders 
-					<span class="badge bg-warning text-dark rounded-pill">{{ orders_without_feedback }}</span>
-				    </a>
-				</li>
-				{% if current_user.role in ["uploader", "admin"] %}
-				<li>
-				    <a class="dropdown-item" href="{{ url_for('order.pending_orders') }}">
-					Pending Orders 
-					<span class="badge bg-danger rounded-pill">{{ pending_orders }}</span>
-				    </a>
-				</li>
-				<li>
-				    <a class="dropdown-item" href="{{ url_for('user.my_cards') }}">My Cards</a>
-				</li>
-				<li>
-				    <a class="dropdown-item" href="/admin/upload">Upload</a>
-				</li>
-				{% endif %}
-			    </ul>
-			</li>
-			{% endif %}
-		    </ul>
-
-		    <!-- Right-Aligned Links -->
-		    <ul class="navbar-nav ms-auto">
-			{% if current_user.is_authenticated %}
-			<li class="nav-item">
-			    <a class="nav-link" href="/cart">
-				<i class="bi bi-cart-fill"></i> Cart 
-				<span class="badge bg-success rounded-pill">{{ cart_items_count }}</span>
-			    </a>
-			</li>
-			<li class="nav-item">
-			    <span class="nav-link disabled">Welcome, {{ current_user.username }}!</span>
-			</li>
-			<li class="nav-item">
-			    <a class="nav-link" href="/auth/logout">Logout</a>
-			</li>
-			{% else %}
-			<li class="nav-item">
-			    <a class="nav-link" href="/auth/sign-in">Sign in</a>
-			</li>
-			{% endif %}
-		    </ul>
-
-		    <!-- Dark Mode Toggle -->
-		    <button id="darkModeSwitch" class="btn btn-outline-primary ms-3">
-			<i class="bi bi-moon"></i>
-		    </button>
-		</div>
 	    </div>
-	</nav>
+	</div>
+    </nav>
 
     <!-- Card View Modal -->
     <div class="modal fade" id="cardViewModal" tabindex="-1" aria-labelledby="cardViewModalLabel" aria-hidden="true">
@@ -228,30 +245,25 @@
 	</div>
     </div>
 
-
-    <!-- Main Content -->
     <div class="container">
         {% block content %}
         {% endblock %}
     </div>
 
     <!-- Flash Messages -->
-    <div class="container mt-3">
+    <div class="alert-container">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-        <div class="alert-container">
             {% for category, message in messages %}
             <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
                 {{ message }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             {% endfor %}
-        </div>
         {% endif %}
         {% endwith %}
     </div>
 
-    <!-- Footer -->
     <footer class="footer">
         <p>&copy; 2024 Pika-Card. All rights reserved.</p>
     </footer>
@@ -270,22 +282,13 @@
             localStorage.setItem('theme', theme);
         }
 
-        // Load theme on page load
         const savedTheme = localStorage.getItem('theme') || 'light';
         applyTheme(savedTheme);
 
-        // Toggle dark mode
         darkModeSwitch.addEventListener('click', () => {
             const newTheme = document.body.classList.contains('bg-dark') ? 'light' : 'dark';
             applyTheme(newTheme);
         });
-
-	function showCardImage(imageUrl, cardName) {
-	    document.getElementById('cardImage').src = imageUrl;
-	    document.getElementById('modalCardTitle').innerText = cardName || "Card";
-	    const modal = new bootstrap.Modal(document.getElementById('cardViewModal'));
-	    modal.show();
-	}
     </script>
 </body>
 </html>
