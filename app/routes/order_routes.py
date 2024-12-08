@@ -1,7 +1,7 @@
 # order_routes.py
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_required, current_user
-from ..models import db, Order, Card, User, order_cards
+from ..models import db, Order, Card, User, order_cards, Cart
 from ..mail_service import send_email
 
 order_bp = Blueprint("order", __name__)
@@ -51,6 +51,13 @@ def confirm_order(order_id):
         flash("You are not authorized to confirm this order.", "danger")
         return redirect(url_for("order.pending_orders"))
 
+    # Mark cards as unavailable (set amount to 0) and remove them from carts
+    for card in order.cards:
+        if card.amount > 0:  
+            card.amount = 0
+            db.session.query(Cart).filter_by(card_id=card.id).delete()  
+
+    # Update order status to Confirmed
     order.status = "Confirmed"
     db.session.commit()
 
@@ -59,11 +66,11 @@ def confirm_order(order_id):
     send_email(
         recipient=buyer.email,
         subject="Order Confirmed",
-        body="Your order for cards has been confirmed by the seller.\n"
-        "The seller will contact you soon.",
+        body=f"Your order for cards has been confirmed by the seller.\n"
+             f"The seller will contact you soon.\n\nOrder ID: {order.id}",
     )
 
-    flash("Order confirmed and buyer notified.", "success")
+    flash("Order confirmed, cards marked as sold, and buyer notified.", "success")
     return redirect(url_for("order.pending_orders"))
 
 
