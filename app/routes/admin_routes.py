@@ -144,39 +144,6 @@ def get_card_details():
         print(f"Error fetching card details: {e}", flush=True)
         return jsonify({"error": "Failed to fetch card details"}), 500
 
-
-@admin_bp.route("/reset_cards", methods=["POST"])
-@roles_required("admin")
-def reset_cards():
-    try:
-        # Fetch all image URLs from the Card table
-        cards = Card.query.all()
-        image_urls = [card.image_url for card in cards if card.image_url]
-
-        # Initialize S3 client
-        s3 = boto3.client("s3", region_name=Config.AWS_REGION)
-        bucket_name = Config.S3_BUCKET
-
-        # Delete images from S3
-        for url in image_urls:
-            try:
-                # Extract the object key from the URL
-                object_key = url.split(f"{bucket_name}/")[-1]
-                s3.delete_object(Bucket=bucket_name, Key=object_key)
-                print(f"Deleted {object_key} from S3.", flush=True)
-            except Exception as e:
-                print(f"Failed to delete {url} from S3: {e}", flush=True)
-
-        # Delete all records in the Card table
-        Card.query.delete()
-        db.session.commit()
-        return {"message": "All cards and associated images have been deleted."}, 200
-
-    except Exception as e:
-        print(f"Error resetting cards: {e}", flush=True)
-        return {"message": "Failed to reset cards."}, 500
-
-
 @admin_bp.route("/users", methods=["GET", "POST"])
 @roles_required("admin")
 def manage_users():
