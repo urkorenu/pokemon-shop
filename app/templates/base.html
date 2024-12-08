@@ -144,6 +144,22 @@
                 font-size: 0.9rem;
             }
         }
+
+	.flash-container {
+	    z-index: 1050;
+	}
+
+	.flash-container .alert {
+	    animation: fadeInOut 5s ease-in-out forwards;
+	}
+
+	/* Smooth fade-in-out animation */
+	@keyframes fadeInOut {
+	    0% { opacity: 0; transform: translateY(-20px); }
+	    10% { opacity: 1; transform: translateY(0); }
+	    90% { opacity: 1; transform: translateY(0); }
+	    100% { opacity: 0; transform: translateY(-20px); }
+	}
     </style>
 </head>
 <body>
@@ -265,18 +281,18 @@
     </div>
 
     <!-- Flash Messages -->
-    <div class="alert-container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            {% endfor %}
-        {% endif %}
-        {% endwith %}
-    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+	<div class="flash-container position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 1050; width: auto;">
+	    {% for category, message in messages %}
+		<div class="alert alert-{{ category }} alert-dismissible fade show shadow" role="alert" style="min-width: 300px; max-width: 500px;">
+		    {{ message }}
+		    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+	    {% endfor %}
+	</div>
+    {% endif %}
+    {% endwith %}
 
     <footer class="footer bg-dark text-light py-4">
         <div class="container text-center">
