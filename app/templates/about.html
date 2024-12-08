@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <h1 class="text-center mb-4">About Us</h1>
+            <p class="lead text-center">
+                Welcome to <strong>Pika-Card</strong>, your ultimate destination for Pokémon card enthusiasts!
+            </p>
+
+            <div class="row mt-4">
+                <div class="col-md-6 mb-4">
+                    <h3>Our Mission</h3>
+                    <p>
+                        At Pika-Card, we aim to provide the best platform for buying, selling, and showcasing Pokémon cards.
+                        Our team is passionate about the Pokémon universe and dedicated to building a vibrant community of collectors and players.
+                    </p>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <img src="{{ url_for('static', filename='images/mission.jpg') }}" alt="About Us" class="img-fluid rounded">
+                </div>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6 mb-4">
+                    <img src="{{ url_for('static', filename='images/mission.jpg') }}" alt="Our Mission" class="img-fluid rounded">
+                </div>
+                <div class="col-md-6 mb-4">
+                    <h3>Why Choose Us?</h3>
+                    <ul>
+                        <li>Wide selection of Pokémon cards</li>
+                        <li>Seamless user experience</li>
+                        <li>Secure transactions and trusted sellers</li>
+                        <li>Community-driven platform</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{{ url_for('user.contact_us') }}" class="btn btn-primary">Contact Us</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

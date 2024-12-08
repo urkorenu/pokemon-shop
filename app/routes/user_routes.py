@@ -273,7 +273,7 @@ def contact_us():
 
         if not (name and email and message_content):
             flash("All fields are required!", "danger")
-            return redirect(url_for("contact_us"))
+            return redirect(url_for("user.contact_us"))
 
         # Send email to the admin
         msg = f"""
@@ -300,3 +300,7 @@ def contact_us():
         return redirect(url_for("user.contact_us"))
 
     return render_template("contact.html")
+
+@user_bp.route('/about', methods=["GET"])
+def about_us():
+    return render_template("about.html")
