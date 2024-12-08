@@ -198,6 +198,9 @@
 			</ul>
 		    </li>
 		    {% endif %}
+		    <li class="nav-item">
+			<a class="nav-link" href="{{ url_for('user.contact_us') }}">Contact Us</a>
+		    </li>
 		</ul>
 
 		<!-- Right-Aligned Links -->
@@ -289,6 +292,12 @@
             const newTheme = document.body.classList.contains('bg-dark') ? 'light' : 'dark';
             applyTheme(newTheme);
         });
+	function showCardImage(imageUrl, cardName) {
+	    document.getElementById('cardImage').src = imageUrl;
+	    document.getElementById('modalCardTitle').innerText = cardName || "Card";
+	    const modal = new bootstrap.Modal(document.getElementById('cardViewModal'));
+	    modal.show();
+	}
     </script>
 </body>
 </html>

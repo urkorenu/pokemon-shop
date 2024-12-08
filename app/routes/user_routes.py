@@ -262,3 +262,41 @@ def view_cart():
     return render_template(
         "cart.html", grouped_cart=grouped_cart, total_price=total_price
     )
+
+
+@user_bp.route("/contact", methods=["GET", "POST"])
+def contact_us():
+    if request.method == "POST":
+        name = request.form.get("name")
+        email = request.form.get("email")
+        message_content = request.form.get("message")
+
+        if not (name and email and message_content):
+            flash("All fields are required!", "danger")
+            return redirect(url_for("contact_us"))
+
+        # Send email to the admin
+        msg = f"""
+        You have received a new message via Contact Us Form:
+
+        Name: {name}
+        Email: {email}
+
+        Message:
+        {message_content}
+        """
+
+        try:
+            send_email(
+                recipient=Config.ADMIN_MAIL,
+                subject=f"New Contact Us Message from {name}",
+                body=msg,
+            )
+            flash("Your message has been sent successfully!", "success")
+        except Exception as e:
+            flash("Failed to send message. Please try again later.", "danger")
+            print(str(e), flush=True)
+
+        return redirect(url_for("user.contact_us"))
+
+    return render_template("contact.html")
