@@ -263,7 +263,8 @@ def view_cart():
         "cart.html", grouped_cart=grouped_cart, total_price=total_price
     )
 
-@user_bp.route('/contact', methods=["GET", "POST"])
+
+@user_bp.route("/contact", methods=["GET", "POST"])
 def contact_us():
     if request.method == "POST":
         name = request.form.get("name")
@@ -288,13 +289,13 @@ def contact_us():
         try:
             send_email(
                 recipient=Config.ADMIN_MAIL,
-                subject = f"New Contact Us Message from {name}",
+                subject=f"New Contact Us Message from {name}",
                 body=msg,
-                )
+            )
             flash("Your message has been sent successfully!", "success")
         except Exception as e:
             flash("Failed to send message. Please try again later.", "danger")
-            print(str(e), flush = True)
+            print(str(e), flush=True)
 
         return redirect(url_for("user.contact_us"))
 
