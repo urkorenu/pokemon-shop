@@ -127,10 +127,11 @@ def my_cards():
         flash("You do not have permission to access this page.", "danger")
         return redirect(url_for("user.view_cards"))
 
-    # Fetch the cards uploaded by the current user
-    my_cards = Card.query.filter_by(uploader_id=current_user.id).all()
+    # Fetch available and sold cards separately
+    available_cards = Card.query.filter_by(uploader_id=current_user.id).filter(Card.amount > 0).all()
+    sold_cards = Card.query.filter_by(uploader_id=current_user.id).filter(Card.amount == 0).all()
 
-    return render_template("my_cards.html", cards=my_cards)
+    return render_template("my_cards.html", available_cards=available_cards, sold_cards=sold_cards)
 
 
 @user_bp.route("/edit-card/<int:card_id>", methods=["GET", "POST"])
