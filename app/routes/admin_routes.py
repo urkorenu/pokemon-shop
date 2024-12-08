@@ -7,6 +7,7 @@ import boto3
 from config import Config
 from app import cache
 from app.utils import roles_required
+from ..mail_service import send_email
 
 admin_bp = Blueprint("admin", __name__)
 
@@ -150,24 +151,41 @@ def manage_users():
     users = User.query.filter(User.role != "admin").all()  # Exclude admins
 
     if request.method == "POST":
-        user_id = request.form.get("user_id")  # Ensure user_id is correctly submitted
-        new_role = request.form.get(
-            f"role_{user_id}"
-        )  # Fetch the role for the specific user
+        user_id = request.form.get("user_id")
+        new_role = request.form.get(f"role_{user_id}")
+        ban_reason = request.form.get(f"ban_reason_{user_id}", None)
 
         if not user_id or not new_role:
             flash("Invalid user or role data.", "error")
             return redirect(url_for("admin.manage_users"))
 
-        if new_role not in ["normal", "uploader"]:
+        if new_role not in ["normal", "uploader", "banned", "admin"]:
             flash("Invalid role.", "error")
             return redirect(url_for("admin.manage_users"))
 
         user = User.query.get(user_id)
+
         if user:
+            old_role = user.role
             user.role = new_role
+
+            # Handle role-specific logic
+            if old_role != new_role:
+                if new_role == "uploader":
+                    send_email(recipient=user.email, subject="Uploader Role Granted",
+                                           body=f"Congratulations {user.username}, you have been granted the uploader role!")
+
+                elif new_role == "banned":
+                    send_email(recipient=user.email, subject="Account Banned",
+                                           body=f"Dear {user.username}, your account has been banned.\nReason: {ban_reason}")
+                    flash(f"User {user.username} has been banned.", "warning")
+
+                elif old_role == "banned" and new_role != "banned":
+                    send_email(recipient=user.email, subject="Account Unbanned",
+                                           body=f"Dear {user.username}, your account has been unbanned. You can access your account now.")
+
             db.session.commit()
-            flash(f"User {user.username} promoted to {new_role}.", "success")
+            flash(f"User {user.username}'s role updated to {new_role}.", "success")
         else:
             flash("User not found.", "error")
 
