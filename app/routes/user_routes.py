@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from ..models import Card, Cart, db, User, Order
 from flask_login import login_required, current_user
 from sqlalchemy.orm import joinedload
+from sqlalchemy import or_
 import boto3
 from config import Config
 from ..cities import CITIES_IN_ISRAEL
@@ -45,7 +46,12 @@ def view_cards():
         query = query.order_by(Card.number.asc())
 
     # Execute the query
-    cards = query.all()
+
+    cards = (
+        Card.query.join(User)
+        .filter(or_(User.role == "uploader", User.role == "admin"), Card.amount == 1)
+        .all()
+    )
 
     # Get unique set names for the filter dropdown
     unique_set_names = [
@@ -117,10 +123,17 @@ def my_cards():
         flash("You do not have permission to access this page.", "danger")
         return redirect(url_for("user.view_cards"))
 
-    # Fetch the cards uploaded by the current user
-    my_cards = Card.query.filter_by(uploader_id=current_user.id).all()
+    # Fetch available and sold cards separately
+    available_cards = (
+        Card.query.filter_by(uploader_id=current_user.id).filter(Card.amount > 0).all()
+    )
+    sold_cards = (
+        Card.query.filter_by(uploader_id=current_user.id).filter(Card.amount == 0).all()
+    )
 
-    return render_template("my_cards.html", cards=my_cards)
+    return render_template(
+        "my_cards.html", available_cards=available_cards, sold_cards=sold_cards
+    )
 
 
 @user_bp.route("/edit-card/<int:card_id>", methods=["GET", "POST"])
@@ -273,7 +286,7 @@ def contact_us():
 
         if not (name and email and message_content):
             flash("All fields are required!", "danger")
-            return redirect(url_for("contact_us"))
+            return redirect(url_for("user.contact_us"))
 
         # Send email to the admin
         msg = f"""
@@ -300,3 +313,8 @@ def contact_us():
         return redirect(url_for("user.contact_us"))
 
     return render_template("contact.html")
+
+
+@user_bp.route("/about", methods=["GET"])
+def about_us():
+    return render_template("about.html")

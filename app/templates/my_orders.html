@@ -12,7 +12,16 @@
                 <a href="{{ url_for('user.profile', user_id=order.seller_id) }}" class="text-decoration-none">
                     {{ order.seller.username }}
                 </a> |
-                Status: {{ order.status }}
+                Status:
+                <span class="badge 
+                    {% if order.status == 'Completed' %} bg-success
+                    {% elif order.status == 'Confirmed' %} bg-info
+                    {% elif order.status == 'Rejected' %} bg-danger
+                    {% elif order.status == 'Pending' %} bg-warning
+                    {% else %} bg-secondary
+                    {% endif %}">
+                    {{ order.status }}
+                </span>
             </h4>
             <table class="table">
                 <thead>

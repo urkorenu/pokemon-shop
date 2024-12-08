@@ -3,6 +3,9 @@ from flask_login import login_user, logout_user, login_required, current_user
 from ..models import User, db, Order, Cart
 from flask_bcrypt import generate_password_hash, check_password_hash
 from ..cities import CITIES_IN_ISRAEL
+from ..mail_service import send_email
+from config import Config
+
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -22,7 +25,11 @@ def auth():
                 flash("Login successful!", "success")
                 return redirect(url_for("user.view_cards"))
 
-            flash("Invalid email or password.", "error")
+            elif user.role == "banned":
+                flash("Your account has been banned", "error")
+
+            else:
+                flash("Invalid email or password.", "error")
 
         elif form_type == "register":
             username = request.form.get("username")
@@ -85,23 +92,115 @@ def logout():
 @login_required
 def account():
     if request.method == "POST":
-        # Handle profile updates
-        username = request.form.get("username")
-        email = request.form.get("email")
+        action = request.form.get("action")  # Identify which form was submitted
 
-        if username:
-            current_user.username = username
-        if email:
-            current_user.email = email
+        if action == "update_profile":
+            # Update profile details
+            username = request.form.get("username")
+            email = request.form.get("email")
+            location = request.form.get("location")
+            contact_preference = request.form.get("contact_preference")
+            contact_details = request.form.get("contact_details")
 
-        db.session.commit()
-        flash("Profile updated successfully!", "success")
+            if username:
+                current_user.username = username
+            if email:
+                current_user.email = email
+            if location:
+                current_user.location = location
+            if contact_preference:
+                current_user.contact_preference = contact_preference
+            if contact_details:
+                current_user.contact_details = contact_details
+
+            db.session.commit()
+            flash("Profile updated successfully!", "success")
+
+        elif action == "change_password":
+            # Change password logic
+            old_password = request.form.get("old_password")
+            new_password = request.form.get("new_password")
+
+            if not check_password_hash(current_user.password_hash, old_password):
+                flash("Old password is incorrect.", "danger")
+            else:
+                current_user.password_hash = generate_password_hash(new_password)
+                db.session.commit()
+                flash("Password updated successfully!", "success")
+
+        elif action == "delete_account":
+            # Delete account logic
+            db.session.delete(current_user)
+            db.session.commit()
+            flash("Your account has been deleted.", "success")
+            return redirect(url_for("auth.login"))
+
         return redirect(url_for("auth.account"))
 
-    # Get user's order history
+    # Retrieve user's order history
     orders = Order.query.filter_by(buyer_id=current_user.id).all()
 
-    return render_template("account.html", orders=orders)
+    return render_template("account.html", orders=orders, cities=CITIES_IN_ISRAEL)
+
+
+@auth_bp.route("/request_uploader", methods=["POST"])
+@login_required
+def request_uploader():
+    # Check if user already has the uploader or admin role
+    if current_user.role in ["uploader", "admin"]:
+        flash("You already have the uploader or admin role.", "info")
+        return redirect(url_for("auth.account"))
+
+    if current_user.request_status == "Pending":
+        flash("Your request is already pending. Please wait for admin review.", "info")
+        return redirect(url_for("auth.account"))
+
+    # Validate rules acceptance
+    rules_accepted = request.form.get("rules_accepted")
+    if not rules_accepted:
+        flash("You must accept the rules before submitting your request.", "danger")
+        return redirect(url_for("auth.account"))
+
+    # Confirm user details
+    if not all(
+        [current_user.email, current_user.location, current_user.contact_details]
+    ):
+        flash(
+            "Please ensure your profile details (email, location, and contact details) are updated.",
+            "danger",
+        )
+        return redirect(url_for("auth.account"))
+
+    # Send email
+    message_body = f"""
+    User {current_user.username} has requested to become an uploader.
+
+    User Details:
+    - Email: {current_user.email}
+    - Location: {current_user.location}
+    - Contact Preference: {current_user.contact_preference}
+    - Contact Details: {current_user.contact_details}
+
+    Please review the request.
+    """
+    try:
+        send_email(
+            recipient=Config.ADMIN_MAIL,
+            subject=f"Uploader Role Request from {current_user.username}",
+            body=message_body,
+        )
+        # Update request status
+        current_user.request_status = "Pending"
+        db.session.commit()
+        flash(
+            "Your request to become an uploader has been submitted successfully!",
+            "success",
+        )
+    except Exception as e:
+        flash("Failed to send the request. Please try again later.", "danger")
+        print(str(e))
+
+    return redirect(url_for("auth.account"))
 
 
 @auth_bp.route("/change_password", methods=["POST"])
@@ -133,4 +232,4 @@ def delete_account():
 
     logout_user()
     flash("Your account and all associated data have been deleted.", "success")
-    return redirect(url_for("auth.login"))
+    return redirect(url_for("auth.auth"))

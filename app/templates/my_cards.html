@@ -3,9 +3,12 @@
 {% block content %}
 <div class="container">
     <h2 class="text-center mb-4">My Uploaded Cards</h2>
+
+    <!-- Available Cards -->
+    <h4>Available Cards</h4>
     <div class="row">
-        {% if cards %}
-        {% for card in cards %}
+        {% if available_cards %}
+        {% for card in available_cards %}
         <div class="col-md-3 mb-4">
             <div class="card shadow-sm">
                 <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}" style="height: 200px; object-fit: cover;">
@@ -29,7 +32,36 @@
         {% endfor %}
         {% else %}
         <div class="col-12 text-center">
-            <p>You have not uploaded any cards yet.</p>
+            <p>No available cards.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <hr>
+
+    <!-- Sold Cards -->
+    <h4>Sold Cards</h4>
+    <div class="row">
+        {% if sold_cards %}
+        {% for card in sold_cards %}
+        <div class="col-md-3 mb-4">
+            <div class="card shadow-sm border-danger">
+                <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}" style="height: 200px; object-fit: cover;">
+                <div class="card-body">
+                    <h5 class="card-title text-danger">{{ card.name }} (Sold)</h5>
+                    <p class="card-text">
+                        <strong>Set:</strong> {{ card.set_name }}<br>
+                        <strong>Price:</strong> {{ card.price }} ILS<br>
+                        <strong>Condition:</strong> {{ card.condition }}<br>
+                        <strong>Amount:</strong> {{ card.amount }}<br>
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="col-12 text-center">
+            <p>No sold cards.</p>
         </div>
         {% endif %}
     </div>

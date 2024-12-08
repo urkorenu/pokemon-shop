@@ -36,11 +36,17 @@
                 {% endif %}
             </p>
 
-            <!-- Add to Cart Button -->
-            <form method="POST" action="{{ url_for('user.add_to_cart') }}">
-                <input type="hidden" name="card_id" value="{{ card.id }}">
-                <button type="submit" class="btn btn-primary btn-sm w-100 mt-2">Add to Cart</button>
-            </form>
+	    <!-- Add to Cart or Sold Button -->
+	    {% if card.amount > 0 %}
+		<!-- Add to Cart Button -->
+		<form method="POST" action="{{ url_for('user.add_to_cart') }}">
+		    <input type="hidden" name="card_id" value="{{ card.id }}">
+		    <button type="submit" class="btn btn-primary btn-sm w-100 mt-2">Add to Cart</button>
+		</form>
+	    {% else %}
+		<!-- Sold Button -->
+		<button class="btn btn-danger btn-sm w-100 mt-2" disabled>Sold</button>
+	    {% endif %}
         </div>
     </div>
 

@@ -11,6 +11,7 @@
                     <th>Email</th>
                     <th>Current Role</th>
                     <th>Promote To</th>
+                    <th>Ban Reason</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -24,7 +25,16 @@
                         <select name="role_{{ user.id }}" class="form-select">
                             <option value="normal" {% if user.role == "normal" %}selected{% endif %}>Normal</option>
                             <option value="uploader" {% if user.role == "uploader" %}selected{% endif %}>Uploader</option>
+                            <option value="banned" {% if user.role == "banned" %}selected{% endif %}>Banned</option>
+                            <option value="admin" {% if user.role == "admin" %}selected{% endif %}>Admin</option>
                         </select>
+                    </td>
+                    <td>
+                        {% if user.role != "banned" %}
+                        <input type="text" name="ban_reason_{{ user.id }}" class="form-control" placeholder="Optional reason">
+                        {% else %}
+                        <span class="text-muted">User is banned</span>
+                        {% endif %}
                     </td>
                     <td>
                         <button type="submit" name="user_id" value="{{ user.id }}" class="btn btn-primary btn-sm">Update</button>
@@ -36,3 +46,4 @@
     </form>
 </div>
 {% endblock %}
+
