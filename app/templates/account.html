@@ -19,7 +19,14 @@
         </div>
         <div class="mb-3">
             <label for="location" class="form-label">Location</label>
-            <input type="text" class="form-control" id="location" name="location" value="{{ current_user.location }}">
+            <select class="form-select" id="location" name="location" required>
+                <option value="" disabled selected>Select Your Location</option>
+                {% for city in cities %}
+                    <option value="{{ city }}" {% if current_user.location == city %}selected{% endif %}>
+                        {{ city }}
+                    </option>
+                {% endfor %}
+            </select>
         </div>
         <div class="mb-3">
             <label for="contact_preference" class="form-label">Contact Preference</label>
