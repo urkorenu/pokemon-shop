@@ -14,6 +14,7 @@ class User(db.Model, UserMixin):
     contact_details = db.Column(db.String(250), nullable=False)
     rating = db.Column(db.Float, nullable=True)
     feedback_count = db.Column(db.Integer, default=0)
+    request_status = db.Column(db.String(20), default=None)
 
     def set_password(self, password):
         from flask_bcrypt import generate_password_hash
