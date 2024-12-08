@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from ..models import Card, Cart, db, User, Order
 from flask_login import login_required, current_user
 from sqlalchemy.orm import joinedload
+from sqlalchemy import or_, and_
 import boto3
 from config import Config
 from ..cities import CITIES_IN_ISRAEL
@@ -45,8 +46,16 @@ def view_cards():
         query = query.order_by(Card.number.asc())
 
     # Execute the query
-    cards = Card.query.join(User).filter(User.role == "uploader").all()
 
+    cards = (
+        Card.query
+        .join(User)
+        .filter(
+            or_(User.role == "uploader", User.role == "admin"),  # Roles: uploader OR admin
+            Card.amount == 1                                     # Amount equals 1
+        )
+        .all()
+    )
 
     # Get unique set names for the filter dropdown
     unique_set_names = [
