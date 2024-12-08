@@ -133,4 +133,4 @@ def delete_account():
 
     logout_user()
     flash("Your account and all associated data have been deleted.", "success")
-    return redirect(url_for("auth.login"))
+    return redirect(url_for("auth.auth"))
