@@ -59,8 +59,8 @@ def confirm_order(order_id):
     send_email(
         recipient=buyer.email,
         subject="Order Confirmed",
-        body=f"Your order for cards has been confirmed by the seller.\n"
-        f"The seller will contact you soon.",
+        body="Your order for cards has been confirmed by the seller.\n"
+        "The seller will contact you soon.",
     )
 
     flash("Order confirmed and buyer notified.", "success")

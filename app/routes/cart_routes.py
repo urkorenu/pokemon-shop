@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
-from ..models import Cart, Card, Order, db, User
+from ..models import Cart, Order, db, User
 from ..mail_service import send_email
 
 cart_bp = Blueprint("cart", __name__)
@@ -81,7 +81,7 @@ def checkout():
             send_email(
                 recipient=seller.email,
                 subject="New Order Received",
-                body=f"You have received a new order containing the following cards:\n"
+                body="You have received a new order containing the following cards:\n"
                 + "\n".join(f"- {item.card.name} (x{item.quantity})" for item in items)
                 + f"\n\nBuyer Details:\nName: {current_user.username}\n"
                 f"Contact: {current_user.contact_details} ({current_user.contact_preference})\n"
