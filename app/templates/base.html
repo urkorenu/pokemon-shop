@@ -207,6 +207,11 @@
 			</ul>
 		    </li>
 		    {% endif %}
+		    {% if current_user.role in ["admin"] %}
+		    <li class="nav-item">
+			<a class="nav-link" href="{{ url_for('admin.manage_users') }}">Manage Users</a>
+		    </li>
+		    {% endif %}
 		</ul>
 
 		<!-- Right-Aligned Links -->
