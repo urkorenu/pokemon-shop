@@ -148,7 +148,7 @@ def get_card_details():
 @admin_bp.route("/users", methods=["GET", "POST"])
 @roles_required("admin")
 def manage_users():
-    users = User.query.filter(User.role != "admin").all()  # Exclude admins
+    users = User.query.all()
 
     if request.method == "POST":
         user_id = request.form.get("user_id")
@@ -176,6 +176,13 @@ def manage_users():
                                            body=f"Congratulations {user.username}, you have been granted the uploader role!")
 
                 elif new_role == "banned":
+                    cards_to_remove = Card.query.filter_by(uploader_id=user.id).all()
+                    for card in cards_to_remove:
+                        db.session.execute(
+                            "DELETE FROM cart WHERE card_id = :card_id",
+                            {"card_id": card.id}
+                        )
+                    db.session.commit()
                     send_email(recipient=user.email, subject="Account Banned",
                                            body=f"Dear {user.username}, your account has been banned.\nReason: {ban_reason}")
                     flash(f"User {user.username} has been banned.", "warning")
