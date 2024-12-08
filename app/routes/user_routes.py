@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from ..models import Card, Cart, db, User, Order
 from flask_login import login_required, current_user
 from sqlalchemy.orm import joinedload
-from sqlalchemy import or_, and_
+from sqlalchemy import or_
 import boto3
 from config import Config
 from ..cities import CITIES_IN_ISRAEL
@@ -51,8 +51,8 @@ def view_cards():
         Card.query
         .join(User)
         .filter(
-            or_(User.role == "uploader", User.role == "admin"),  # Roles: uploader OR admin
-            Card.amount == 1                                     # Amount equals 1
+            or_(User.role == "uploader", User.role == "admin"),
+            Card.amount == 1
         )
         .all()
     )

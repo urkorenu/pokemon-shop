@@ -3,7 +3,6 @@ from ..models import Card, db, User
 from flask_login import current_user
 import requests
 from app.upload_to_s3 import upload_to_s3
-import boto3
 from config import Config
 from app import cache
 from app.utils import roles_required
