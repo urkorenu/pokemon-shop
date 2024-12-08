@@ -53,9 +53,9 @@ def confirm_order(order_id):
 
     # Mark cards as unavailable (set amount to 0) and remove them from carts
     for card in order.cards:
-        if card.amount > 0:  
+        if card.amount > 0:
             card.amount = 0
-            db.session.query(Cart).filter_by(card_id=card.id).delete()  
+            db.session.query(Cart).filter_by(card_id=card.id).delete()
 
     # Update order status to Confirmed
     order.status = "Confirmed"
@@ -67,7 +67,7 @@ def confirm_order(order_id):
         recipient=buyer.email,
         subject="Order Confirmed",
         body=f"Your order for cards has been confirmed by the seller.\n"
-             f"The seller will contact you soon.\n\nOrder ID: {order.id}",
+        f"The seller will contact you soon.\n\nOrder ID: {order.id}",
     )
 
     flash("Order confirmed, cards marked as sold, and buyer notified.", "success")

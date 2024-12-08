@@ -24,10 +24,9 @@ def auth():
                 login_user(user)
                 flash("Login successful!", "success")
                 return redirect(url_for("user.view_cards"))
-            
+
             elif user.role == "banned":
                 flash("Your account has been banned", "error")
-
 
             else:
                 flash("Invalid email or password.", "error")
@@ -87,6 +86,7 @@ def logout():
     logout_user()
     flash("You have been logged out.", "success")
     return redirect(url_for("auth.auth"))
+
 
 @auth_bp.route("/account", methods=["GET", "POST"])
 @login_required
@@ -162,8 +162,13 @@ def request_uploader():
         return redirect(url_for("auth.account"))
 
     # Confirm user details
-    if not all([current_user.email, current_user.location, current_user.contact_details]):
-        flash("Please ensure your profile details (email, location, and contact details) are updated.", "danger")
+    if not all(
+        [current_user.email, current_user.location, current_user.contact_details]
+    ):
+        flash(
+            "Please ensure your profile details (email, location, and contact details) are updated.",
+            "danger",
+        )
         return redirect(url_for("auth.account"))
 
     # Send email
@@ -187,13 +192,15 @@ def request_uploader():
         # Update request status
         current_user.request_status = "Pending"
         db.session.commit()
-        flash("Your request to become an uploader has been submitted successfully!", "success")
+        flash(
+            "Your request to become an uploader has been submitted successfully!",
+            "success",
+        )
     except Exception as e:
         flash("Failed to send the request. Please try again later.", "danger")
         print(str(e))
 
     return redirect(url_for("auth.account"))
-
 
 
 @auth_bp.route("/change_password", methods=["POST"])

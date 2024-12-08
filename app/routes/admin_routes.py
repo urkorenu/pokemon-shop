@@ -143,6 +143,7 @@ def get_card_details():
         print(f"Error fetching card details: {e}", flush=True)
         return jsonify({"error": "Failed to fetch card details"}), 500
 
+
 @admin_bp.route("/users", methods=["GET", "POST"])
 @roles_required("admin")
 def manage_users():
@@ -170,24 +171,33 @@ def manage_users():
             # Handle role-specific logic
             if old_role != new_role:
                 if new_role == "uploader":
-                    send_email(recipient=user.email, subject="Uploader Role Granted",
-                                           body=f"Congratulations {user.username}, you have been granted the uploader role!")
+                    send_email(
+                        recipient=user.email,
+                        subject="Uploader Role Granted",
+                        body=f"Congratulations {user.username}, you have been granted the uploader role!",
+                    )
 
                 elif new_role == "banned":
                     cards_to_remove = Card.query.filter_by(uploader_id=user.id).all()
                     for card in cards_to_remove:
                         db.session.execute(
                             "DELETE FROM cart WHERE card_id = :card_id",
-                            {"card_id": card.id}
+                            {"card_id": card.id},
                         )
                     db.session.commit()
-                    send_email(recipient=user.email, subject="Account Banned",
-                                           body=f"Dear {user.username}, your account has been banned.\nReason: {ban_reason}")
+                    send_email(
+                        recipient=user.email,
+                        subject="Account Banned",
+                        body=f"Dear {user.username}, your account has been banned.\nReason: {ban_reason}",
+                    )
                     flash(f"User {user.username} has been banned.", "warning")
 
                 elif old_role == "banned" and new_role != "banned":
-                    send_email(recipient=user.email, subject="Account Unbanned",
-                                           body=f"Dear {user.username}, your account has been unbanned. You can access your account now.")
+                    send_email(
+                        recipient=user.email,
+                        subject="Account Unbanned",
+                        body=f"Dear {user.username}, your account has been unbanned. You can access your account now.",
+                    )
 
             db.session.commit()
             flash(f"User {user.username}'s role updated to {new_role}.", "success")

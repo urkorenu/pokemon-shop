@@ -48,12 +48,8 @@ def view_cards():
     # Execute the query
 
     cards = (
-        Card.query
-        .join(User)
-        .filter(
-            or_(User.role == "uploader", User.role == "admin"),
-            Card.amount == 1
-        )
+        Card.query.join(User)
+        .filter(or_(User.role == "uploader", User.role == "admin"), Card.amount == 1)
         .all()
     )
 
@@ -128,10 +124,16 @@ def my_cards():
         return redirect(url_for("user.view_cards"))
 
     # Fetch available and sold cards separately
-    available_cards = Card.query.filter_by(uploader_id=current_user.id).filter(Card.amount > 0).all()
-    sold_cards = Card.query.filter_by(uploader_id=current_user.id).filter(Card.amount == 0).all()
+    available_cards = (
+        Card.query.filter_by(uploader_id=current_user.id).filter(Card.amount > 0).all()
+    )
+    sold_cards = (
+        Card.query.filter_by(uploader_id=current_user.id).filter(Card.amount == 0).all()
+    )
 
-    return render_template("my_cards.html", available_cards=available_cards, sold_cards=sold_cards)
+    return render_template(
+        "my_cards.html", available_cards=available_cards, sold_cards=sold_cards
+    )
 
 
 @user_bp.route("/edit-card/<int:card_id>", methods=["GET", "POST"])
@@ -312,6 +314,7 @@ def contact_us():
 
     return render_template("contact.html")
 
-@user_bp.route('/about', methods=["GET"])
+
+@user_bp.route("/about", methods=["GET"])
 def about_us():
     return render_template("about.html")
