@@ -41,7 +41,6 @@ def upload_card():
         name = request.form.get("name")
         price = request.form.get("price")
         condition = request.form.get("condition")
-        amount = request.form.get("amount")
         set_name = request.form.get("set_name")
         number = request.form.get("number")
         card_type = request.form.get("card_type")
@@ -96,7 +95,7 @@ def upload_card():
             price=price,
             tcg_price=selected_price,
             condition=condition,
-            amount=amount,
+            amount=1,
             set_name=set_name,
             number=number,
             image_url=image_url,
