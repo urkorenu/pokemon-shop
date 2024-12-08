@@ -3,6 +3,9 @@ from flask_login import login_user, logout_user, login_required, current_user
 from ..models import User, db, Order, Cart
 from flask_bcrypt import generate_password_hash, check_password_hash
 from ..cities import CITIES_IN_ISRAEL
+from ..mail_service import send_email
+from config import Config
+
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -88,11 +91,20 @@ def account():
         # Handle profile updates
         username = request.form.get("username")
         email = request.form.get("email")
+        location = request.form.get("location")
+        contact_preference = request.form.get("contact_preference")
+        contact_details = request.form.get("contact_details")
 
         if username:
             current_user.username = username
         if email:
             current_user.email = email
+        if location:
+            current_user.username = location
+        if contact_preference:
+            current_user.username = contact_preference
+        if contact_details:
+            current_user.username = contact_details
 
         db.session.commit()
         flash("Profile updated successfully!", "success")
@@ -103,6 +115,51 @@ def account():
 
     return render_template("account.html", orders=orders)
 
+@auth_bp.route("/request_uploader", methods=["POST"])
+@login_required
+def request_uploader():
+    if current_user.request_status == "Pending":
+        flash("Your request is already pending. Please wait for admin review.", "info")
+        return redirect(url_for("auth.account"))
+
+    # Validate rules acceptance
+    rules_accepted = request.form.get("rules_accepted")
+    if not rules_accepted:
+        flash("You must accept the rules before submitting your request.", "danger")
+        return redirect(url_for("auth.account"))
+
+    # Confirm user details
+    if not all([current_user.email, current_user.location, current_user.contact_details]):
+        flash("Please ensure your profile details (email, location, and contact details) are updated.", "danger")
+        return redirect(url_for("auth.account"))
+
+    # Send email
+    message_body = f"""
+    User {current_user.username} has requested to become an uploader.
+
+    User Details:
+    - Email: {current_user.email}
+    - Location: {current_user.location}
+    - Contact Preference: {current_user.contact_preference}
+    - Contact Details: {current_user.contact_details}
+
+    Please review the request.
+    """
+    try:
+        send_email(
+            recipient=Config.ADMIN_MAIL,
+            subject=f"Uploader Role Request from {current_user.username}",
+            body=message_body,
+        )
+        # Update request status
+        current_user.request_status = "Pending"
+        db.session.commit()
+        flash("Your request to become an uploader has been submitted successfully!", "success")
+    except Exception as e:
+        flash("Failed to send the request. Please try again later.", "danger")
+        print(str(e))
+
+    return redirect(url_for("auth.account"))
 
 @auth_bp.route("/change_password", methods=["POST"])
 @login_required

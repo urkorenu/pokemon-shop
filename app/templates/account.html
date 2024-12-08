@@ -7,38 +7,67 @@
 
     <!-- Profile Details -->
     <h4>Profile</h4>
-    <form method="POST" action="/auth/account" class="mb-4">
+    <form method="POST" action="{{ url_for('auth.account') }}" class="mb-4">
         <div class="mb-3">
             <label for="username" class="form-label">Username</label>
-            <input type="text" class="form-control" id="username" name="username" value="{{ current_user.username }}">
+            <input type="text" class="form-control" id="username" name="username" value="{{ current_user.username }}" required>
         </div>
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" name="email" value="{{ current_user.email }}">
+            <input type="email" class="form-control" id="email" name="email" value="{{ current_user.email }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="location" class="form-label">Location</label>
+            <input type="text" class="form-control" id="location" name="location" value="{{ current_user.location }}">
+        </div>
+        <div class="mb-3">
+            <label for="contact_preference" class="form-label">Contact Preference</label>
+            <select class="form-select" id="contact_preference" name="contact_preference" required>
+                <option value="email" {% if current_user.contact_preference == 'email' %}selected{% endif %}>Email</option>
+                <option value="phone" {% if current_user.contact_preference == 'phone' %}selected{% endif %}>Phone</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="contact_details" class="form-label">Contact Details</label>
+            <input type="text" class="form-control" id="contact_details" name="contact_details" value="{{ current_user.contact_details }}" required>
         </div>
         <button type="submit" class="btn btn-primary">Update Profile</button>
     </form>
 
-    <!-- Change Password -->
-    <h4>Change Password</h4>
-    <form method="POST" action="/auth/change_password" class="mb-4">
-        <div class="mb-3">
-            <label for="old_password" class="form-label">Old Password</label>
-            <input type="password" class="form-control" id="old_password" name="old_password" required>
-        </div>
-        <div class="mb-3">
-            <label for="new_password" class="form-label">New Password</label>
-            <input type="password" class="form-control" id="new_password" name="new_password" required>
-        </div>
-        <button type="submit" class="btn btn-warning">Change Password</button>
-    </form>
+    <!-- Request to Become Uploader -->
+    <h4>Uploader Role Request</h4>
 
-    <!-- Delete Account -->
-    <h4>Delete Account</h4>
-    <form method="POST" action="{{ url_for('auth.delete_account') }}">
-        <p class="text-danger">Deleting your account is permanent and cannot be undone.</p>
-        <button type="submit" class="btn btn-danger">Delete Account</button>
-    </form>
+    {% if current_user.request_status == 'Pending' %}
+        <p class="text-info">Your request to become an uploader is currently <strong>Pending</strong>.</p>
+    {% elif current_user.request_status == 'Approved' %}
+        <p class="text-success">Your request to become an uploader has been <strong>Approved</strong>. Welcome to the team!</p>
+    {% elif current_user.request_status == 'Rejected' %}
+        <p class="text-danger">Your request to become an uploader was <strong>Rejected</strong>. Please contact support for more details.</p>
+    {% else %}
+        <p class="text-muted">
+            Before submitting a request, ensure your profile details (email, location, and contact details) are up-to-date and accurate.
+        </p>
+        <form method="POST" action="{{ url_for('auth.request_uploader') }}">
+            <div class="mb-3">
+                <h5>Rules for Uploaders</h5>
+                <ul>
+                    <li>You must provide accurate contact information.</li>
+                    <li>All uploaded cards must adhere to community guidelines.</li>
+                    <li>Failure to follow rules may result in account suspension.</li>
+                </ul>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="rules_accepted" name="rules_accepted" required>
+                    <label class="form-check-label" for="rules_accepted">
+                        I have read and accept the rules for becoming an uploader.
+                    </label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure all your details are correct and you accept the rules?')">
+                Request Uploader Role
+            </button>
+        </form>
+    {% endif %}
+
 
     <hr>
 
@@ -50,7 +79,9 @@
         <li class="list-group-item">
             <strong>Order ID:</strong> {{ order.id }} |
             <strong>Status:</strong> {{ order.status }} |
-            <strong>Total:</strong> ${{ order.total_price }} |
+            <strong>Total:</strong>
+            {% set total_price = order.cards | sum(attribute='price') %}
+            {{ total_price }} ILS |
             <strong>Date:</strong> {{ order.created_at.strftime('%Y-%m-%d') }}
         </li>
         {% endfor %}
@@ -60,4 +91,3 @@
     {% endif %}
 </div>
 {% endblock %}
-
