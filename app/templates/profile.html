@@ -8,6 +8,42 @@
             <h2>{{ user.username }}</h2>
             <p><i class="bi bi-geo-alt-fill"></i> <strong>Location:</strong> {{ user.location if user.location else "N/A" }}</p>
             <p><i class="bi bi-star-fill text-warning"></i> <strong>Rating:</strong> {{ "%.1f" | format(user.rating) if user.rating else "No ratings yet" }} ({{ user.feedback_count }} feedback)</p>
+            
+            <!-- Show status only if user is banned -->
+            {% if user.role == 'banned' %}
+            <p class="text-danger"><strong>Status:</strong> Banned</p>
+            {% endif %}
+        </div>
+        <div class="col-md-3 text-end">
+            <!-- Report User Button -->
+            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#reportUserModal">
+                <i class="bi bi-flag"></i> Report User
+            </button>
+        </div>
+    </div>
+
+    <!-- Report User Modal -->
+    <div class="modal fade" id="reportUserModal" tabindex="-1" aria-labelledby="reportUserModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reportUserModalLabel">Report User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ url_for('user.report_user', user_id=user.id) }}">
+                        <label for="report_reason" class="form-label">Reason for report:</label>
+                        <select class="form-select" name="reason" required>
+                            <option value="spam">Spam</option>
+                            <option value="abusive behavior">Abusive Behavior</option>
+                            <option value="misleading information">Misleading Information</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <textarea class="form-control mt-2" name="details" rows="3" placeholder="Additional details (optional)"></textarea>
+                        <button type="submit" class="btn btn-danger mt-3 w-100">Submit Report</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -31,9 +67,6 @@
             {% endif %}
         </div>
     </div>
-
-    <!-- Include the Search Form -->
-    {% include "_search_form.html" %}
 
     <h3 class="mt-4">Uploaded Cards</h3>
     <div class="row">

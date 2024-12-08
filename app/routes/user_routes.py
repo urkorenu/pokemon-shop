@@ -65,6 +65,32 @@ def view_cards():
         cities=CITIES_IN_ISRAEL,
     )
 
+@user_bp.route("/report_user/<int:user_id>", methods=["POST"])
+@login_required
+def report_user(user_id):
+    user = User.query.get_or_404(user_id)
+    
+    reason = request.form.get("reason")
+    details = request.form.get("details")
+
+    if not reason:
+        flash("Please provide a reason for the report.", "danger")
+        return redirect(url_for("user.profile", user_id=user_id))
+
+    # Example of storing or sending the report (adjust as needed)
+    send_email(
+        recipient=Config.ADMIN_MAIL,
+        subject=f"User Report - {user.username}",
+        body=(
+            f"User '{current_user.username}' reported the user '{user.username}'.\n"
+            f"Reason: {reason}\nDetails: {details if details else 'No additional details provided.'}"
+        ),
+    )
+
+    flash("User has been reported successfully. Thank you!", "success")
+    return redirect(url_for("user.profile", user_id=user_id))
+
+
 
 @user_bp.route("/profile/<int:user_id>")
 def profile(user_id):
