@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from ..models import Card, Cart, db, User, Order
 from flask_login import login_required, current_user
 from sqlalchemy.orm import joinedload
@@ -64,6 +64,12 @@ def view_cards():
         unique_set_names=unique_set_names,
         cities=CITIES_IN_ISRAEL,
     )
+
+@user_bp.route('/change-lang/<lang>')
+def change_lang(lang):
+    if lang in ['en', 'he']:
+        session['lang'] = lang
+    return redirect(request.referrer or url_for('index'))
 
 @user_bp.route("/report_user/<int:user_id>", methods=["POST"])
 @login_required
