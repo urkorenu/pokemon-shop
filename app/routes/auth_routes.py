@@ -24,8 +24,13 @@ def auth():
                 login_user(user)
                 flash("Login successful!", "success")
                 return redirect(url_for("user.view_cards"))
+            
+            elif user.role == "banned":
+                flash("Your account has been banned", "error")
 
-            flash("Invalid email or password.", "error")
+
+            else:
+                flash("Invalid email or password.", "error")
 
         elif form_type == "register":
             username = request.form.get("username")
