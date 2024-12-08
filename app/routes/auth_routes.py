@@ -83,41 +83,69 @@ def logout():
     flash("You have been logged out.", "success")
     return redirect(url_for("auth.auth"))
 
-
 @auth_bp.route("/account", methods=["GET", "POST"])
 @login_required
 def account():
     if request.method == "POST":
-        # Handle profile updates
-        username = request.form.get("username")
-        email = request.form.get("email")
-        location = request.form.get("location")
-        contact_preference = request.form.get("contact_preference")
-        contact_details = request.form.get("contact_details")
+        action = request.form.get("action")  # Identify which form was submitted
 
-        if username:
-            current_user.username = username
-        if email:
-            current_user.email = email
-        if location:
-            current_user.username = location
-        if contact_preference:
-            current_user.username = contact_preference
-        if contact_details:
-            current_user.username = contact_details
+        if action == "update_profile":
+            # Update profile details
+            username = request.form.get("username")
+            email = request.form.get("email")
+            location = request.form.get("location")
+            contact_preference = request.form.get("contact_preference")
+            contact_details = request.form.get("contact_details")
 
-        db.session.commit()
-        flash("Profile updated successfully!", "success")
+            if username:
+                current_user.username = username
+            if email:
+                current_user.email = email
+            if location:
+                current_user.location = location
+            if contact_preference:
+                current_user.contact_preference = contact_preference
+            if contact_details:
+                current_user.contact_details = contact_details
+
+            db.session.commit()
+            flash("Profile updated successfully!", "success")
+
+        elif action == "change_password":
+            # Change password logic
+            old_password = request.form.get("old_password")
+            new_password = request.form.get("new_password")
+
+            if not check_password_hash(current_user.password_hash, old_password):
+                flash("Old password is incorrect.", "danger")
+            else:
+                current_user.password_hash = generate_password_hash(new_password)
+                db.session.commit()
+                flash("Password updated successfully!", "success")
+
+        elif action == "delete_account":
+            # Delete account logic
+            db.session.delete(current_user)
+            db.session.commit()
+            flash("Your account has been deleted.", "success")
+            return redirect(url_for("auth.login"))
+
         return redirect(url_for("auth.account"))
 
-    # Get user's order history
+    # Retrieve user's order history
     orders = Order.query.filter_by(buyer_id=current_user.id).all()
 
     return render_template("account.html", orders=orders)
 
+
 @auth_bp.route("/request_uploader", methods=["POST"])
 @login_required
 def request_uploader():
+    # Check if user already has the uploader or admin role
+    if current_user.role in ["uploader", "admin"]:
+        flash("You already have the uploader or admin role.", "info")
+        return redirect(url_for("auth.account"))
+
     if current_user.request_status == "Pending":
         flash("Your request is already pending. Please wait for admin review.", "info")
         return redirect(url_for("auth.account"))
@@ -160,6 +188,8 @@ def request_uploader():
         print(str(e))
 
     return redirect(url_for("auth.account"))
+
+
 
 @auth_bp.route("/change_password", methods=["POST"])
 @login_required
