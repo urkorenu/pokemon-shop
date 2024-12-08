@@ -45,7 +45,8 @@ def view_cards():
         query = query.order_by(Card.number.asc())
 
     # Execute the query
-    cards = query.all()
+    cards = Card.query.join(User).filter(User.role == "uploader").all()
+
 
     # Get unique set names for the filter dropdown
     unique_set_names = [
