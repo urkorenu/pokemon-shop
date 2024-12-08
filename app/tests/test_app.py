@@ -41,6 +41,6 @@ def test_login_page(client):
     """
     Test to verify the login page renders correctly.
     """
-    response = client.get("/auth/login")
+    response = client.get("/auth/sign-in")
     assert response.status_code == 200
     assert b"Login" in response.data  # Check if "Login" text is in the page
