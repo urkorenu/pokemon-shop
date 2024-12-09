@@ -85,7 +85,7 @@ def profile(user_id):
         cards=cards,
         feedback=completed_orders,
         unique_set_names=unique_set_names,
-        show_sold_checkbox=show_sold
+        show_sold_checkbox=True
     )
 
 @user_bp.route("/my-cards")
