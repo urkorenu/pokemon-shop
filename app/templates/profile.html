@@ -68,6 +68,20 @@
         </div>
     </div>
 
+    <!-- Include the Search Form -->
+    {% include "_search_form.html" %}
+    <input type="hidden" name="name" value="{{ request.args.get('name', '') }}">
+    <input type="hidden" name="set_name" value="{{ request.args.get('set_name', '') }}">
+    <input type="hidden" name="is_graded" value="{{ request.args.get('is_graded', '') }}">
+    <input type="hidden" name="sort" value="{{ request.args.get('sort', '') }}">
+
+    <div class="form-check d-flex align-items-center">
+        <input class="form-check-input me-2" type="checkbox" name="show_sold" id="showSold"
+               {% if request.args.get('show_sold') == 'on' %}checked{% endif %}
+               onchange="this.form.submit()">
+        <label class="form-check-label" for="showSold">{{ _('Show Sold Cards') }}</label>
+    </div>
+
     <h3 class="mt-4">Uploaded Cards</h3>
     <div class="row">
         {% if cards %}
