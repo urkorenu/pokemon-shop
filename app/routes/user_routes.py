@@ -6,6 +6,7 @@ from sqlalchemy import or_
 from flask_sqlalchemy import Pagination
 import boto3
 from config import Config
+from urllib.parse import urlparse
 from ..cities import CITIES_IN_ISRAEL
 from ..mail_service import send_email
 
@@ -39,7 +40,13 @@ def set_language():
     else:
         flash("Invalid language selection.", "danger")
 
-    return redirect(request.referrer or url_for("user.view_cards"))
+    referrer = request.referrer
+    if referrer:
+        referrer = referrer.replace('\\', '')
+        parsed_referrer = urlparse(referrer)
+        if not parsed_referrer.netloc and not parsed_referrer.scheme:
+            return redirect(referrer)
+    return redirect(url_for("user.view_cards"))
 
 
 @user_bp.route("/report_user/<int:user_id>", methods=["POST"])
