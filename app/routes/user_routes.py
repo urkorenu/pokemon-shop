@@ -149,16 +149,15 @@ def edit_card(card_id):
 def delete_card(card_id):
     card = Card.query.get_or_404(card_id)
 
-    if card.uploader_id != current_user.id and current_user.role != "admin":
-        flash("You do not have permission to delete this card.", "danger")
-        return redirect(url_for("user.my_cards"))
+    # Ensure only admins can delete other users' cards, not their own
+    if current_user.role != "admin":
+        if card.uploader_id != current_user.id:
+            flash("You do not have permission to delete this card.", "danger")
+            return redirect(url_for("user.my_cards"))
 
     # Initialize S3 client
     s3 = boto3.client("s3", region_name=Config.AWS_REGION)
     bucket_name = Config.S3_BUCKET
-
-    # Debugging: Print Config values
-    print(f"AWS_REGION: {Config.AWS_REGION}, S3_BUCKET: {Config.S3_BUCKET}", flush=True)
 
     # Delete the image from S3 if it exists
     if card.image_url:
@@ -178,6 +177,27 @@ def delete_card(card_id):
         except Exception as e:
             print(f"Failed to delete {card.image_url} from S3: {e}", flush=True)
             flash("Failed to delete the image from S3.", "danger")
+
+    # Notify the seller via email if deleted by an admin and uploader is not the current user
+    if current_user.role == "admin" and card.uploader_id != current_user.id:
+        uploader = User.query.get(card.uploader_id)
+        if uploader and uploader.email:  # Ensure the uploader exists and has an email
+            email_subject = "Your Card Has Been Deleted"
+            email_body = (
+                f"Hello {uploader.username},\n\n"
+                f"Your card '{card.name}' (Card Number: {card.number}, Set: {card.set_name}) "
+                f"has been deleted by an administrator.\n\n"
+                "If you have any questions, please contact support.\n\n"
+                "Best regards,\nThe Pika-Card Team"
+            )
+            try:
+                send_email(
+                    recipient=uploader.email,
+                    subject=email_subject,
+                    body=email_body,
+                )
+            except Exception as e:
+                print(f"Failed to send email notification: {e}", flush=True)
 
     # Delete the card from the database
     Cart.query.filter_by(card_id=card.id).delete()
