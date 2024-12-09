@@ -14,49 +14,16 @@ user_bp = Blueprint("user", __name__)
 
 @user_bp.route("/")
 def view_cards():
-    # Get search and filter parameters from the request
-    name_query = request.args.get("name", "").strip()
-    set_name_query = request.args.get("set_name", "")
-    sort_option = request.args.get("sort", "")
-    location_query = request.args.get("location", "").strip()
-    is_graded = request.args.get("is_graded", "")
-
-    # Base Query: Cards with uploader role filter and amount > 0
-    base_query = Card.query.options(joinedload(Card.uploader)).join(User).filter(
-        or_(User.role == "uploader", User.role == "admin"),
-        Card.amount > 0
-    )
-
-    # Apply filters
-    if name_query:
-        base_query = base_query.filter(Card.name.ilike(f"%{name_query}%"))
-    if set_name_query:
-        base_query = base_query.filter(Card.set_name == set_name_query)
-    if location_query:
-        base_query = base_query.filter(User.location.ilike(f"%{location_query}%"))
-    if is_graded == "yes":
-        base_query = base_query.filter(Card.is_graded.is_(True))
-    elif is_graded == "no":
-        base_query = base_query.filter(Card.is_graded.is_(False))
-
-    # Apply sorting
-    if sort_option == "price_asc":
-        base_query = base_query.order_by(Card.price.asc())
-    elif sort_option == "price_desc":
-        base_query = base_query.order_by(Card.price.desc())
-    elif sort_option == "card_number":
-        base_query = base_query.order_by(Card.number.asc())
-
-    # Fetch cards and distinct set names in a single query
-    cards = base_query.all()
-    unique_set_names = {card.set_name for card in cards}
+    cards, unique_set_names = filter_cards()
 
     return render_template(
         "cards.html",
-        cards=cards,  # Only cards with amount > 0
-        unique_set_names=sorted(unique_set_names),  # Unique set names
+        cards=cards,
+        unique_set_names=unique_set_names,
         cities=CITIES_IN_ISRAEL,
+        show_sold_checkbox=False
     )
+
 
 @user_bp.route("/set-language", methods=["POST"])
 def set_language():
@@ -99,36 +66,12 @@ def report_user(user_id):
 @user_bp.route("/profile/<int:user_id>")
 def profile(user_id):
     user = User.query.get_or_404(user_id)
+    
+    # Filter cards
+    show_sold = request.args.get("show_sold") == "on"
+    cards, unique_set_names = filter_cards(user_id=user_id, show_sold=show_sold)
 
-    # Get search and filter parameters
-    name_query = request.args.get("name", "").strip()
-    set_name_query = request.args.get("set_name", "")
-    is_graded = request.args.get("is_graded", "")
-    sort_option = request.args.get("sort", "")
-
-    # Filter user's uploaded cards
-    query = Card.query.filter_by(uploader_id=user_id)
-
-    if name_query:
-        query = query.filter(Card.name.ilike(f"%{name_query}%"))
-    if set_name_query:
-        query = query.filter(Card.set_name == set_name_query)
-    if is_graded == "yes":
-        query = query.filter(Card.is_graded.is_(True))
-    elif is_graded == "no":
-        query = query.filter(Card.is_graded.is_(False))
-
-    # Apply sorting
-    if sort_option == "price_asc":
-        query = query.order_by(Card.price.asc())
-    elif sort_option == "price_desc":
-        query = query.order_by(Card.price.desc())
-    elif sort_option == "card_number":
-        query = query.order_by(Card.number.asc())
-
-    cards = query.all()
-
-    # Fetch feedback and ratings for the user's completed sales
+    # Fetch feedback for the user's completed sales
     completed_orders = (
         db.session.query(User.username, Order.feedback, Order.rating)
         .join(Order, Order.buyer_id == User.id)
@@ -141,10 +84,9 @@ def profile(user_id):
         user=user,
         cards=cards,
         feedback=completed_orders,
-        unique_set_names=Card.query.distinct(Card.set_name).all(),
-        include_location=False,  # Exclude location filter
+        unique_set_names=unique_set_names,
+        show_sold_checkbox=show_sold
     )
-
 
 @user_bp.route("/my-cards")
 @login_required
@@ -348,3 +290,59 @@ def contact_us():
 @user_bp.route("/about", methods=["GET"])
 def about_us():
     return render_template("about.html")
+
+def filter_cards(base_query=None, user_id=None, show_sold=False):
+    """
+    Reusable function to filter cards based on search and filter parameters.
+
+    :param base_query: Optional base query to filter on (defaults to all cards).
+    :param user_id: Optional user_id to filter cards by uploader.
+    :param show_sold: Boolean indicating whether to include sold cards (amount == 0).
+    :return: Filtered query and unique set names.
+    """
+    # Start with base query or all cards
+    if base_query is None:
+        base_query = Card.query.options(joinedload(Card.uploader)).join(User)
+
+    # Filters
+    name_query = request.args.get("name", "").strip()
+    set_name_query = request.args.get("set_name", "")
+    is_graded = request.args.get("is_graded", "")
+    sort_option = request.args.get("sort", "")
+    show_sold = request.args.get("show_sold", "off") == "on" or show_sold
+
+    # Base filters
+    query = base_query.filter(or_(User.role == "uploader", User.role == "admin"))
+
+    if user_id:
+        query = query.filter(Card.uploader_id == user_id)
+
+    # Only exclude sold cards if 'show_sold' is False
+    if not show_sold:
+        query = query.filter(Card.amount > 0)
+
+    if name_query:
+        query = query.filter(Card.name.ilike(f"%{name_query}%"))
+    if set_name_query:
+        query = query.filter(Card.set_name == set_name_query)
+    if is_graded == "yes":
+        query = query.filter(Card.is_graded.is_(True))
+    elif is_graded == "no":
+        query = query.filter(Card.is_graded.is_(False))
+
+    # Apply sorting
+    if sort_option == "price_asc":
+        query = query.order_by(Card.price.asc())
+    elif sort_option == "price_desc":
+        query = query.order_by(Card.price.desc())
+    elif sort_option == "card_number":
+        query = query.order_by(Card.number.asc())
+
+    # Execute query
+    cards = query.all()
+
+    # Extract unique set names
+    unique_set_names = {card.set_name for card in cards}
+
+    return cards, sorted(unique_set_names)
+
