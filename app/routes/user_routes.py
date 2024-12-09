@@ -329,7 +329,6 @@ def about_us():
     return render_template("about.html")
 
 
-
 def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_page=12):
     """
     Reusable function to filter cards based on search and filter parameters.
