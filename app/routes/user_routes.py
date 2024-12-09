@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from ..models import Card, Cart, db, User, Order
 from flask_login import login_required, current_user
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, aliased
 from sqlalchemy import or_
+from flask_sqlalchemy import Pagination
 import boto3
 from config import Config
 from ..cities import CITIES_IN_ISRAEL
@@ -14,12 +15,17 @@ user_bp = Blueprint("user", __name__)
 
 @user_bp.route("/")
 def view_cards():
-    cards, unique_set_names = filter_cards()
+    # Get the page number from request args (default to page 1)
+    page = request.args.get("page", 1, type=int)
+
+    # Call filter_cards with pagination
+    paginated_cards, unique_set_names = filter_cards(page=page)
 
     return render_template(
         "cards.html",
-        cards=cards,
+        cards=paginated_cards.items,
         unique_set_names=unique_set_names,
+        pagination=paginated_cards,
         cities=CITIES_IN_ISRAEL,
         show_sold_checkbox=False
     )
@@ -68,7 +74,9 @@ def profile(user_id):
     
     # Filter cards
     show_sold = request.args.get("show_sold") == "on"
-    cards, unique_set_names = filter_cards(user_id=user_id, show_sold=show_sold)
+    page = request.args.get("page", 1, type=int)
+
+    paginated_cards, unique_set_names = filter_cards(user_id=user_id, show_sold=show_sold, page=page)
 
     # Fetch feedback for the user's completed sales
     completed_orders = (
@@ -81,9 +89,10 @@ def profile(user_id):
     return render_template(
         "profile.html",
         user=user,
-        cards=cards,
+        cards=paginated_cards.items,
         feedback=completed_orders,
         unique_set_names=unique_set_names,
+        pagination=paginated_cards,
         show_sold_checkbox=True
     )
 
@@ -292,7 +301,7 @@ def about_us():
 from sqlalchemy.orm import aliased
 
 
-def filter_cards(base_query=None, user_id=None, show_sold=False):
+def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_page=12):
     """
     Reusable function to filter cards based on search and filter parameters.
 
@@ -344,11 +353,10 @@ def filter_cards(base_query=None, user_id=None, show_sold=False):
     elif sort_option == "card_number":
         query = query.order_by(Card.number.asc())
 
-    # Execute query
-    cards = query.all()
+    # Paginate the query
+    paginated_cards = query.paginate(page=page, per_page=per_page, error_out=False)
 
-    # Extract unique set names
-    unique_set_names = {card.set_name for card in cards}
+    # Extract unique set names for the current page
+    unique_set_names = {card.set_name for card in paginated_cards.items}
 
-    return cards, sorted(unique_set_names)
-
+    return paginated_cards, sorted(unique_set_names)
