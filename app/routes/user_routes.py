@@ -42,7 +42,7 @@ def set_language():
 
     referrer = request.referrer
     if referrer:
-        referrer = referrer.replace('\\', '')
+        referrer = referrer.replace("\\", "")
         parsed_referrer = urlparse(referrer)
         if not parsed_referrer.netloc and not parsed_referrer.scheme:
             return redirect(referrer)
