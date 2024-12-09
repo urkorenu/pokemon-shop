@@ -30,7 +30,6 @@ def set_language():
     lang = request.form.get("lang")  
     if lang in ['en', 'he']:
         session['lang'] = lang
-        flash("Language switched successfully.", "success")
     else:
         flash("Invalid language selection.", "danger")
 
