@@ -3,7 +3,6 @@ from ..models import Card, Cart, db, User, Order
 from flask_login import login_required, current_user
 from sqlalchemy.orm import joinedload, aliased
 from sqlalchemy import or_
-from flask_sqlalchemy import Pagination
 import boto3
 from config import Config
 from urllib.parse import urlparse
@@ -329,8 +328,6 @@ def contact_us():
 def about_us():
     return render_template("about.html")
 
-
-from sqlalchemy.orm import aliased
 
 
 def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_page=12):
