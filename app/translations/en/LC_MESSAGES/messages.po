@@ -6,6 +6,94 @@ msgstr ""
 msgid "Available Pokémon Cards"
 msgstr "Available Pokémon Cards"
 
+msgid "Uploaded:"
+msgstr "Uploaded:"
+
+msgid "N/A"
+msgstr "N/A"
+
+msgid "Card Type:"
+msgstr "Card Type:"
+
+msgid "Set:"
+msgstr "Set:"
+
+msgid "Card Number:"
+msgstr "Card Number:"
+
+msgid "Condition:"
+msgstr "Condition:"
+
+msgid "Price:"
+msgstr "Price:"
+
+msgid "Uploaded By:"
+msgstr "Uploaded By:"
+
+msgid "Add to Cart"
+msgstr "Add to Cart"
+
+msgid "Sold"
+msgstr "Sold"
+
+msgid "Close"
+msgstr "Close"
+
+msgid "Amount:"
+msgstr "Amount:"
+
+msgid "Graded:"
+msgstr "Graded:"
+
+msgid "Yes"
+msgstr "Yes"
+
+msgid "No"
+msgstr "No"
+
+msgid "Grading Company:"
+msgstr "Grading Company:"
+
+msgid "Grade:"
+msgstr "Grade:"
+
+msgid "Uploader Location:"
+msgstr "Uploader Location:"
+
+msgid "TCGPlayer Price:"
+msgstr "TCGPlayer Price:"
+
+msgid "Report"
+msgstr "Report"
+
+msgid "Report Card"
+msgstr "Report Card"
+
+msgid "Reason for report:"
+msgstr "Reason for report:"
+
+msgid "Bad Picture"
+msgstr "Bad Picture"
+
+msgid "Misleading Information"
+msgstr "Misleading Information"
+
+msgid "Fake Card"
+msgstr "Fake Card"
+
+msgid "Other"
+msgstr "Other"
+
+msgid "Additional details (optional)"
+msgstr "Additional details (optional)"
+
+msgid "Submit Report"
+msgstr "Submit Report"
+
+
+msgid "No cards found. Try adjusting your search or filters."
+msgstr "No cards found. Try adjusting your search or filters."
+
 msgid "English"
 msgstr "English"
 
