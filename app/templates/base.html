@@ -257,15 +257,17 @@
 		    <i class="bi bi-moon"></i>
 		</button>
 
-        <!-- Language Switcher -->
-        <div class="ms-auto">
-            <a href="{{ url_for('user.change_lang', lang='en') }}" class="btn btn-outline-primary btn-sm me-2">
-                {{ _('English') }}
-            </a>
-            <a href="{{ url_for('user.change_lang', lang='he') }}" class="btn btn-outline-primary btn-sm">
-                {{ _('Hebrew') }}
-            </a>
-        </div>
+		<!-- Language Switcher (using forms for POST) -->
+		<div class="ms-auto">
+		    <form method="POST" action="{{ url_for('user.set_language') }}" class="d-inline">
+			<input type="hidden" name="lang" value="en">
+			<button type="submit" class="btn btn-outline-primary btn-sm me-2">{{ _('English') }}</button>
+		    </form>
+		    <form method="POST" action="{{ url_for('user.set_language') }}" class="d-inline">
+			<input type="hidden" name="lang" value="he">
+			<button type="submit" class="btn btn-outline-primary btn-sm">{{ _('Hebrew') }}</button>
+		    </form>
+		</div>
 	    </div>
 	</div>
     </nav>

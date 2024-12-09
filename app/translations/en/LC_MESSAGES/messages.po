@@ -1,0 +1,14 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: en\n"
+
+msgid "Available Pokémon Cards"
+msgstr "Available Pokémon Cards"
+
+msgid "English"
+msgstr "English"
+
+msgid "Hebrew"
+msgstr "Hebrew"
+

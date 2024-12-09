@@ -65,11 +65,16 @@ def view_cards():
         cities=CITIES_IN_ISRAEL,
     )
 
-@user_bp.route('/change-lang/<lang>')
-def change_lang(lang):
+@user_bp.route("/set-language", methods=["POST"])
+def set_language():
+    lang = request.form.get("lang")  
     if lang in ['en', 'he']:
         session['lang'] = lang
-    return redirect(request.referrer or url_for('index'))
+        flash("Language switched successfully.", "success")
+    else:
+        flash("Invalid language selection.", "danger")
+
+    return redirect(request.referrer or url_for('user.view_cards'))
 
 @user_bp.route("/report_user/<int:user_id>", methods=["POST"])
 @login_required
