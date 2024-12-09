@@ -13,7 +13,7 @@ msgid "N/A"
 msgstr "לא זמין"
 
 msgid "Card Type:"
-msgstr "סוג הכרטיס:"
+msgstr "סוג הקלף:"
 
 msgid "Set:"
 msgstr "סט:"
@@ -58,7 +58,7 @@ msgid "Grade:"
 msgstr "דירוג:"
 
 msgid "Uploader Location:"
-msgstr "מיקום המעלה:"
+msgstr "מיקום המוכר:"
 
 msgid "TCGPlayer Price:"
 msgstr "מחיר TCGPlayer:"
