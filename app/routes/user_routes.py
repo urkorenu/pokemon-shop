@@ -290,6 +290,8 @@ def contact_us():
 @user_bp.route("/about", methods=["GET"])
 def about_us():
     return render_template("about.html")
+from sqlalchemy.orm import aliased
+
 
 def filter_cards(base_query=None, user_id=None, show_sold=False):
     """
@@ -300,19 +302,22 @@ def filter_cards(base_query=None, user_id=None, show_sold=False):
     :param show_sold: Boolean indicating whether to include sold cards (amount == 0).
     :return: Filtered query and unique set names.
     """
-    # Start with base query or all cards
+    # Use an alias for User table to avoid duplicate joins
+    uploader_alias = aliased(User)
+
     if base_query is None:
-        base_query = Card.query.options(joinedload(Card.uploader)).join(User)
+        base_query = Card.query.options(joinedload(Card.uploader)).join(uploader_alias)
 
     # Filters
     name_query = request.args.get("name", "").strip()
     set_name_query = request.args.get("set_name", "")
+    location_query = request.args.get("location", "").strip()
     is_graded = request.args.get("is_graded", "")
     sort_option = request.args.get("sort", "")
     show_sold = request.args.get("show_sold", "off") == "on" or show_sold
 
     # Base filters
-    query = base_query.filter(or_(User.role == "uploader", User.role == "admin"))
+    query = base_query.filter(or_(uploader_alias.role == "uploader", uploader_alias.role == "admin"))
 
     if user_id:
         query = query.filter(Card.uploader_id == user_id)
@@ -325,6 +330,8 @@ def filter_cards(base_query=None, user_id=None, show_sold=False):
         query = query.filter(Card.name.ilike(f"%{name_query}%"))
     if set_name_query:
         query = query.filter(Card.set_name == set_name_query)
+    if location_query:
+        query = query.filter(uploader_alias.location.ilike(f"%{location_query}%"))
     if is_graded == "yes":
         query = query.filter(Card.is_graded.is_(True))
     elif is_graded == "no":
