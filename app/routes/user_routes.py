@@ -21,47 +21,40 @@ def view_cards():
     location_query = request.args.get("location", "").strip()
     is_graded = request.args.get("is_graded", "")
 
-    # Query the database with eager loading for uploader relationship
-    query = Card.query.options(joinedload(Card.uploader))
+    # Base Query: Cards with uploader role filter and amount > 0
+    base_query = Card.query.options(joinedload(Card.uploader)).join(User).filter(
+        or_(User.role == "uploader", User.role == "admin"),
+        Card.amount > 0
+    )
 
+    # Apply filters
     if name_query:
-        query = query.filter(Card.name.ilike(f"%{name_query}%"))
+        base_query = base_query.filter(Card.name.ilike(f"%{name_query}%"))
     if set_name_query:
-        query = query.filter(Card.set_name == set_name_query)
+        base_query = base_query.filter(Card.set_name == set_name_query)
     if location_query:
-        query = query.join(Card.uploader).filter(
-            User.location.ilike(f"%{location_query}%")
-        )
+        base_query = base_query.filter(User.location.ilike(f"%{location_query}%"))
     if is_graded == "yes":
-        query = query.filter(Card.is_graded.is_(True))
+        base_query = base_query.filter(Card.is_graded.is_(True))
     elif is_graded == "no":
-        query = query.filter(Card.is_graded.is_(False))
+        base_query = base_query.filter(Card.is_graded.is_(False))
 
     # Apply sorting
     if sort_option == "price_asc":
-        query = query.order_by(Card.price.asc())
+        base_query = base_query.order_by(Card.price.asc())
     elif sort_option == "price_desc":
-        query = query.order_by(Card.price.desc())
+        base_query = base_query.order_by(Card.price.desc())
     elif sort_option == "card_number":
-        query = query.order_by(Card.number.asc())
+        base_query = base_query.order_by(Card.number.asc())
 
-    # Execute the query
-
-    cards = (
-        Card.query.join(User)
-        .filter(or_(User.role == "uploader", User.role == "admin"), Card.amount == 1)
-        .all()
-    )
-
-    # Get unique set names for the filter dropdown
-    unique_set_names = [
-        card.set_name for card in Card.query.distinct(Card.set_name).all()
-    ]
+    # Fetch cards and distinct set names in a single query
+    cards = base_query.all()
+    unique_set_names = {card.set_name for card in cards}
 
     return render_template(
         "cards.html",
-        cards=cards,
-        unique_set_names=unique_set_names,
+        cards=cards,  # Only cards with amount > 0
+        unique_set_names=sorted(unique_set_names),  # Unique set names
         cities=CITIES_IN_ISRAEL,
     )
 
