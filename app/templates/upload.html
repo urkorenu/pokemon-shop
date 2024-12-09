@@ -35,10 +35,17 @@
         <input type="text" id="name" name="name" class="form-control" placeholder="Card name will be auto-filled" readonly required>
     </div>
 
-    <!-- Price -->
+    <!-- Price or Follow TCGPlayer -->
     <div class="mb-3">
         <label for="price" class="form-label">Price:</label>
-        <input type="number" id="price" name="price" step="0.01" class="form-control" placeholder="Enter price" required>
+        <div class="input-group">
+            <span class="input-group-text">ILS</span>
+            <input type="number" id="price" name="price" step="0.01" class="form-control" placeholder="Enter price manually">
+        </div>
+        <div class="form-check mt-2">
+            <input type="checkbox" id="follow_tcg" name="follow_tcg" class="form-check-input">
+            <label for="follow_tcg" class="form-check-label">Follow TCGPlayer Price (The price is for Ungraded in NM condition)</label>
+        </div>
     </div>
 
     <!-- Condition -->
@@ -51,12 +58,9 @@
             <option value="HP">Heavily Played (HP)</option>
             <option value="DMG">Damaged (DMG)</option>
         </select>
-    </div>
-
-    <!-- File Upload -->
-    <div class="mb-3">
-        <label for="image" class="form-label">Card Image:</label>
-        <input type="file" id="image" name="image" class="form-control" accept="image/*" required>
+        <small class="text-muted" id="tcg_warning" style="display: none;">
+            To follow TCGPlayer Price, the condition must be "Near Mint (NM)".
+        </small>
     </div>
 
     <!-- Is Graded -->
@@ -77,13 +81,61 @@
         </select>
     </div>
 
-    <!-- Submit and Reset Buttons -->
-    <div class="d-flex justify-content-between mt-4">
+    <!-- File Upload -->
+    <div class="mb-3">
+        <label for="image" class="form-label">Card Image:</label>
+        <input type="file" id="image" name="image" class="form-control" accept="image/*" required>
+    </div>
+
+    <!-- Submit -->
+    <div class="mt-4">
         <button type="submit" class="btn btn-primary">Upload</button>
     </div>
 </form>
 
 <script>
+    const priceInput = document.getElementById('price');
+    const followTcgCheckbox = document.getElementById('follow_tcg');
+    const conditionSelect = document.getElementById('condition');
+    const tcgWarning = document.getElementById('tcg_warning');
+
+    // Enforce condition logic for "Follow TCGPlayer Price"
+    function enforceConditionLogic() {
+        if (followTcgCheckbox.checked) {
+            conditionSelect.value = "NM"; // Automatically set to Near Mint
+            conditionSelect.disabled = true; // Lock condition
+            priceInput.value = ''; // Clear manual price
+            priceInput.disabled = true;
+            tcgWarning.style.display = 'block';
+        } else {
+            conditionSelect.disabled = false; // Unlock condition
+            priceInput.disabled = false;
+            tcgWarning.style.display = 'none';
+        }
+    }
+
+    // Disable "Follow TCGPlayer" if condition is not Near Mint
+    conditionSelect.addEventListener('change', () => {
+        if (conditionSelect.value !== "NM") {
+            followTcgCheckbox.checked = false; // Uncheck follow TCG
+            followTcgCheckbox.disabled = true; // Disable follow option
+            enforceConditionLogic();
+        } else {
+            followTcgCheckbox.disabled = false; // Allow selection
+        }
+    });
+
+    // Handle follow TCG checkbox logic
+    followTcgCheckbox.addEventListener('change', enforceConditionLogic);
+
+    // Validate form submission
+    document.querySelector('form').addEventListener('submit', (e) => {
+        if (!priceInput.value && !followTcgCheckbox.checked) {
+            e.preventDefault();
+            alert('You must either enter a manual price or choose to follow TCGPlayer price.');
+        }
+    });
+
     async function fetchCardDetails() {
         const setName = document.getElementById("set_name").value;
         const cardNumber = document.getElementById("number").value;
@@ -129,6 +181,7 @@
         const gradedFields = document.getElementById("graded_fields");
         gradedFields.style.display = this.checked ? "block" : "none";
     });
+
 </script>
 {% endblock %}
 

@@ -44,6 +44,7 @@ class Card(db.Model):
     uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
     uploader_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
     uploader = db.relationship("User", backref="uploaded_cards")
+    follow_tcg = db.Column(db.Boolean, default=False)
 
 
 # Define the association table for orders and cards

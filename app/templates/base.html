@@ -21,8 +21,19 @@
             font-family: Arial, sans-serif;
         }
 
+        body {
+            font-family: Arial, sans-serif;
+            {% if session.get('lang', 'en') == 'he' %}
+            direction: rtl;
+            text-align: right;
+            {% endif %}
+        }
+
         .navbar {
             margin-bottom: 0;
+            {% if session.get('lang', 'en') == 'he' %}
+            flex-direction: row-reverse;
+            {% endif %}
         }
 
         .navbar-brand img {
@@ -144,6 +155,28 @@
                 font-size: 0.9rem;
             }
         }
+
+        .dropdown-menu {
+            {% if session.get('lang', 'en') == 'he' %}
+            text-align: right;
+            {% endif %}
+        }
+
+        .flash-container {
+            z-index: 1050;
+        }
+
+        .flash-container .alert {
+            animation: fadeInOut 5s ease-in-out forwards;
+        }
+
+        /* Smooth fade-in-out animation */
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-20px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
     </style>
 </head>
 <body>
@@ -186,14 +219,14 @@
 			    <li>
 			    <li>
 				<a class="dropdown-item" href="{{ url_for('order.my_orders') }}">
-				    My Orders 
+				    My Orders
 				    <span class="badge bg-warning text-dark rounded-pill">{{ orders_without_feedback }}</span>
 				</a>
 			    </li>
 			    {% if current_user.role in ["uploader", "admin"] %}
 			    <li>
 				<a class="dropdown-item" href="{{ url_for('order.pending_orders') }}">
-				    Pending Orders 
+				    Pending Orders
 				    <span class="badge bg-danger rounded-pill">{{ pending_orders }}</span>
 				</a>
 			    </li>
@@ -219,7 +252,7 @@
 		    {% if current_user.is_authenticated %}
 		    <li class="nav-item">
 			<a class="nav-link" href="/cart">
-			    <i class="bi bi-cart-fill"></i> Cart 
+			    <i class="bi bi-cart-fill"></i> Cart
 			    <span class="badge bg-success rounded-pill">{{ cart_items_count }}</span>
 			</a>
 		    </li>
@@ -240,9 +273,40 @@
 		<button id="darkModeSwitch" class="btn btn-outline-primary ms-3">
 		    <i class="bi bi-moon"></i>
 		</button>
-	    </div>
+
+        <!-- Language Switch Modal Trigger -->
+        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#languageModal">
+            {% if session.get('lang', 'en') == 'he' %}
+                🇮🇱 עברית
+            {% else %}
+                🇺🇸 English
+            {% endif %}
+        </button>
+        </div>
 	</div>
     </nav>
+
+        <!-- Language Switch Modal -->
+    <div class="modal fade" id="languageModal" tabindex="-1" aria-labelledby="languageModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="languageModalLabel">{{ _('Choose Language') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ url_for('user.set_language') }}">
+                        <button type="submit" name="lang" value="en" class="btn btn-outline-primary w-100 mb-2">
+                            🇺🇸 English
+                        </button>
+                        <button type="submit" name="lang" value="he" class="btn btn-outline-primary w-100">
+                            🇮🇱 עברית
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Card View Modal -->
     <div class="modal fade" id="cardViewModal" tabindex="-1" aria-labelledby="cardViewModalLabel" aria-hidden="true">
@@ -265,18 +329,18 @@
     </div>
 
     <!-- Flash Messages -->
-    <div class="alert-container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            {% endfor %}
-        {% endif %}
-        {% endwith %}
-    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+	<div class="flash-container position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 1050; width: auto;">
+	    {% for category, message in messages %}
+		<div class="alert alert-{{ category }} alert-dismissible fade show shadow" role="alert" style="min-width: 300px; max-width: 500px;">
+		    {{ message }}
+		    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+	    {% endfor %}
+	</div>
+    {% endif %}
+    {% endwith %}
 
     <footer class="footer bg-dark text-light py-4">
         <div class="container text-center">

@@ -1,0 +1,102 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: he\n"
+
+msgid "Available Pokémon Cards"
+msgstr "קלפי פוקימון זמינים"
+
+msgid "Uploaded:"
+msgstr "הועלה:"
+
+msgid "N/A"
+msgstr "לא זמין"
+
+msgid "Card Type:"
+msgstr "סוג הקלף:"
+
+msgid "Set:"
+msgstr "סט:"
+
+msgid "Card Number:"
+msgstr "מספר קלף:"
+
+msgid "Condition:"
+msgstr "מצב:"
+
+msgid "Price:"
+msgstr "מחיר:"
+
+msgid "Uploaded By:"
+msgstr "הועלה על ידי:"
+
+msgid "Add to Cart"
+msgstr "הוסף לעגלה"
+
+msgid "Sold"
+msgstr "נמכר"
+
+msgid "Close"
+msgstr "סגור"
+
+msgid "Amount:"
+msgstr "כמות:"
+
+msgid "Graded:"
+msgstr "מדורג:"
+
+msgid "Yes"
+msgstr "כן"
+
+msgid "No"
+msgstr "לא"
+
+msgid "Grading Company:"
+msgstr "חברת דירוג:"
+
+msgid "Grade:"
+msgstr "דירוג:"
+
+msgid "Uploader Location:"
+msgstr "מיקום המוכר:"
+
+msgid "TCGPlayer Price:"
+msgstr "מחיר TCGPlayer:"
+
+msgid "Report"
+msgstr "דווח"
+
+msgid "Report Card"
+msgstr "דיווח על קלף"
+
+msgid "Reason for report:"
+msgstr "סיבת הדיווח:"
+
+msgid "Bad Picture"
+msgstr "תמונה לא טובה"
+
+msgid "Misleading Information"
+msgstr "מידע מטעה"
+
+msgid "Fake Card"
+msgstr " קלף מזויף"
+
+msgid "Other"
+msgstr "אחר"
+
+msgid "Additional details (optional)"
+msgstr "פרטים נוספים (אופציונלי)"
+
+msgid "Submit Report"
+msgstr "שלח דיווח"
+
+
+msgid "No cards found. Try adjusting your search or filters."
+msgstr "לא נמצאו כרטיסים. נסו לשנות את החיפוש או את הפילטרים."
+
+msgid "English"
+msgstr "אנגלית"
+
+msgid "Hebrew"
+msgstr "עברית"
+

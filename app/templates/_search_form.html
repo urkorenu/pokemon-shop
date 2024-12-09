@@ -1,10 +1,10 @@
-<form method="GET" action="/" class="row g-3 mb-4">
+<form method="GET" action="{{ request.path }}" class="row g-3 mb-4">
     <div class="col-md-2">
         <input type="text" name="name" class="form-control" placeholder="Search by Pokémon Name" value="{{ request.args.get('name', '') }}">
     </div>
     <div class="col-md-2">
         <select name="set_name" class="form-select">
-            <option value="">Filter by Set Name</option>
+            <option value="">{{ _('Filter by Set Name') }}</option>
             {% for set_name in unique_set_names|unique %}
             <option value="{{ set_name }}" {% if request.args.get('set_name') == set_name %}selected{% endif %}>
                 {{ set_name }}
@@ -14,9 +14,9 @@
     </div>
     <div class="col-md-2">
         <select name="is_graded" class="form-select">
-            <option value="">Graded?</option>
-            <option value="yes" {% if request.args.get('is_graded') == 'yes' %}selected{% endif %}>Yes</option>
-            <option value="no" {% if request.args.get('is_graded') == 'no' %}selected{% endif %}>No</option>
+            <option value="">{{ _('Graded?') }}</option>
+            <option value="yes" {% if request.args.get('is_graded') == 'yes' %}selected{% endif %}>{{ _('Yes') }}</option>
+            <option value="no" {% if request.args.get('is_graded') == 'no' %}selected{% endif %}>{{ _('No') }}</option>
         </select>
     </div>
     <div class="col-md-2">
@@ -31,14 +31,24 @@
     </div>
     <div class="col-md-2">
         <select name="sort" class="form-select">
-            <option value="">Sort By</option>
-            <option value="price_asc" {% if request.args.get('sort') == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
-            <option value="price_desc" {% if request.args.get('sort') == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
-            <option value="card_number" {% if request.args.get('sort') == 'card_number' %}selected{% endif %}>Card Number</option>
+            <option value="">{{ _('Sort By') }}</option>
+            <option value="price_asc" {% if request.args.get('sort') == 'price_asc' %}selected{% endif %}>{{ _('Price: Low to High') }}</option>
+            <option value="price_desc" {% if request.args.get('sort') == 'price_desc' %}selected{% endif %}>{{ _('Price: High to Low') }}</option>
+            <option value="card_number" {% if request.args.get('sort') == 'card_number' %}selected{% endif %}>{{ _('Card Number') }}</option>
         </select>
     </div>
+
+    <!-- Conditionally render the checkbox -->
+    {% if show_sold_checkbox %}
+    <div class="col-md-2 form-check d-flex align-items-center">
+        <input class="form-check-input me-2" type="checkbox" name="show_sold" id="showSold" 
+               {% if request.args.get('show_sold') == 'on' %}checked{% endif %} onchange="this.form.submit()">
+        <label class="form-check-label" for="showSold">{{ _('Show Sold Cards') }}</label>
+    </div>
+    {% endif %}
+
     <div class="col-md-2">
-        <button type="submit" class="btn btn-primary w-100">Search</button>
+        <button type="submit" class="btn btn-primary w-100">{{ _('Search') }}</button>
     </div>
 </form>
 

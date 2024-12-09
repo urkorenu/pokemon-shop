@@ -38,7 +38,8 @@ def upload_card():
     if request.method == "POST":
         # Get form data
         name = request.form.get("name")
-        price = request.form.get("price")
+        follow_tcg = request.form.get("follow_tcg") == "on"
+        price = float(request.form.get("price") or 0.0)
         condition = request.form.get("condition")
         set_name = request.form.get("set_name")
         number = request.form.get("number")
@@ -73,6 +74,9 @@ def upload_card():
             # Extract TCG prices
             tcg_price_data = card_details.get("tcgplayer", {}).get("prices", {})
             selected_price = tcg_price_data.get(card_type, {}).get("market", 0.0)
+            if follow_tcg:
+                price = round(selected_price * 3.56, 0)
+                condition = "NM"
 
         except requests.RequestException as e:
             print(f"Error fetching card details: {e}", flush=True)
@@ -92,6 +96,7 @@ def upload_card():
         card = Card(
             name=name,
             price=price,
+            follow_tcg=follow_tcg,
             tcg_price=selected_price,
             condition=condition,
             amount=1,

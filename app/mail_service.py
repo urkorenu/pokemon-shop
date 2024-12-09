@@ -4,7 +4,7 @@ from botocore.exceptions import ClientError
 
 # Set up the SES client
 def send_email(subject, body, recipient, sender="orders@pika-card.store"):
-    ses = boto3.client("ses", region_name="eu-north-1")  # Change to your SES region
+    ses = boto3.client("ses", region_name="eu-north-1")
     try:
         response = ses.send_email(
             Source=sender,
@@ -14,7 +14,7 @@ def send_email(subject, body, recipient, sender="orders@pika-card.store"):
             Message={
                 "Subject": {"Data": subject},
                 "Body": {
-                    "Text": {"Data": body},
+                    "Text": {"Data": body + "\nBest regards,\nThe Pika-Card Team"},
                 },
             },
         )

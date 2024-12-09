@@ -1,10 +1,11 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from ..models import Card, Cart, db, User, Order
 from flask_login import login_required, current_user
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, aliased
 from sqlalchemy import or_
 import boto3
 from config import Config
+from urllib.parse import urlparse
 from ..cities import CITIES_IN_ISRAEL
 from ..mail_service import send_email
 
@@ -14,91 +15,78 @@ user_bp = Blueprint("user", __name__)
 
 @user_bp.route("/")
 def view_cards():
-    # Get search and filter parameters from the request
-    name_query = request.args.get("name", "").strip()
-    set_name_query = request.args.get("set_name", "")
-    sort_option = request.args.get("sort", "")
-    location_query = request.args.get("location", "").strip()
-    is_graded = request.args.get("is_graded", "")
+    # Get the page number from request args (default to page 1)
+    page = request.args.get("page", 1, type=int)
 
-    # Query the database with eager loading for uploader relationship
-    query = Card.query.options(joinedload(Card.uploader))
-
-    if name_query:
-        query = query.filter(Card.name.ilike(f"%{name_query}%"))
-    if set_name_query:
-        query = query.filter(Card.set_name == set_name_query)
-    if location_query:
-        query = query.join(Card.uploader).filter(
-            User.location.ilike(f"%{location_query}%")
-        )
-    if is_graded == "yes":
-        query = query.filter(Card.is_graded.is_(True))
-    elif is_graded == "no":
-        query = query.filter(Card.is_graded.is_(False))
-
-    # Apply sorting
-    if sort_option == "price_asc":
-        query = query.order_by(Card.price.asc())
-    elif sort_option == "price_desc":
-        query = query.order_by(Card.price.desc())
-    elif sort_option == "card_number":
-        query = query.order_by(Card.number.asc())
-
-    # Execute the query
-
-    cards = (
-        Card.query.join(User)
-        .filter(or_(User.role == "uploader", User.role == "admin"), Card.amount == 1)
-        .all()
-    )
-
-    # Get unique set names for the filter dropdown
-    unique_set_names = [
-        card.set_name for card in Card.query.distinct(Card.set_name).all()
-    ]
+    # Call filter_cards with pagination
+    paginated_cards, unique_set_names = filter_cards(page=page)
 
     return render_template(
         "cards.html",
-        cards=cards,
+        cards=paginated_cards.items,
         unique_set_names=unique_set_names,
+        pagination=paginated_cards,
         cities=CITIES_IN_ISRAEL,
+        show_sold_checkbox=False,
     )
+
+
+@user_bp.route("/set-language", methods=["POST"])
+def set_language():
+    lang = request.form.get("lang")
+    if lang in ["en", "he"]:
+        session["lang"] = lang
+    else:
+        flash("Invalid language selection.", "danger")
+
+    referrer = request.referrer
+    if referrer:
+        referrer = referrer.replace("\\", "")
+        parsed_referrer = urlparse(referrer)
+        if not parsed_referrer.netloc and not parsed_referrer.scheme:
+            return redirect(referrer)
+    return redirect(url_for("user.view_cards"))
+
+
+@user_bp.route("/report_user/<int:user_id>", methods=["POST"])
+@login_required
+def report_user(user_id):
+    user = User.query.get_or_404(user_id)
+
+    reason = request.form.get("reason")
+    details = request.form.get("details")
+
+    if not reason:
+        flash("Please provide a reason for the report.", "danger")
+        return redirect(url_for("user.profile", user_id=user_id))
+
+    # Example of storing or sending the report (adjust as needed)
+    send_email(
+        recipient=Config.ADMIN_MAIL,
+        subject=f"User Report - {user.username}",
+        body=(
+            f"User '{current_user.username}' reported the user '{user.username}'.\n"
+            f"Reason: {reason}\nDetails: {details if details else 'No additional details provided.'}"
+        ),
+    )
+
+    flash("User has been reported successfully. Thank you!", "success")
+    return redirect(url_for("user.profile", user_id=user_id))
 
 
 @user_bp.route("/profile/<int:user_id>")
 def profile(user_id):
     user = User.query.get_or_404(user_id)
 
-    # Get search and filter parameters
-    name_query = request.args.get("name", "").strip()
-    set_name_query = request.args.get("set_name", "")
-    is_graded = request.args.get("is_graded", "")
-    sort_option = request.args.get("sort", "")
+    # Filter cards
+    show_sold = request.args.get("show_sold") == "on"
+    page = request.args.get("page", 1, type=int)
 
-    # Filter user's uploaded cards
-    query = Card.query.filter_by(uploader_id=user_id)
+    paginated_cards, unique_set_names = filter_cards(
+        user_id=user_id, show_sold=show_sold, page=page
+    )
 
-    if name_query:
-        query = query.filter(Card.name.ilike(f"%{name_query}%"))
-    if set_name_query:
-        query = query.filter(Card.set_name == set_name_query)
-    if is_graded == "yes":
-        query = query.filter(Card.is_graded.is_(True))
-    elif is_graded == "no":
-        query = query.filter(Card.is_graded.is_(False))
-
-    # Apply sorting
-    if sort_option == "price_asc":
-        query = query.order_by(Card.price.asc())
-    elif sort_option == "price_desc":
-        query = query.order_by(Card.price.desc())
-    elif sort_option == "card_number":
-        query = query.order_by(Card.number.asc())
-
-    cards = query.all()
-
-    # Fetch feedback and ratings for the user's completed sales
+    # Fetch feedback for the user's completed sales
     completed_orders = (
         db.session.query(User.username, Order.feedback, Order.rating)
         .join(Order, Order.buyer_id == User.id)
@@ -109,10 +97,11 @@ def profile(user_id):
     return render_template(
         "profile.html",
         user=user,
-        cards=cards,
+        cards=paginated_cards.items,
         feedback=completed_orders,
-        unique_set_names=Card.query.distinct(Card.set_name).all(),
-        include_location=False,  # Exclude location filter
+        unique_set_names=unique_set_names,
+        pagination=paginated_cards,
+        show_sold_checkbox=True,
     )
 
 
@@ -169,16 +158,15 @@ def edit_card(card_id):
 def delete_card(card_id):
     card = Card.query.get_or_404(card_id)
 
-    if card.uploader_id != current_user.id and current_user.role != "admin":
-        flash("You do not have permission to delete this card.", "danger")
-        return redirect(url_for("user.my_cards"))
+    # Ensure only admins can delete other users' cards, not their own
+    if current_user.role != "admin":
+        if card.uploader_id != current_user.id:
+            flash("You do not have permission to delete this card.", "danger")
+            return redirect(url_for("user.my_cards"))
 
     # Initialize S3 client
     s3 = boto3.client("s3", region_name=Config.AWS_REGION)
     bucket_name = Config.S3_BUCKET
-
-    # Debugging: Print Config values
-    print(f"AWS_REGION: {Config.AWS_REGION}, S3_BUCKET: {Config.S3_BUCKET}", flush=True)
 
     # Delete the image from S3 if it exists
     if card.image_url:
@@ -198,6 +186,27 @@ def delete_card(card_id):
         except Exception as e:
             print(f"Failed to delete {card.image_url} from S3: {e}", flush=True)
             flash("Failed to delete the image from S3.", "danger")
+
+    # Notify the seller via email if deleted by an admin and uploader is not the current user
+    if current_user.role == "admin" and card.uploader_id != current_user.id:
+        uploader = User.query.get(card.uploader_id)
+        if uploader and uploader.email:  # Ensure the uploader exists and has an email
+            email_subject = "Your Card Has Been Deleted"
+            email_body = (
+                f"Hello {uploader.username},\n\n"
+                f"Your card '{card.name}' (Card Number: {card.number}, Set: {card.set_name}) "
+                f"has been deleted by an administrator.\n\n"
+                "If you have any questions, please contact support.\n\n"
+                "Best regards,\nThe Pika-Card Team"
+            )
+            try:
+                send_email(
+                    recipient=uploader.email,
+                    subject=email_subject,
+                    body=email_body,
+                )
+            except Exception as e:
+                print(f"Failed to send email notification: {e}", flush=True)
 
     # Delete the card from the database
     Cart.query.filter_by(card_id=card.id).delete()
@@ -318,3 +327,66 @@ def contact_us():
 @user_bp.route("/about", methods=["GET"])
 def about_us():
     return render_template("about.html")
+
+
+def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_page=12):
+    """
+    Reusable function to filter cards based on search and filter parameters.
+
+    :param base_query: Optional base query to filter on (defaults to all cards).
+    :param user_id: Optional user_id to filter cards by uploader.
+    :param show_sold: Boolean indicating whether to include sold cards (amount == 0).
+    :return: Filtered query and unique set names.
+    """
+    # Use an alias for User table to avoid duplicate joins
+    uploader_alias = aliased(User)
+
+    if base_query is None:
+        base_query = Card.query.options(joinedload(Card.uploader)).join(uploader_alias)
+
+    # Filters
+    name_query = request.args.get("name", "").strip()
+    set_name_query = request.args.get("set_name", "")
+    location_query = request.args.get("location", "").strip()
+    is_graded = request.args.get("is_graded", "")
+    sort_option = request.args.get("sort", "")
+    show_sold = request.args.get("show_sold", "off") == "on" or show_sold
+
+    # Base filters
+    query = base_query.filter(
+        or_(uploader_alias.role == "uploader", uploader_alias.role == "admin")
+    )
+
+    if user_id:
+        query = query.filter(Card.uploader_id == user_id)
+
+    # Only exclude sold cards if 'show_sold' is False
+    if not show_sold:
+        query = query.filter(Card.amount > 0)
+
+    if name_query:
+        query = query.filter(Card.name.ilike(f"%{name_query}%"))
+    if set_name_query:
+        query = query.filter(Card.set_name == set_name_query)
+    if location_query:
+        query = query.filter(uploader_alias.location.ilike(f"%{location_query}%"))
+    if is_graded == "yes":
+        query = query.filter(Card.is_graded.is_(True))
+    elif is_graded == "no":
+        query = query.filter(Card.is_graded.is_(False))
+
+    # Apply sorting
+    if sort_option == "price_asc":
+        query = query.order_by(Card.price.asc())
+    elif sort_option == "price_desc":
+        query = query.order_by(Card.price.desc())
+    elif sort_option == "card_number":
+        query = query.order_by(Card.number.asc())
+
+    # Paginate the query
+    paginated_cards = query.paginate(page=page, per_page=per_page, error_out=False)
+
+    # Extract unique set names for the current page
+    unique_set_names = {card.set_name for card in paginated_cards.items}
+
+    return paginated_cards, sorted(unique_set_names)

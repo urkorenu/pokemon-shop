@@ -21,12 +21,13 @@ def auth():
             user = User.query.filter_by(email=email).first()
 
             if user and user.check_password(password):
+                if user.role == "banned":
+                    flash("Your account has been banned", "error")
+                    return redirect(url_for("auth.auth"))
+
                 login_user(user)
                 flash("Login successful!", "success")
                 return redirect(url_for("user.view_cards"))
-
-            elif user.role == "banned":
-                flash("Your account has been banned", "error")
 
             else:
                 flash("Invalid email or password.", "error")
