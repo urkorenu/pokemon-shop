@@ -12,7 +12,6 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.9.1/font/bootstrap-icons.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <style>
-        /* General Reset */
         html, body {
             height: 100vh;
             margin: 0;
@@ -22,38 +21,19 @@
             font-family: Arial, sans-serif;
         }
 
-        /* RTL Language Support */
-        body.rtl {
+        body {
+            font-family: Arial, sans-serif;
+            {% if session.get('lang', 'en') == 'he' %}
             direction: rtl;
             text-align: right;
+            {% endif %}
         }
 
-        body.rtl .navbar {
-            flex-direction: row-reverse;
-        }
-
-        body.rtl .navbar-nav {
-            margin-right: 0;
-            margin-left: auto;
-        }
-
-        body.rtl .dropdown-menu {
-            text-align: right;
-        }
-
-        body.rtl .footer {
-            text-align: right;
-        }
-
-        /* LTR Language Support */
-        body.ltr {
-            direction: ltr;
-            text-align: left;
-        }
-
-        /* Navbar */
         .navbar {
             margin-bottom: 0;
+            {% if session.get('lang', 'en') == 'he' %}
+            flex-direction: row-reverse;
+            {% endif %}
         }
 
         .navbar-brand img {
@@ -61,13 +41,11 @@
             height: auto;
         }
 
-        /* Container */
         .container {
             flex: 1;
             padding-top: 20px;
         }
 
-        /* Footer */
         .footer {
             background-color: #343a40;
             color: white;
@@ -85,7 +63,6 @@
             color: #ffc107; /* Hover effect with yellow color */
         }
 
-        /* Alerts */
         .alert {
             border-radius: 0.5rem;
         }
@@ -113,7 +90,7 @@
             filter: invert(1);
         }
 
-        /* Dark Mode for Alerts */
+        /* Flash Messages Dark Mode */
         body.bg-dark .alert {
             background-color: #333333 !important;
             color: #f8f9fa !important;
@@ -144,7 +121,7 @@
             border-color: #117a8b !important;
         }
 
-        /* Dark Mode Buttons */
+        /* Button Styling */
         body.bg-dark .btn {
             border: none;
         }
@@ -179,7 +156,12 @@
             }
         }
 
-        /* Flash Messages Fade-In-Out Animation */
+        .dropdown-menu {
+            {% if session.get('lang', 'en') == 'he' %}
+            text-align: right;
+            {% endif %}
+        }
+
         .flash-container {
             z-index: 1050;
         }
@@ -188,43 +170,17 @@
             animation: fadeInOut 5s ease-in-out forwards;
         }
 
+        /* Smooth fade-in-out animation */
         @keyframes fadeInOut {
             0% { opacity: 0; transform: translateY(-20px); }
             10% { opacity: 1; transform: translateY(0); }
             90% { opacity: 1; transform: translateY(0); }
             100% { opacity: 0; transform: translateY(-20px); }
         }
-
-        /* Buttons */
-        .btn {
-            border: none;
-            font-weight: 600;
-        }
-
-        .btn-warning {
-            background-color: #ffc107;
-            color: #212529;
-        }
-
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-        }
-
-        .btn-outline-primary {
-            border-color: #007bff;
-            color: #007bff;
-        }
-
-        .btn-outline-primary:hover {
-            background-color: #007bff;
-            color: white;
-        }
-
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark {{ 'rtl' if session.get('lang', 'en') == 'he' else 'ltr' }}">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 	<div class="container-fluid">
 	    <!-- Brand -->
 	    <a class="navbar-brand" href="{{ url_for('user.view_cards') }}">
@@ -263,14 +219,14 @@
 			    <li>
 			    <li>
 				<a class="dropdown-item" href="{{ url_for('order.my_orders') }}">
-				    My Orders 
+				    My Orders
 				    <span class="badge bg-warning text-dark rounded-pill">{{ orders_without_feedback }}</span>
 				</a>
 			    </li>
 			    {% if current_user.role in ["uploader", "admin"] %}
 			    <li>
 				<a class="dropdown-item" href="{{ url_for('order.pending_orders') }}">
-				    Pending Orders 
+				    Pending Orders
 				    <span class="badge bg-danger rounded-pill">{{ pending_orders }}</span>
 				</a>
 			    </li>
@@ -296,7 +252,7 @@
 		    {% if current_user.is_authenticated %}
 		    <li class="nav-item">
 			<a class="nav-link" href="/cart">
-			    <i class="bi bi-cart-fill"></i> Cart 
+			    <i class="bi bi-cart-fill"></i> Cart
 			    <span class="badge bg-success rounded-pill">{{ cart_items_count }}</span>
 			</a>
 		    </li>
@@ -318,18 +274,39 @@
 		    <i class="bi bi-moon"></i>
 		</button>
 
-        <!-- Language Switch Button -->
-        <form method="POST" action="{{ url_for('user.set_language') }}" class="d-inline">
-            <input type="hidden" name="lang" value="{{ 'en' if session.get('lang', 'en') == 'he' else 'he' }}">
-            <button type="submit" class="btn btn-outline-primary ms-2">
-                {% if session.get('lang', 'en') == 'he' %}
-                    🇺🇸 {{ _('English') }}
-                {% else %}
-                    🇮🇱 {{ _('עברית') }}
-                {% endif %}
-            </button>
-        </form>
+        <!-- Language Switch Modal Trigger -->
+        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#languageModal">
+            {% if session.get('lang', 'en') == 'he' %}
+                🇮🇱 עברית
+            {% else %}
+                🇺🇸 English
+            {% endif %}
+        </button>
+        </div>
+	</div>
+    </nav>
 
+        <!-- Language Switch Modal -->
+    <div class="modal fade" id="languageModal" tabindex="-1" aria-labelledby="languageModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="languageModalLabel">{{ _('Choose Language') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ url_for('user.set_language') }}">
+                        <button type="submit" name="lang" value="en" class="btn btn-outline-primary w-100 mb-2">
+                            🇺🇸 English
+                        </button>
+                        <button type="submit" name="lang" value="he" class="btn btn-outline-primary w-100">
+                            🇮🇱 עברית
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Card View Modal -->
     <div class="modal fade" id="cardViewModal" tabindex="-1" aria-labelledby="cardViewModalLabel" aria-hidden="true">
