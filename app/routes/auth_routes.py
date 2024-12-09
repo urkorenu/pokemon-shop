@@ -29,7 +29,6 @@ def auth():
                 flash("Login successful!", "success")
                 return redirect(url_for("user.view_cards"))
 
-
             else:
                 flash("Invalid email or password.", "error")
 

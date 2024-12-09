@@ -27,25 +27,26 @@ def view_cards():
         unique_set_names=unique_set_names,
         pagination=paginated_cards,
         cities=CITIES_IN_ISRAEL,
-        show_sold_checkbox=False
+        show_sold_checkbox=False,
     )
 
 
 @user_bp.route("/set-language", methods=["POST"])
 def set_language():
-    lang = request.form.get("lang")  
-    if lang in ['en', 'he']:
-        session['lang'] = lang
+    lang = request.form.get("lang")
+    if lang in ["en", "he"]:
+        session["lang"] = lang
     else:
         flash("Invalid language selection.", "danger")
 
-    return redirect(request.referrer or url_for('user.view_cards'))
+    return redirect(request.referrer or url_for("user.view_cards"))
+
 
 @user_bp.route("/report_user/<int:user_id>", methods=["POST"])
 @login_required
 def report_user(user_id):
     user = User.query.get_or_404(user_id)
-    
+
     reason = request.form.get("reason")
     details = request.form.get("details")
 
@@ -67,16 +68,17 @@ def report_user(user_id):
     return redirect(url_for("user.profile", user_id=user_id))
 
 
-
 @user_bp.route("/profile/<int:user_id>")
 def profile(user_id):
     user = User.query.get_or_404(user_id)
-    
+
     # Filter cards
     show_sold = request.args.get("show_sold") == "on"
     page = request.args.get("page", 1, type=int)
 
-    paginated_cards, unique_set_names = filter_cards(user_id=user_id, show_sold=show_sold, page=page)
+    paginated_cards, unique_set_names = filter_cards(
+        user_id=user_id, show_sold=show_sold, page=page
+    )
 
     # Fetch feedback for the user's completed sales
     completed_orders = (
@@ -93,8 +95,9 @@ def profile(user_id):
         feedback=completed_orders,
         unique_set_names=unique_set_names,
         pagination=paginated_cards,
-        show_sold_checkbox=True
+        show_sold_checkbox=True,
     )
+
 
 @user_bp.route("/my-cards")
 @login_required
@@ -318,6 +321,8 @@ def contact_us():
 @user_bp.route("/about", methods=["GET"])
 def about_us():
     return render_template("about.html")
+
+
 from sqlalchemy.orm import aliased
 
 
@@ -345,7 +350,9 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
     show_sold = request.args.get("show_sold", "off") == "on" or show_sold
 
     # Base filters
-    query = base_query.filter(or_(uploader_alias.role == "uploader", uploader_alias.role == "admin"))
+    query = base_query.filter(
+        or_(uploader_alias.role == "uploader", uploader_alias.role == "admin")
+    )
 
     if user_id:
         query = query.filter(Card.uploader_id == user_id)

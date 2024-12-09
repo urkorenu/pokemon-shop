@@ -1,5 +1,5 @@
 # app/__init__.py
-from flask import Flask, session,request
+from flask import Flask, session, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager, current_user
@@ -14,16 +14,18 @@ login_manager = LoginManager()
 cache = Cache()
 
 
-
 def create_app():
     app = Flask(__name__)
     app.config.from_object("config.Config")
-    app.config['LANGUAGES'] = ['en', 'he']
+    app.config["LANGUAGES"] = ["en", "he"]
     babel = Babel(app)
-    def get_locale():
-        return session.get('lang') or request.accept_languages.best_match(app.config['LANGUAGES'])
-    babel.init_app(app, locale_selector=get_locale)
 
+    def get_locale():
+        return session.get("lang") or request.accept_languages.best_match(
+            app.config["LANGUAGES"]
+        )
+
+    babel.init_app(app, locale_selector=get_locale)
 
     # Initialize extensions
     db.init_app(app)
