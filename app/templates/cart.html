@@ -2,12 +2,12 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2>My Cart</h2>
+    <h2>{{ _('My Cart') }}</h2>
     <hr>
     {% if grouped_cart %}
         {% for seller_id, items in grouped_cart.items() %}
             <h4>
-                Seller:
+                {{ _('Seller:') }}
                 <a href="{{ url_for('user.profile', user_id=seller_id) }}" class="text-decoration-none">
                     {{ items[0].card.uploader.username }}
                 </a>
@@ -15,12 +15,12 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Card</th>
-                        <th>Set</th>
-                        <th>Card Number</th>
-                        <th>Grade</th>
-                        <th>Price</th>
-                        <th>Actions</th>
+                        <th>{{ _('Card') }}</th>
+                        <th>{{ _('Set') }}</th>
+                        <th>{{ _('Card Number') }}</th>
+                        <th>{{ _('Grade') }}</th>
+                        <th>{{ _('Price') }}</th>
+                        <th>{{ _('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -33,19 +33,19 @@
                             {% if item.card.is_graded %}
                                 {{ item.card.grade }}
                             {% else %}
-                                N/A
+                                {{ _('N/A') }}
                             {% endif %}
                         </td>
-                        <td>{{ item.card.price }} ILS</td>
+                        <td>{{ item.card.price }} {{ _('ILS') }}</td>
                         <td>
                             <form method="POST" action="{{ url_for('cart.remove_from_cart', cart_id=item.id) }}" class="d-inline">
-                                <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                                <button type="submit" class="btn btn-sm btn-danger">{{ _('Remove') }}</button>
                             </form>
                             <button
                                 type="button"
                                 class="btn btn-sm btn-primary"
                                 onclick="showCardImage('{{ item.card.image_url }}', '{{ item.card.name }}')">
-                                View Card
+                                {{ _('View Card') }}
                             </button>
                         </td>
                     </tr>
@@ -54,13 +54,13 @@
             </table>
         {% endfor %}
         <div class="text-end">
-            <h5>Total Price: {{ total_price }} ILS</h5>
+            <h5>{{ _('Total Price:') }} {{ total_price }} {{ _('ILS') }}</h5>
             <form method="POST" action="{{ url_for('cart.checkout') }}">
-                <button type="submit" class="btn btn-success">Proceed to Checkout</button>
+                <button type="submit" class="btn btn-success">{{ _('Checkout') }}</button>
             </form>
         </div>
     {% else %}
-        <p>Your cart is empty. <a href="/">Start shopping!</a></p>
+        <p>{{ _('Your cart is empty.') }} <a href="/">{{ _('Start shopping!') }}</a></p>
     {% endif %}
 </div>
 {% endblock %}

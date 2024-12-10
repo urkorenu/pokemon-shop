@@ -376,7 +376,7 @@ msgid "Date:"
 msgstr "תאריך:"
 
 msgid "Grade"
-msgstr "ציון"
+msgstr "דירוג"
 
 msgid "Confirm"
 msgstr "אישור"
@@ -452,4 +452,16 @@ msgstr "תמונת קלף:"
 
 msgid "Upload"
 msgstr "העלה"
+
+msgid "My Cart"
+msgstr "העגלה שלי"
+
+msgid "Remove"
+msgstr "הסר"
+
+msgid "Total Price:"
+msgstr "סה״כ:"
+
+msgid "Checkout"
+msgstr "בצע הזמנה"
 
