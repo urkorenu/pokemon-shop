@@ -100,3 +100,42 @@ msgstr "English"
 msgid "Hebrew"
 msgstr "Hebrew"
 
+msgid "Home"
+msgstr "Home"
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "My Profile"
+msgstr "My Profile"
+
+msgid "My Account"
+msgstr "My Account"
+
+msgid "My Orders"
+msgstr "My Orders"
+
+msgid "Pending Orders"
+msgstr "Pending Orders"
+
+msgid "My Cards"
+msgstr "My Cards"
+
+msgid "Upload"
+msgstr "Upload"
+
+msgid "Manage Users"
+msgstr "Manage Users"
+
+msgid "Cart"
+msgstr "Cart"
+
+msgid "About Us"
+msgstr "About Us"
+
+msgid "Contact Us"
+msgstr "Contact Us"
+
+msgid "Welcome,"
+msgstr "Welcome,"
+

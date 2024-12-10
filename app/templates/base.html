@@ -198,43 +198,43 @@
 		<!-- Left-Aligned Links -->
 		<ul class="navbar-nav me-auto">
 		    <li class="nav-item">
-			<a class="nav-link" href="/">Home</a>
+			<a class="nav-link" href="/">{{ _('Home') }}</a>
 		    </li>
 		    {% if current_user.is_authenticated %}
 		    <li class="nav-item dropdown">
 			<a class="nav-link dropdown-toggle" href="#" id="navbarUserMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-			    Dashboard
+			    {{ _('Dashboard') }}
 			</a>
 			<ul class="dropdown-menu" aria-labelledby="navbarUserMenu">
 			    <li>
 				<a class="dropdown-item" href="{{ url_for('user.profile', user_id=current_user.id) }}">
-				    My Profile
+				    {{ _('My Profile') }}
 				</a>
 			    </li>
 			    <li>
 				<a class="dropdown-item" href="{{ url_for('auth.account') }}">
-				    My Account
+				    {{ _('My Account') }}
 				</a>
 			    </li>
 			    <li>
 			    <li>
 				<a class="dropdown-item" href="{{ url_for('order.my_orders') }}">
-				    My Orders
+				    {{ _('My Orders') }}
 				    <span class="badge bg-warning text-dark rounded-pill">{{ orders_without_feedback }}</span>
 				</a>
 			    </li>
 			    {% if current_user.role in ["uploader", "admin"] %}
 			    <li>
 				<a class="dropdown-item" href="{{ url_for('order.pending_orders') }}">
-				    Pending Orders
+				    {{ _('Pending Orders') }}
 				    <span class="badge bg-danger rounded-pill">{{ pending_orders }}</span>
 				</a>
 			    </li>
 			    <li>
-				<a class="dropdown-item" href="{{ url_for('user.my_cards') }}">My Cards</a>
+				<a class="dropdown-item" href="{{ url_for('user.my_cards') }}">{{ _('My Cards') }}</a>
 			    </li>
 			    <li>
-				<a class="dropdown-item" href="/admin/upload">Upload</a>
+				<a class="dropdown-item" href="/admin/upload">{{ ('Upload') }}</a>
 			    </li>
 			    {% endif %}
 			</ul>
@@ -242,7 +242,7 @@
 		    {% endif %}
 		    {% if current_user.role in ["admin"] %}
 		    <li class="nav-item">
-			<a class="nav-link" href="{{ url_for('admin.manage_users') }}">Manage Users</a>
+			<a class="nav-link" href="{{ url_for('admin.manage_users') }}">{{ ('Manage Users') }}</a>
 		    </li>
 		    {% endif %}
 		</ul>
@@ -252,19 +252,19 @@
 		    {% if current_user.is_authenticated %}
 		    <li class="nav-item">
 			<a class="nav-link" href="/cart">
-			    <i class="bi bi-cart-fill"></i> Cart
+			    <i class="bi bi-cart-fill"></i> {{ ('Cart') }}
 			    <span class="badge bg-success rounded-pill">{{ cart_items_count }}</span>
 			</a>
 		    </li>
 		    <li class="nav-item">
-			<span class="nav-link disabled">Welcome, {{ current_user.username }}!</span>
+			<span class="nav-link disabled">{{ _('Welcome,') }} {{ current_user.username }}!</span>
 		    </li>
 		    <li class="nav-item">
-			<a class="nav-link" href="/auth/logout">Logout</a>
+			<a class="nav-link" href="/auth/logout">{{ _('Logout') }}</a>
 		    </li>
 		    {% else %}
 		    <li class="nav-item">
-			<a class="nav-link" href="/auth/sign-in">Sign in</a>
+			<a class="nav-link" href="/auth/sign-in">{{ _('Sign in') }}</a>
 		    </li>
 		    {% endif %}
 		</ul>
@@ -354,10 +354,10 @@
                 <div class="col-12">
                     <ul class="list-inline mb-0">
                         <li class="list-inline-item">
-                            <a class="text-light text-decoration-none" href="{{ url_for('user.about_us') }}">About Us</a>
+                            <a class="text-light text-decoration-none" href="{{ url_for('user.about_us') }}">{{ _('About Us') }}</a>
                         </li>
                         <li class="list-inline-item">
-                            <a class="text-light text-decoration-none" href="{{ url_for('user.contact_us') }}">Contact Us</a>
+                            <a class="text-light text-decoration-none" href="{{ url_for('user.contact_us') }}">{{ _('Contact Us') }}</a>
                         </li>
                     </ul>
                 </div>

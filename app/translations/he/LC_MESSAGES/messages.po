@@ -100,3 +100,42 @@ msgstr "אנגלית"
 msgid "Hebrew"
 msgstr "עברית"
 
+msgid "Home"
+msgstr "דף הבית"
+
+msgid "Dashboard"
+msgstr "לוח בקרה"
+
+msgid "My Profile"
+msgstr "הפרופיל שלי"
+
+msgid "My Account"
+msgstr "החשבון שלי"
+
+msgid "My Orders"
+msgstr "ההזמנות שלי"
+
+msgid "Pending Orders"
+msgstr "הזמנות ממתינות"
+
+msgid "My Cards"
+msgstr "הכרטיסים שלי"
+
+msgid "Upload"
+msgstr "העלאה"
+
+msgid "Manage Users"
+msgstr "ניהול משתמשים"
+
+msgid "Cart"
+msgstr "עגלת קניות"
+
+msgid "About Us"
+msgstr "אודות"
+
+msgid "Contact Us"
+msgstr "צור קשר"
+
+msgid "Welcome,"
+msgstr "ברוך הבא,"
+
