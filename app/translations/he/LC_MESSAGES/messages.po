@@ -465,3 +465,21 @@ msgstr "סה״כ:"
 msgid "Checkout"
 msgstr "בצע הזמנה"
 
+msgid "Your cart is empty."
+msgstr "העגלה שלך ריקה."
+
+msgid "We'd love to hear from you! Please fill out the form below and we'll get back to you soon."
+msgstr "נשמח לשמוע ממך! אנא מלא את הטופס למטה ונחזור אליך בהקדם."
+
+msgid "Your Name"
+msgstr "השם שלך"
+
+msgid "Your Email"
+msgstr "האימייל שלך"
+
+msgid "Your Message"
+msgstr "ההודעה שלך"
+
+msgid "Send Message"
+msgstr "שלח הודעה"
+
