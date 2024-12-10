@@ -130,7 +130,7 @@ msgid "Cart"
 msgstr "עגלת קניות"
 
 msgid "About Us"
-msgstr "אודות"
+msgstr "עלינו"
 
 msgid "Contact Us"
 msgstr "צור קשר"
@@ -524,4 +524,38 @@ msgstr "כבר יש לך חשבון? "
 
 msgid "Login here"
 msgstr "התחבר כאן"
+
+msgid "Welcome to"
+msgstr "ברוכים הבאים אל"
+
+msgid "your ultimate destination for Pokémon card enthusiasts!"
+msgstr "היעד המושלם עבור חובבי קלפי פוקימון!"
+
+msgid "Our Mission"
+msgstr "המשימה שלנו"
+
+msgid "Why Choose Us?"
+msgstr "למה לבחור בנו?"
+
+msgid "Wide selection of Pokémon cards"
+msgstr "מבחר רחב של קלפי פוקימון"
+
+msgid "Seamless user experience"
+msgstr "חוויית משתמש חלקה"
+
+msgid "Secure transactions and trusted sellers"
+msgstr "עסקאות מאובטחות ומוכרים אמינים"
+
+msgid "Community-driven platform"
+msgstr "פלטפורמה מונעת קהילה"
+
+msgid "Contact Us"
+msgstr "צור קשר"
+
+msgid "Made in Israel"
+msgstr "תוצרת כחול-לבן"
+
+msgid "At Pika-Card, we aim to provide the best platform for buying, selling, and showcasing Pokémon cards. Our team is passionate about the Pokémon universe and dedicated to building a vibrant community of collectors and players."
+msgstr "ב-Pika-Card, אנחנו שואפים לספק את הפלטפורמה הטובה ביותר לקנייה, מכירה ותצוגה של קלפי פוקימון. הצוות שלנו נלהב מהעולם של פוקימון ומחויב לבנות קהילה תוססת של אספנים ושחקנים."
+
 
