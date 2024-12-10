@@ -118,7 +118,7 @@ msgid "Pending Orders"
 msgstr "הזמנות ממתינות"
 
 msgid "My Cards"
-msgstr "הקליפים שלי"
+msgstr "הקלפים שלי"
 
 msgid "Upload"
 msgstr "העלאה"
@@ -386,4 +386,28 @@ msgstr "דחייה"
 
 msgid "No pending orders available."
 msgstr "אין הזמנות ממתינות זמינות."
+
+msgid "My Uploaded Cards"
+msgstr "הקלפים שלי"
+
+msgid "Available Cards"
+msgstr "קלפים זמינים"
+
+msgid "Edit"
+msgstr "ערוך"
+
+msgid "Delete"
+msgstr "מחק"
+
+msgid "Are you sure you want to delete this card?"
+msgstr "האם אתה בטוח שברצונך למחוק כרטיס זה?"
+
+msgid "No available cards."
+msgstr "אין כרטיסים זמינים."
+
+msgid "Sold Cards"
+msgstr "קלפים שנמכרו"
+
+msgid "No sold cards."
+msgstr "אין קלפים שנמכרו."
 
