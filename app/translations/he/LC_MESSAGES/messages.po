@@ -219,3 +219,86 @@ msgstr "קודם"
 msgid "Next"
 msgstr "הבא"
 
+msgid "Profile"
+msgstr "הפרופיל שלי"
+
+msgid "Username"
+msgstr "שם משתמש"
+
+msgid "Email"
+msgstr "אימייל"
+
+msgid "Location"
+msgstr "מיקום"
+
+msgid "Select Your Location"
+msgstr "בחר את המיקום שלך"
+
+msgid "Contact Preference"
+msgstr "דרך תקשורת"
+
+msgid "Phone"
+msgstr "טלפון"
+
+msgid "Contact Details"
+msgstr "פרטי קשר"
+
+msgid "Update Profile"
+msgstr "עדכן פרופיל"
+
+msgid "Uploader Role Request"
+msgstr "בקשה להעלאת קלפים"
+
+msgid "You already have the {role} role. No further action is required."
+msgstr "כבר יש לך את תפקיד {role}. אין צורך בפעולה נוספת."
+
+msgid "Your request to become an uploader is currently {status}."
+msgstr "הבקשה שלך להפוך למעלה קלפים נמצאת כרגע במצב {status}."
+
+msgid "Your request to become an uploader has been {status}. Welcome to the team!"
+msgstr "הבקשה שלך להפוך למעלה קלפים אושרה. ברוך הבא לצוות!"
+
+msgid "Rules for Uploaders"
+msgstr "חוקי מעלה תוכן"
+
+msgid "I have read and accept the rules for becoming an uploader."
+msgstr "קראתי ואני מסכים לחוקי הלאת קלפים."
+
+msgid "Order History"
+msgstr "היסטוריית הזמנות"
+
+msgid "Order ID"
+msgstr "מזהה הזמנה"
+
+msgid "Status"
+msgstr "סטטוס"
+
+msgid "Total"
+msgstr "סה\"כ"
+
+msgid "ILS"
+msgstr "ש\"ח"
+
+msgid "Date"
+msgstr "תאריך"
+
+msgid "No orders found."
+msgstr "לא נמצאו הזמנות."
+
+msgid "Change Password"
+msgstr "שינוי סיסמא"
+
+msgid "Old Password"
+msgstr "סיסמא ישנה"
+
+msgid "New Password"
+msgstr "סיסמא חדשה"
+
+msgid "Delete Account"
+msgstr "מחיקת חשבון"
+
+msgid "Deleting your account is permanent and cannot be undone."
+msgstr "מחיקת החשבון תמחק את החשבון לתמיד ולא יהיה ניתן לשחזר"
+
+
+
