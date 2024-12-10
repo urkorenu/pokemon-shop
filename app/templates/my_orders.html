@@ -2,36 +2,36 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2>My Orders</h2>
+    <h2>{{ _('My Orders') }}</h2>
     <hr>
     {% if orders %}
         {% for order in orders %}
             <h4>
-                Order ID: {{ order.id }} |
-                Seller:
+                {{ _('Order ID:') }} {{ order.id }} |
+                {{ _('Seller:') }}
                 <a href="{{ url_for('user.profile', user_id=order.seller_id) }}" class="text-decoration-none">
                     {{ order.seller.username }}
                 </a> |
-                Status:
-                <span class="badge 
+                {{ _('Status:') }}
+                <span class="badge
                     {% if order.status == 'Completed' %} bg-success
                     {% elif order.status == 'Confirmed' %} bg-info
                     {% elif order.status == 'Rejected' %} bg-danger
                     {% elif order.status == 'Pending' %} bg-warning
                     {% else %} bg-secondary
                     {% endif %}">
-                    {{ order.status }}
+                    {{ _(order.status) }}
                 </span>
             </h4>
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Card</th>
-                        <th>Set</th>
-                        <th>Card Number</th>
-                        <th>Grade</th>
-                        <th>Price</th>
-                        <th>Actions</th>
+                        <th>{{ _('Card') }}</th>
+                        <th>{{ _('Set') }}</th>
+                        <th>{{ _('Card Number') }}</th>
+                        <th>{{ _('Grade') }}</th>
+                        <th>{{ _('Price') }}</th>
+                        <th>{{ _('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -45,16 +45,16 @@
                             {% if card.is_graded %}
                                 {{ card.grade }}
                             {% else %}
-                                N/A
+                                {{ _('N/A') }}
                             {% endif %}
                         </td>
-                        <td>{{ card.price }} ILS</td>
+                        <td>{{ card.price }} {{ _('ILS') }}</td>
                         <td>
                             <button
                                 type="button"
                                 class="btn btn-sm btn-primary"
                                 onclick="showCardImage('{{ card.image_url }}')">
-                                View Card
+                                {{ _('View Card') }}
                             </button>
                         </td>
                         {% set total_price = total_price + card.price %}
@@ -62,34 +62,34 @@
                     {% endfor %}
                 </tbody>
             </table>
-            <p class="text-end"><strong>Total Amount: {{ order.total_price }} ILS</strong></p>
+            <p class="text-end"><strong>{{ _('Total Amount:') }} {{ order.total_price }} {{ _('ILS') }}</strong></p>
 
             <!-- Feedback Section -->
             <div class="mt-3">
                 {% if order.status == "Confirmed" and not order.feedback %}
                     <form method="POST" action="{{ url_for('order.submit_feedback', order_id=order.id) }}">
-                        <textarea name="feedback" class="form-control" placeholder="Write your feedback" required></textarea>
+                        <textarea name="feedback" class="form-control" placeholder="{{ _('Write your feedback') }}" required></textarea>
                         <select name="rating" class="form-select mt-2" required>
-                            <option value="" disabled selected>Rate the seller</option>
-                            <option value="5">5 - Excellent</option>
-                            <option value="4">4 - Good</option>
-                            <option value="3">3 - Average</option>
-                            <option value="2">2 - Poor</option>
-                            <option value="1">1 - Very Poor</option>
+                            <option value="" disabled selected>{{ _('Rate the seller') }}</option>
+                            <option value="5">5 - {{ _('Excellent') }}</option>
+                            <option value="4">4 - {{ _('Good') }}</option>
+                            <option value="3">3 - {{ _('Average') }}</option>
+                            <option value="2">2 - {{ _('Poor') }}</option>
+                            <option value="1">1 - {{ _('Very Poor') }}</option>
                         </select>
-                        <button type="submit" class="btn btn-primary mt-2">Submit Feedback</button>
+                        <button type="submit" class="btn btn-primary mt-2">{{ _('Submit Feedback') }}</button>
                     </form>
                 {% elif order.feedback %}
-                    <strong>Feedback:</strong> {{ order.feedback }}<br>
-                    <strong>Rating:</strong> {{ order.rating }}
+                    <strong>{{ _('Feedback:') }}</strong> {{ order.feedback }}<br>
+                    <strong>{{ _('Rating:') }}</strong> {{ order.rating }}
                 {% else %}
-                    <p>No feedback provided.</p>
+                    <p>{{ _('No feedback provided.') }}</p>
                 {% endif %}
             </div>
             <hr>
         {% endfor %}
     {% else %}
-        <p>You have no orders. <a href="/">Start shopping!</a></p>
+        <p>{{ _('You have no orders.') }} <a href="/">{{ _('Start shopping!') }}</a></p>
     {% endif %}
 </div>
 {% endblock %}

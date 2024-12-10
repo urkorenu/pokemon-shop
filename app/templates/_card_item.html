@@ -37,7 +37,7 @@
                     {% endif %}">
                     {{ card.condition }}
                 </span><br>
-                <strong>{{ _('Price:') }}</strong> {{ card.price }} ILS<br>
+                <strong>{{ _('Price:') }}</strong> {{ card.price }} {{ _('ILS') }}<br>
                 {% if card.uploader %}
                 <strong>{{ _('Uploaded By:') }}</strong>
                 <a href="{{ url_for('user.profile', user_id=card.uploader.id) }}">
@@ -75,7 +75,7 @@
                         <strong>{{ _('Set:') }}</strong> {{ card.set_name }}<br>
                         <strong>{{ _('Condition:') }}</strong> {{ card.condition }}<br>
                         <strong>{{ _('Amount:') }}</strong> {{ card.amount }}<br>
-                        <strong>{{ _('Price:') }}</strong> {{ card.price }} ILS<br>
+                        <strong>{{ _('Price:') }}</strong> {{ card.price }} {{ _('ILS') }}<br>
                         <strong>{{ _('Graded:') }}</strong> {{ _('Yes') if card.is_graded else _('No') }}<br>
                         {% if card.is_graded %}
                         <strong>{{ _('Grading Company:') }}</strong> {{ card.grading_company }}<br>

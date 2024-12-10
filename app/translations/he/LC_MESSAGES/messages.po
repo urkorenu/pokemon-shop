@@ -118,7 +118,7 @@ msgid "Pending Orders"
 msgstr "הזמנות ממתינות"
 
 msgid "My Cards"
-msgstr "הכרטיסים שלי"
+msgstr "הקליפים שלי"
 
 msgid "Upload"
 msgstr "העלאה"
@@ -184,7 +184,7 @@ msgid "feedback"
 msgstr "ביקורות"
 
 msgid "Status:"
-msgstr "סטטוס::"
+msgstr "סטטוס:"
 
 msgid "Banned"
 msgstr "חסום"
@@ -200,6 +200,9 @@ msgstr "התנהגות פוגענית"
 
 msgid "Feedbacks"
 msgstr "ביקורות"
+
+msgid "Feedback:"
+msgstr "ביקורת:"
 
 msgid "No feedback available yet."
 msgstr "אין משובים זמינים עדיין."
@@ -300,5 +303,66 @@ msgstr "מחיקת חשבון"
 msgid "Deleting your account is permanent and cannot be undone."
 msgstr "מחיקת החשבון תמחק את החשבון לתמיד ולא יהיה ניתן לשחזר"
 
+msgid "Order ID:"
+msgstr "מספר הזמנה:"
 
+msgid "Seller:"
+msgstr "מוכר:"
+
+msgid "Status:"
+msgstr "סטטוס:"
+
+msgid "Card"
+msgstr "כרטיס"
+
+msgid "Set"
+msgstr "סט"
+
+msgid "N/A"
+msgstr "לא זמין"
+
+msgid "Price"
+msgstr "מחיר"
+
+msgid "Actions"
+msgstr "פעולות"
+
+msgid "View Card"
+msgstr "צפה בקלף"
+
+msgid "Total Amount:"
+msgstr "סכום כולל:"
+
+msgid "Write your feedback"
+msgstr "כתוב את הביקורת שלך"
+
+msgid "Rate the seller"
+msgstr "דרג את המוכר"
+
+msgid "Excellent"
+msgstr "מצוין"
+
+msgid "Good"
+msgstr "טוב"
+
+msgid "Average"
+msgstr "בינוני"
+
+msgid "Poor"
+msgstr "גרוע"
+
+msgid "Very Poor"
+msgstr "גרוע מאוד"
+
+msgid "Submit Feedback"
+msgstr "שלח ביקורת"
+
+msgid "No feedback provided."
+msgstr "לא סופק ביקורת."
+
+msgid "You have no orders."
+msgstr "אין לך הזמנות."
+
+msgid "Start shopping!"
+msgstr "התחל לקנות!"
 
