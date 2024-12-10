@@ -313,7 +313,7 @@ msgid "Status:"
 msgstr "סטטוס:"
 
 msgid "Card"
-msgstr "כרטיס"
+msgstr "קלף"
 
 msgid "Set"
 msgstr "סט"
@@ -365,4 +365,25 @@ msgstr "אין לך הזמנות."
 
 msgid "Start shopping!"
 msgstr "התחל לקנות!"
+
+msgid "Pending Orders"
+msgstr "הזמנות ממתינות"
+
+msgid "Buyer:"
+msgstr "קונה:"
+
+msgid "Date:"
+msgstr "תאריך:"
+
+msgid "Grade"
+msgstr "ציון"
+
+msgid "Confirm"
+msgstr "אישור"
+
+msgid "Reject"
+msgstr "דחייה"
+
+msgid "No pending orders available."
+msgstr "אין הזמנות ממתינות זמינות."
 
