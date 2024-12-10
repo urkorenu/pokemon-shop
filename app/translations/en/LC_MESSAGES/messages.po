@@ -175,3 +175,51 @@ msgstr "Show Sold Cards"
 msgid "Search"
 msgstr "Search"
 
+msgid "Location:"
+msgstr "Location:"
+
+msgid "Rating:"
+msgstr "Rating:"
+
+msgid "No ratings yet"
+msgstr "No ratings yet"
+
+msgid "feedback"
+msgstr "feedback"
+
+msgid "Status:"
+msgstr "Status:"
+
+msgid "Banned"
+msgstr "Banned"
+
+msgid "Report User"
+msgstr "Report User"
+
+msgid "Spam"
+msgstr "Spam"
+
+msgid "Abusive Behavior"
+msgstr "Abusive Behavior"
+
+msgid "Feedbacks"
+msgstr "Feedbacks"
+
+msgid "No feedback available yet."
+msgstr "No feedback available yet."
+
+msgid "Uploaded Cards"
+msgstr "Uploaded Cards"
+
+msgid "This user has not uploaded any cards yet."
+msgstr "This user has not uploaded any cards yet."
+
+msgid "Page navigation"
+msgstr "Page navigation"
+
+msgid "Previous"
+msgstr "Previous"
+
+msgid "Next"
+msgstr "Next"
+

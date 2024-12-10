@@ -90,9 +90,8 @@ msgstr "פרטים נוספים (אופציונלי)"
 msgid "Submit Report"
 msgstr "שלח דיווח"
 
-
 msgid "No cards found. Try adjusting your search or filters."
-msgstr "לא נמצאו כרטיסים. נסו לשנות את החיפוש או את הפילטרים."
+msgstr "לא נמצאו קלפים. נסו לשנות את החיפוש או את הפילטרים."
 
 msgid "English"
 msgstr "אנגלית"
@@ -171,4 +170,52 @@ msgstr "הצג קליפם שנמכרו"
 
 msgid "Search"
 msgstr "חפש"
+
+msgid "Location:"
+msgstr "מיקום:"
+
+msgid "Rating:"
+msgstr "דירוג:"
+
+msgid "No ratings yet"
+msgstr "אין דירוגים עדיין"
+
+msgid "feedback"
+msgstr "ביקורות"
+
+msgid "Status:"
+msgstr "סטטוס::"
+
+msgid "Banned"
+msgstr "חסום"
+
+msgid "Report User"
+msgstr "דווח על משתמש"
+
+msgid "Spam"
+msgstr "ספאם"
+
+msgid "Abusive Behavior"
+msgstr "התנהגות פוגענית"
+
+msgid "Feedbacks"
+msgstr "ביקורות"
+
+msgid "No feedback available yet."
+msgstr "אין משובים זמינים עדיין."
+
+msgid "Uploaded Cards"
+msgstr "קלפים שהועלו"
+
+msgid "This user has not uploaded any cards yet."
+msgstr "משתמש זה עדיין לא העלה קלפים."
+
+msgid "Page navigation"
+msgstr "ניווט עמודים"
+
+msgid "Previous"
+msgstr "קודם"
+
+msgid "Next"
+msgstr "הבא"
 
