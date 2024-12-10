@@ -39,13 +39,12 @@
     </div>
 
     {% if show_sold_checkbox %}
-    <div class="col-md-2 form-check d-flex align-items-center" style="direction: rtl;">
-	<input class="form-check-input ms-2" type="checkbox" name="show_sold" id="showSold"
-	       {% if request.args.get('show_sold') == 'on' %}checked{% endif %} onchange="this.form.submit()">
-	<label class="form-check-label" for="showSold">{{ _('Show Sold Cards') }}</label>
+    <div class="col-md-2 form-check d-flex align-items-center">
+        <input class="form-check-input me-2" type="checkbox" name="show_sold" id="showSold"
+               {% if request.args.get('show_sold') == 'on' %}checked{% endif %} onchange="this.form.submit()">
+        <label class="form-check-label" for="showSold">{{ _('Show Sold Cards') }}</label>
     </div>
     {% endif %}
-
 
     <div class="col-md-2">
         <button type="submit" class="btn btn-primary w-100">{{ _('Search') }}</button>
