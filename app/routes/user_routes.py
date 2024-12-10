@@ -51,6 +51,7 @@ def set_language():
     # Fallback redirect
     return redirect(url_for("user.view_cards"))
 
+
 @user_bp.route("/report_user/<int:user_id>", methods=["POST"])
 @login_required
 def report_user(user_id):
