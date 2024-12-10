@@ -1,3 +1,30 @@
+<style>
+    /* Lock card size */
+    .card {
+        height: 100%; /* Ensures equal height for cards */
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+    }
+
+    /* Lock text size and prevent overflow */
+    .card-title,
+    .card-text {
+        white-space: nowrap; /* Prevent text from wrapping */
+        overflow: hidden;    /* Hide overflowed text */
+        text-overflow: ellipsis; /* Add ellipsis (...) for long text */
+    }
+
+    /* Set a fixed height for images */
+    .card-img-top {
+        height: 200px;
+        object-fit: cover;
+    }
+</style>
 <div class="col-md-3 mb-4">
     <div class="card shadow-sm position-relative" id="card-{{ card.id }}">
         <!-- Upload Date Label -->
