@@ -483,3 +483,45 @@ msgstr "ההודעה שלך"
 msgid "Send Message"
 msgstr "שלח הודעה"
 
+msgid "Login"
+msgstr "התחבר"
+
+msgid "Enter your email"
+msgstr "הזן את האימייל שלך"
+
+msgid "Password"
+msgstr "סיסמא"
+
+msgid "Enter your password"
+msgstr "הזן את הסיסמא שלך"
+
+msgid "Choose a username"
+msgstr "בחר שם משתמש"
+
+msgid "Choose a password"
+msgstr "בחר סיסמא"
+
+msgid "Select your area"
+msgstr "בחר את האזור שלך"
+
+msgid "Phone or Facebook Link"
+msgstr "מספר טלפון או קישור לפייסבוק"
+
+msgid "Enter phone number or Facebook link"
+msgstr "הזן מספר טלפון או קישור לפייסבוק"
+
+msgid "Register"
+msgstr "הרשמה"
+
+msgid "Register here"
+msgstr "הירשם כאן"
+
+msgid "Don't have an account? "
+msgstr "אין לך חשבון? "
+
+msgid "Already have an account? "
+msgstr "כבר יש לך חשבון? "
+
+msgid "Login here"
+msgstr "התחבר כאן"
+
