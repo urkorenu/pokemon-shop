@@ -1,11 +1,12 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from ..models import Card, Cart, db, User, Order
 from flask_login import login_required, current_user
+from flask_babel import _
 from sqlalchemy.orm import joinedload, aliased
 from sqlalchemy import or_
 import boto3
 from config import Config
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
 from ..cities import CITIES_IN_ISRAEL
 from ..mail_service import send_email
 
@@ -34,19 +35,21 @@ def view_cards():
 @user_bp.route("/set-language", methods=["POST"])
 def set_language():
     lang = request.form.get("lang")
+    referrer = request.form.get("referrer", "/")  # Default to home page
+
+    # Validate and set the language
     if lang in ["en", "he"]:
         session["lang"] = lang
     else:
-        flash("Invalid language selection.", "danger")
+        flash(_("Invalid language selection."), "danger")
 
-    referrer = request.referrer
-    if referrer:
-        referrer = referrer.replace("\\", "")
-        parsed_referrer = urlparse(referrer)
-        if not parsed_referrer.netloc and not parsed_referrer.scheme:
-            return redirect(referrer)
+    # Ensure the referrer is a safe relative path
+    parsed_referrer = urlparse(referrer)
+    if not parsed_referrer.netloc and parsed_referrer.path:
+        return redirect(referrer)
+
+    # Fallback redirect
     return redirect(url_for("user.view_cards"))
-
 
 @user_bp.route("/report_user/<int:user_id>", methods=["POST"])
 @login_required

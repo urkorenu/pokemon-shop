@@ -318,14 +318,17 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" action="{{ url_for('user.set_language') }}">
-                        <button type="submit" name="lang" value="en" class="btn btn-outline-primary w-100 mb-2">
-                            🇺🇸 English
-                        </button>
-                        <button type="submit" name="lang" value="he" class="btn btn-outline-primary w-100">
-                            🇮🇱 עברית
-                        </button>
-                    </form>
+		    <form method="POST" action="{{ url_for('user.set_language') }}">
+			<!-- Include the current page as a hidden input -->
+			<input type="hidden" name="referrer" value="{{ request.path }}">
+
+			<button type="submit" name="lang" value="en" class="btn btn-outline-primary w-100 mb-2">
+			    🇺🇸 English
+			</button>
+			<button type="submit" name="lang" value="he" class="btn btn-outline-primary w-100">
+			    🇮🇱 עברית
+			</button>
+		    </form>
                 </div>
             </div>
         </div>
