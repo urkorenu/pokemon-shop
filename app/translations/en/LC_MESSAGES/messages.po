@@ -139,3 +139,6 @@ msgstr "Contact Us"
 msgid "Welcome,"
 msgstr "Welcome,"
 
+msgid "Logout"
+msgstr "Logout"
+

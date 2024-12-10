@@ -30,16 +30,39 @@
         }
 
         .navbar {
-            margin-bottom: 0;
-            {% if session.get('lang', 'en') == 'he' %}
-            flex-direction: row-reverse;
-            {% endif %}
+	    margin-bottom: 0;
+	    {% if session.get('lang', 'en') == 'he' %}
+	    flex-direction: row-reverse;
+	    text-align: right;
+	    {% endif %}
         }
 
         .navbar-brand img {
             width: 50px;
             height: auto;
         }
+
+	.navbar-nav .nav-link, .dropdown-menu .dropdown-item {
+	    {% if session.get('lang', 'he') == 'he' %}
+	    text-align: right;
+	    margin-right: 10px; /* Adjust spacing */
+	    {% endif %}
+	}
+
+	/* Fix alignment for badges and icons */
+	.badge {
+	    vertical-align: middle;
+	}
+
+	.nav-link i {
+	    {% if session.get('lang', 'he') == 'he' %}
+	    margin-left: 5px; /* Fix icon spacing */
+	    margin-right: 0;
+	    {% else %}
+	    margin-right: 5px;
+	    margin-left: 0;
+	    {% endif %}
+	}
 
         .container {
             flex: 1;
@@ -234,7 +257,7 @@
 				<a class="dropdown-item" href="{{ url_for('user.my_cards') }}">{{ _('My Cards') }}</a>
 			    </li>
 			    <li>
-				<a class="dropdown-item" href="/admin/upload">{{ ('Upload') }}</a>
+				<a class="dropdown-item" href="/admin/upload">{{ _('Upload') }}</a>
 			    </li>
 			    {% endif %}
 			</ul>
@@ -242,7 +265,7 @@
 		    {% endif %}
 		    {% if current_user.role in ["admin"] %}
 		    <li class="nav-item">
-			<a class="nav-link" href="{{ url_for('admin.manage_users') }}">{{ ('Manage Users') }}</a>
+			<a class="nav-link" href="{{ url_for('admin.manage_users') }}">{{ _('Manage Users') }}</a>
 		    </li>
 		    {% endif %}
 		</ul>
@@ -252,7 +275,7 @@
 		    {% if current_user.is_authenticated %}
 		    <li class="nav-item">
 			<a class="nav-link" href="/cart">
-			    <i class="bi bi-cart-fill"></i> {{ ('Cart') }}
+			    <i class="bi bi-cart-fill"></i> {{ _('Cart') }}
 			    <span class="badge bg-success rounded-pill">{{ cart_items_count }}</span>
 			</a>
 		    </li>

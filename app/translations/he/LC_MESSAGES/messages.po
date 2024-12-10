@@ -139,3 +139,7 @@ msgstr "צור קשר"
 msgid "Welcome,"
 msgstr "ברוך הבא,"
 
+msgid "Logout"
+msgstr "התנתקות"
+
+
