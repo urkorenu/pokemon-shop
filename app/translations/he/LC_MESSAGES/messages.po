@@ -411,3 +411,45 @@ msgstr "קלפים שנמכרו"
 msgid "No sold cards."
 msgstr "אין קלפים שנמכרו."
 
+msgid "Upload New Pokémon Card"
+msgstr "העלאת קלף פוקימון חדש"
+
+msgid "Set Name:"
+msgstr "שם סט:"
+
+msgid "Type to search..."
+msgstr "הקלד כדי לחפש..."
+
+msgid "Select Card Type"
+msgstr "בחר סוג קלף"
+
+msgid "Card Name:"
+msgstr "שם הקלף:"
+
+msgid "Card name will be auto-filled"
+msgstr "שם הקלף יושלם אוטומטית"
+
+msgid "Enter price manually"
+msgstr "הזן מחיר ידנית"
+
+msgid "Follow TCGPlayer Price (The price is for Ungraded in NM condition)"
+msgstr "עקוב אחרי מחיר TCGPlayer (המחיר הוא עבור קלף במצב NM ולא מדורג)"
+
+msgid "To follow TCGPlayer Price, the condition must be 'Near Mint (NM)'."
+msgstr "כדי לעקוב אחרי מחיר TCGPlayer, המצב חייב להיות NM."
+
+msgid "Is Graded?"
+msgstr "מדורג?"
+
+msgid "Grade (1-10):"
+msgstr "דירוג (1-10):"
+
+msgid "Enter grade"
+msgstr "הזן דירוג"
+
+msgid "Card Image:"
+msgstr "תמונת קלף:"
+
+msgid "Upload"
+msgstr "העלה"
+
