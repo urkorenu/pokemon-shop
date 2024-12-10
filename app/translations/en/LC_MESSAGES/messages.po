@@ -142,3 +142,36 @@ msgstr "Welcome,"
 msgid "Logout"
 msgstr "Logout"
 
+msgid "Search by Pokémon Name"
+msgstr "Search by Pokémon Name"
+
+msgid "Filter by Set Name"
+msgstr "Filter by Set Name"
+
+msgid "Graded?"
+msgstr "Graded?"
+
+msgid "No"
+msgstr "No"
+
+msgid "Filter by Location"
+msgstr "Filter by Location"
+
+msgid "Sort By"
+msgstr "Sort By"
+
+msgid "Price: Low to High"
+msgstr "Price: Low to High"
+
+msgid "Price: High to Low"
+msgstr "Price: High to Low"
+
+msgid "Card Number"
+msgstr "Card Number"
+
+msgid "Show Sold Cards"
+msgstr "Show Sold Cards"
+
+msgid "Search"
+msgstr "Search"
+

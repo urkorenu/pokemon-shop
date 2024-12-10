@@ -142,4 +142,33 @@ msgstr "ברוך הבא,"
 msgid "Logout"
 msgstr "התנתקות"
 
+msgid "Search by Pokémon Name"
+msgstr "חיפוש לפי שם של פוקימון"
+
+msgid "Filter by Set Name"
+msgstr "סינון לפי שם סט"
+
+msgid "Graded?"
+msgstr "מדורג?"
+
+msgid "Filter by Location"
+msgstr "סינון לפי מיקום"
+
+msgid "Sort By"
+msgstr "מיון לפי"
+
+msgid "Price: Low to High"
+msgstr "מחיר: מהנמוך לגבוה"
+
+msgid "Price: High to Low"
+msgstr "מחיר: מהגבוה לנמוך"
+
+msgid "Card Number"
+msgstr "מספר קלף"
+
+msgid "Show Sold Cards"
+msgstr "הצג קליפם שנמכרו"
+
+msgid "Search"
+msgstr "חפש"
 
