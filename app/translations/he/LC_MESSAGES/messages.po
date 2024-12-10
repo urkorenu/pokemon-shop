@@ -558,4 +558,33 @@ msgstr "תוצרת כחול-לבן"
 msgid "At Pika-Card, we aim to provide the best platform for buying, selling, and showcasing Pokémon cards. Our team is passionate about the Pokémon universe and dedicated to building a vibrant community of collectors and players."
 msgstr "ב-Pika-Card, אנחנו שואפים לספק את הפלטפורמה הטובה ביותר לקנייה, מכירה ותצוגה של קלפי פוקימון. הצוות שלנו נלהב מהעולם של פוקימון ומחויב לבנות קהילה תוססת של אספנים ושחקנים."
 
+msgid "Edit Card"
+msgstr "ערוך קלף"
+
+msgid "This card follows TCGPlayer price."
+msgstr "קלף זה עוקב אחר המחיר של TCGPlayer."
+
+msgid "Card Name"
+msgstr "שם הקלף"
+
+msgid "Condition"
+msgstr "מצב"
+
+msgid "Set Name"
+msgstr "שם הסט"
+
+msgid "Card Type"
+msgstr "סוג הכרטיס"
+
+msgid "Grading Company"
+msgstr "חברת דירוג"
+
+msgid "Grade"
+msgstr "ציון"
+
+msgid "Save Changes"
+msgstr "שמור שינויים"
+
+msgid "Cancel"
+msgstr "ביטול"
 
