@@ -75,7 +75,7 @@ def upload_card():
             tcg_price_data = card_details.get("tcgplayer", {}).get("prices", {})
             selected_price = tcg_price_data.get(card_type, {}).get("market", 0.0)
             if follow_tcg:
-                price = round(selected_price * 3.56, 0)
+                price = round(selected_price * 3.56 + 0.5, 0)
                 condition = "NM"
 
         except requests.RequestException as e:
@@ -142,7 +142,11 @@ def get_card_details():
         card_name = card["name"]
         card_types = list(card.get("tcgplayer", {}).get("prices", {}).keys())
 
-        return jsonify({"name": card_name, "types": card_types})
+        return jsonify({
+            "name": card_name,
+            "types": card_types,
+            "prices": card.get("tcgplayer", {}).get("prices", {})
+        })
 
     except requests.RequestException as e:
         print(f"Error fetching card details: {e}", flush=True)

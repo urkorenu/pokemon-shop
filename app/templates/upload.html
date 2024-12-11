@@ -21,18 +21,18 @@
         <input type="text" id="number" name="number" class="form-control" placeholder="{{ _('Enter card number') }}" required>
     </div>
 
+    <!-- Card Name -->
+    <div class="mb-3">
+        <label for="name" class="form-label">{{ _("Card Name:") }}</label>
+        <input type="text" id="name" name="name" class="form-control" placeholder="{{ _('Card name will be auto-filled') }}" readonly required>
+    </div>
+
     <!-- Card Type -->
     <div class="mb-3">
         <label for="card_type" class="form-label">{{ _("Card Type:") }}</label>
         <select id="card_type" name="card_type" class="form-select" required>
             <option value="">{{ _("Select Card Type") }}</option>
         </select>
-    </div>
-
-    <!-- Card Name -->
-    <div class="mb-3">
-        <label for="name" class="form-label">{{ _("Card Name:") }}</label>
-        <input type="text" id="name" name="name" class="form-control" placeholder="{{ _('Card name will be auto-filled') }}" readonly required>
     </div>
 
     <!-- Price or Follow TCGPlayer -->
@@ -91,12 +91,12 @@
         <button type="submit" class="btn btn-primary">{{ _("Upload") }}</button>
     </div>
 </form>
-
 <script>
     const priceInput = document.getElementById('price');
     const followTcgCheckbox = document.getElementById('follow_tcg');
     const conditionSelect = document.getElementById('condition');
     const tcgWarning = document.getElementById('tcg_warning');
+    const cardTypeDropdown = document.getElementById("card_type");
 
     // Enforce condition logic for "Follow TCGPlayer Price"
     function enforceConditionLogic() {
@@ -113,21 +113,81 @@
         }
     }
 
-    // Disable "Follow TCGPlayer" if condition is not Near Mint
-    conditionSelect.addEventListener('change', () => {
-        if (conditionSelect.value !== "NM") {
-            followTcgCheckbox.checked = false; // Uncheck follow TCG
-            followTcgCheckbox.disabled = true; // Disable follow option
+    // Fetch TCGPlayer price and update the price field
+    async function fetchTCGPrice() {
+        const setName = document.getElementById("set_name").value.trim();
+        const cardNumber = document.getElementById("number").value.trim();
+        const cardType = cardTypeDropdown.value.trim();
+
+        console.log("Fetching TCG price for:", { setName, cardNumber, cardType });
+
+        if (!setName || !cardNumber || !cardType) {
+            alert("Please fill Set Name, Card Number, and select Card Type to fetch the price.");
+            followTcgCheckbox.checked = false;
             enforceConditionLogic();
-        } else {
-            followTcgCheckbox.disabled = false; // Allow selection
+            return;
+        }
+
+        try {
+            const apiUrl = `/admin/card-details?set_name=${encodeURIComponent(setName)}&number=${encodeURIComponent(cardNumber)}`;
+            console.log("API URL:", apiUrl);
+
+            const response = await fetch(apiUrl);
+
+            if (!response.ok) {
+                console.error("Failed to fetch card details:", response.status);
+                throw new Error("Failed to fetch card details");
+            }
+
+            const data = await response.json();
+            console.log("API Response:", data);
+
+            const normalizedCardType = cardType.toLowerCase();
+            const availablePrices = data.prices || {};
+
+            let tcgPriceUSD = 0.0;
+
+            for (const key of Object.keys(availablePrices)) {
+                if (key.toLowerCase() === normalizedCardType) {
+                    tcgPriceUSD = parseFloat(availablePrices[key]?.market || 0.0);
+                    break;
+                }
+            }
+
+            if (tcgPriceUSD > 0) {
+                const conversionRate = 3.56;
+                const tcgPriceILS = Math.round(tcgPriceUSD * conversionRate);
+                priceInput.value = tcgPriceILS; // Update the price field
+                console.log("TCG Price in ILS:", tcgPriceILS);
+            } else {
+                throw new Error("TCGPlayer price not found for this card type.");
+            }
+        } catch (error) {
+            console.error("Error fetching TCGPlayer price:", error.message);
+            alert("Failed to fetch TCGPlayer price. Please try again.");
+            followTcgCheckbox.checked = false;
+            enforceConditionLogic();
+        }
+    }
+
+    // Event Listeners
+    followTcgCheckbox.addEventListener('change', async () => {
+        enforceConditionLogic();
+        if (followTcgCheckbox.checked) {
+            await fetchTCGPrice();
         }
     });
 
-    // Handle follow TCG checkbox logic
-    followTcgCheckbox.addEventListener('change', enforceConditionLogic);
+    conditionSelect.addEventListener('change', () => {
+        if (conditionSelect.value !== "NM") {
+            followTcgCheckbox.checked = false;
+            followTcgCheckbox.disabled = true;
+            enforceConditionLogic();
+        } else {
+            followTcgCheckbox.disabled = false;
+        }
+    });
 
-    // Validate form submission
     document.querySelector('form').addEventListener('submit', (e) => {
         if (!priceInput.value && !followTcgCheckbox.checked) {
             e.preventDefault();
@@ -140,7 +200,7 @@
         const cardNumber = document.getElementById("number").value;
 
         document.getElementById("name").value = "";
-        document.getElementById("card_type").innerHTML = '<option value="">Select Card Type</option>';
+        cardTypeDropdown.innerHTML = '<option value="">Select Card Type</option>';
 
         if (!setName || !cardNumber) return;
 
@@ -161,7 +221,6 @@
             }
 
             document.getElementById("name").value = data.name;
-            const cardTypeDropdown = document.getElementById("card_type");
             data.types.forEach((type) => {
                 const option = document.createElement("option");
                 option.value = type;
@@ -180,7 +239,6 @@
         const gradedFields = document.getElementById("graded_fields");
         gradedFields.style.display = this.checked ? "block" : "none";
     });
-
 </script>
 {% endblock %}
 
