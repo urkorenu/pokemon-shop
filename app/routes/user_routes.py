@@ -44,7 +44,7 @@ def set_language():
         flash(_("Invalid language selection."), "danger")
 
     # Ensure the referrer is a safe relative path
-    referrer = referrer.replace('\\', '/')
+    referrer = referrer.replace("\\", "/")
     parsed_referrer = urlparse(referrer)
     if not parsed_referrer.netloc and not parsed_referrer.scheme:
         return redirect(referrer)
