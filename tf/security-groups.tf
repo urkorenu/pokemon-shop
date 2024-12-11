@@ -33,9 +33,9 @@ resource "aws_security_group" "nat_bastion_sg" {
 }
 
 # Security Group for Kubernetes Nodes
-resource "aws_security_group" "k8s_sg" {
+resource "aws_security_group" "app_sg" {
   vpc_id = aws_vpc.main.id
-  name   = "${local.env}-k8s-sg"
+  name   = "${local.env}-app-sg"
 
   ingress {
     description = "Allow SSH access from NAT instance"
@@ -47,10 +47,10 @@ resource "aws_security_group" "k8s_sg" {
 
   ingress {
     description = "Allow all Kubernetes traffic"
-    from_port   = 0
-    to_port     = 65535
+    from_port   = 5000
+    to_port     = 5000
     protocol    = "tcp"
-    cidr_blocks = ["10.0.0.0/16"]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -62,7 +62,7 @@ resource "aws_security_group" "k8s_sg" {
   }
 
   tags = {
-    Name = "${local.env}-k8s-sg"
+    Name = "${local.env}-app-sg"
   }
 }
 
