@@ -6,18 +6,16 @@
     <div class="row align-items-center mb-4">
         <div class="col-md-9">
             <h2>{{ user.username }}</h2>
-            <p><i class="bi bi-geo-alt-fill"></i> <strong>Location:</strong> {{ user.location if user.location else "N/A" }}</p>
-            <p><i class="bi bi-star-fill text-warning"></i> <strong>Rating:</strong> {{ "%.1f" | format(user.rating) if user.rating else "No ratings yet" }} ({{ user.feedback_count }} feedback)</p>
-            
-            <!-- Show status only if user is banned -->
+            <p><i class="bi bi-geo-alt-fill"></i> <strong>{{ _('Location:') }}</strong> {{ user.location if user.location else _('N/A') }}</p>
+            <p><i class="bi bi-star-fill text-warning"></i> <strong>{{ _('Rating:') }}</strong> {{ "%.1f" | format(user.rating) if user.rating else _("No ratings yet") }} ({{ user.feedback_count }} {{ _('feedback') }})</p>
+
             {% if user.role == 'banned' %}
-            <p class="text-danger"><strong>Status:</strong> Banned</p>
+            <p class="text-danger"><strong>{{ _('Status:') }}</strong> {{ _('Banned') }}</p>
             {% endif %}
         </div>
         <div class="col-md-3 text-end">
-            <!-- Report User Button -->
             <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#reportUserModal">
-                <i class="bi bi-flag"></i> Report User
+                <i class="bi bi-flag"></i> {{ _('Report User') }}
             </button>
         </div>
     </div>
@@ -27,20 +25,20 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="reportUserModalLabel">Report User</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h5 class="modal-title" id="reportUserModalLabel">{{ _('Report User') }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
                 </div>
                 <div class="modal-body">
                     <form method="POST" action="{{ url_for('user.report_user', user_id=user.id) }}">
-                        <label for="report_reason" class="form-label">Reason for report:</label>
+                        <label for="report_reason" class="form-label">{{ _('Reason for report:') }}</label>
                         <select class="form-select" name="reason" required>
-                            <option value="spam">Spam</option>
-                            <option value="abusive behavior">Abusive Behavior</option>
-                            <option value="misleading information">Misleading Information</option>
-                            <option value="other">Other</option>
+                            <option value="spam">{{ _('Spam') }}</option>
+                            <option value="abusive behavior">{{ _('Abusive Behavior') }}</option>
+                            <option value="misleading information">{{ _('Misleading Information') }}</option>
+                            <option value="other">{{ _('Other') }}</option>
                         </select>
-                        <textarea class="form-control mt-2" name="details" rows="3" placeholder="Additional details (optional)"></textarea>
-                        <button type="submit" class="btn btn-danger mt-3 w-100">Submit Report</button>
+                        <textarea class="form-control mt-2" name="details" rows="3" placeholder="{{ _('Additional details (optional)') }}"></textarea>
+                        <button type="submit" class="btn btn-danger mt-3 w-100">{{ _('Submit Report') }}</button>
                     </form>
                 </div>
             </div>
@@ -50,7 +48,7 @@
     <!-- Feedback Section -->
     <div class="card mb-4 shadow-sm">
         <div class="card-header bg-primary text-white">
-            <h3 class="mb-0"><i class="bi bi-chat-dots-fill"></i> Feedbacks</h3>
+            <h3 class="mb-0"><i class="bi bi-chat-dots-fill"></i> {{ _('Feedbacks') }}</h3>
         </div>
         <div class="card-body">
             {% if feedback %}
@@ -58,21 +56,20 @@
                     {% for item in feedback %}
                     <li class="list-group-item">
                         <p class="mb-1"><strong>{{ item.username }}:</strong> {{ item.feedback }}</p>
-                        <p class="mb-0"><i class="bi bi-star-fill text-warning"></i> Rating: {{ item.rating }}</p>
+                        <p class="mb-0"><i class="bi bi-star-fill text-warning"></i> {{ _('Rating:') }} {{ item.rating }}</p>
                     </li>
                     {% endfor %}
                 </ul>
             {% else %}
-                <p class="text-muted">No feedback available yet.</p>
+                <p class="text-muted">{{ _('No feedback available yet.') }}</p>
             {% endif %}
         </div>
     </div>
 
     <!-- Include the Search Form -->
-    {% include "_search_form.html" with context %}
+    {% include "_search_form.html" %}
 
-
-    <h3 class="mt-4">Uploaded Cards</h3>
+    <h3 class="mt-4">{{ _('Uploaded Cards') }}</h3>
     <div class="row">
         {% if cards %}
         {% for card in cards %}
@@ -80,17 +77,17 @@
         {% endfor %}
         {% else %}
         <div class="col-12 text-center">
-            <p>This user has not uploaded any cards yet.</p>
+            <p>{{ _('This user has not uploaded any cards yet.') }}</p>
         </div>
         {% endif %}
     </div>
 
     <!-- Pagination Controls -->
-    <nav aria-label="Page navigation">
+    <nav aria-label="{{ _('Page navigation') }}">
         <ul class="pagination justify-content-center">
             {% if pagination.has_prev %}
             <li class="page-item">
-                <a class="page-link" href="{{ url_for('user.view_cards', page=pagination.prev_num) }}" aria-label="Previous">
+                <a class="page-link" href="{{ url_for('user.view_cards', page=pagination.prev_num) }}" aria-label="{{ _('Previous') }}">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
@@ -112,7 +109,7 @@
 
             {% if pagination.has_next %}
             <li class="page-item">
-                <a class="page-link" href="{{ url_for('user.view_cards', page=pagination.next_num) }}" aria-label="Next">
+                <a class="page-link" href="{{ url_for('user.view_cards', page=pagination.next_num) }}" aria-label="{{ _('Next') }}">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>
@@ -121,4 +118,5 @@
     </nav>
 </div>
 {% endblock %}
+
 

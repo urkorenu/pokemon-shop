@@ -100,3 +100,126 @@ msgstr "English"
 msgid "Hebrew"
 msgstr "Hebrew"
 
+msgid "Home"
+msgstr "Home"
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "My Profile"
+msgstr "My Profile"
+
+msgid "My Account"
+msgstr "My Account"
+
+msgid "My Orders"
+msgstr "My Orders"
+
+msgid "Pending Orders"
+msgstr "Pending Orders"
+
+msgid "My Cards"
+msgstr "My Cards"
+
+msgid "Upload"
+msgstr "Upload"
+
+msgid "Manage Users"
+msgstr "Manage Users"
+
+msgid "Cart"
+msgstr "Cart"
+
+msgid "About Us"
+msgstr "About Us"
+
+msgid "Contact Us"
+msgstr "Contact Us"
+
+msgid "Welcome,"
+msgstr "Welcome,"
+
+msgid "Logout"
+msgstr "Logout"
+
+msgid "Search by Pokémon Name"
+msgstr "Search by Pokémon Name"
+
+msgid "Filter by Set Name"
+msgstr "Filter by Set Name"
+
+msgid "Graded?"
+msgstr "Graded?"
+
+msgid "No"
+msgstr "No"
+
+msgid "Filter by Location"
+msgstr "Filter by Location"
+
+msgid "Sort By"
+msgstr "Sort By"
+
+msgid "Price: Low to High"
+msgstr "Price: Low to High"
+
+msgid "Price: High to Low"
+msgstr "Price: High to Low"
+
+msgid "Card Number"
+msgstr "Card Number"
+
+msgid "Show Sold Cards"
+msgstr "Show Sold Cards"
+
+msgid "Search"
+msgstr "Search"
+
+msgid "Location:"
+msgstr "Location:"
+
+msgid "Rating:"
+msgstr "Rating:"
+
+msgid "No ratings yet"
+msgstr "No ratings yet"
+
+msgid "feedback"
+msgstr "feedback"
+
+msgid "Status:"
+msgstr "Status:"
+
+msgid "Banned"
+msgstr "Banned"
+
+msgid "Report User"
+msgstr "Report User"
+
+msgid "Spam"
+msgstr "Spam"
+
+msgid "Abusive Behavior"
+msgstr "Abusive Behavior"
+
+msgid "Feedbacks"
+msgstr "Feedbacks"
+
+msgid "No feedback available yet."
+msgstr "No feedback available yet."
+
+msgid "Uploaded Cards"
+msgstr "Uploaded Cards"
+
+msgid "This user has not uploaded any cards yet."
+msgstr "This user has not uploaded any cards yet."
+
+msgid "Page navigation"
+msgstr "Page navigation"
+
+msgid "Previous"
+msgstr "Previous"
+
+msgid "Next"
+msgstr "Next"
+

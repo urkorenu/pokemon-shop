@@ -7,66 +7,65 @@
             <!-- Card Component -->
             <div class="card shadow">
                 <div class="card-header text-center">
-                    <h3 id="form-title">Login</h3>
+                    <h3 id="form-title">{{ _("Login") }}</h3>
                 </div>
                 <div class="card-body">
 
                     <form id="login-form" action="{{ url_for('auth.auth') }}" method="POST" style="display: block;">
                         <input type="hidden" name="form_type" value="login">
                         <div class="mb-3">
-                            <label for="email-login" class="form-label">Email</label>
-                            <input type="email" class="form-control" name="email" placeholder="Enter your email" required>
+                            <label for="email-login" class="form-label">{{ _("Email") }}</label>
+                            <input type="email" class="form-control" name="email" placeholder="{{ _('Enter your email') }}" required>
                         </div>
                         <div class="mb-3">
-                            <label for="password-login" class="form-label">Password</label>
-                            <input type="password" class="form-control" name="password" placeholder="Enter your password" required>
+                            <label for="password-login" class="form-label">{{ _("Password") }}</label>
+                            <input type="password" class="form-control" name="password" placeholder="{{ _('Enter your password') }}" required>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100">Login</button>
+                        <button type="submit" class="btn btn-primary w-100">{{ _("Login") }}</button>
                     </form>
 
                     <form id="register-form" action="{{ url_for('auth.auth') }}" method="POST" style="display: none;">
                         <input type="hidden" name="form_type" value="register">
                         <div class="mb-3">
-                            <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" name="username" placeholder="Choose a username" required>
+                            <label for="username" class="form-label">{{ _("Username") }}</label>
+                            <input type="text" class="form-control" name="username" placeholder="{{ _('Choose a username') }}" required>
                         </div>
                         <div class="mb-3">
-                            <label for="email-register" class="form-label">Email</label>
-                            <input type="email" class="form-control" name="email" placeholder="Enter your email" required>
+                            <label for="email-register" class="form-label">{{ _("Email") }}</label>
+                            <input type="email" class="form-control" name="email" placeholder="{{ _('Enter your email') }}" required>
                         </div>
                         <div class="mb-3">
-                            <label for="password-register" class="form-label">Password</label>
-                            <input type="password" class="form-control" name="password" placeholder="Choose a password" required>
+                            <label for="password-register" class="form-label">{{ _("Password") }}</label>
+                            <input type="password" class="form-control" name="password" placeholder="{{ _('Choose a password') }}" required>
                         </div>
                         <div class="mb-3">
-                            <label for="location" class="form-label">Location</label>
+                            <label for="location" class="form-label">{{ _("Location") }}</label>
                             <select class="form-select" name="location" required>
-                                <option value="" disabled selected>Select your area</option>
+                                <option value="" disabled selected>{{ _('Select your area') }}</option>
                                 {% for city in cities %}
                                 <option value="{{ city }}">{{ city }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="contact_preference" class="form-label">Contact Preference</label>
+                            <label for="contact_preference" class="form-label">{{ _("Contact Preference") }}</label>
                             <select class="form-select" name="contact_preference" required>
-                                <option value="phone">Phone</option>
-                                <option value="facebook">Facebook</option>
+                                <option value="phone">{{ _("Phone") }}</option>
+                                <option value="facebook">{{ _("Facebook") }}</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="contact_details" class="form-label">Phone or Facebook Link</label>
-                            <input type="text" class="form-control" name="contact_details" placeholder="Enter phone number or Facebook link" required>
+                            <label for="contact_details" class="form-label">{{ _("Phone or Facebook Link") }}</label>
+                            <input type="text" class="form-control" name="contact_details" placeholder="{{ _('Enter phone number or Facebook link') }}" required>
                         </div>
-                        <button type="submit" class="btn btn-success w-100">Register</button>
+                        <button type="submit" class="btn btn-success w-100">{{ _("Register") }}</button>
                     </form>
-
 
                 </div>
                 <div class="card-footer text-center">
                     <small>
-                        <span id="toggle-text">Don't have an account? </span>
-                        <a href="#" id="toggle-link" class="text-primary">Register here</a>
+                        <span id="toggle-text">{{ _("Don't have an account? ") }}</span>
+                        <a href="#" id="toggle-link" class="text-primary">{{ _("Register here") }}</a>
                     </small>
                 </div>
             </div>
@@ -88,17 +87,18 @@
             // Switch to Login
             loginForm.style.display = 'block';
             registerForm.style.display = 'none';
-            formTitle.textContent = 'Login';
-            toggleText.textContent = "Don't have an account? ";
-            toggleLink.textContent = 'Register here';
+            formTitle.textContent = "{{ _('Login') }}";
+            toggleText.textContent = "{{ _("Don't have an account? ") }}";
+            toggleLink.textContent = "{{ _('Register here') }}";
         } else {
             // Switch to Register
             loginForm.style.display = 'none';
             registerForm.style.display = 'block';
-            formTitle.textContent = 'Register';
-            toggleText.textContent = 'Already have an account? ';
-            toggleLink.textContent = 'Login here';
+            formTitle.textContent = "{{ _('Register') }}";
+            toggleText.textContent = "{{ _('Already have an account? ') }}";
+            toggleLink.textContent = "{{ _('Login here') }}";
         }
     });
 </script>
 {% endblock %}
+

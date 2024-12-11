@@ -1,6 +1,6 @@
 <form method="GET" action="{{ request.path }}" class="row g-3 mb-4">
     <div class="col-md-2">
-        <input type="text" name="name" class="form-control" placeholder="Search by Pokémon Name" value="{{ request.args.get('name', '') }}">
+        <input type="text" name="name" class="form-control" placeholder="{{ _('Search by Pokémon Name') }}" value="{{ request.args.get('name', '') }}">
     </div>
     <div class="col-md-2">
         <select name="set_name" class="form-select">
@@ -21,7 +21,7 @@
     </div>
     <div class="col-md-2">
         <select name="location" class="form-select">
-            <option value="">Filter by Location</option>
+            <option value="">{{ _('Filter by Location') }}</option>
             {% for city in cities %}
             <option value="{{ city }}" {% if request.args.get('location') == city %}selected{% endif %}>
                 {{ city }}
@@ -38,10 +38,9 @@
         </select>
     </div>
 
-    <!-- Conditionally render the checkbox -->
     {% if show_sold_checkbox %}
     <div class="col-md-2 form-check d-flex align-items-center">
-        <input class="form-check-input me-2" type="checkbox" name="show_sold" id="showSold" 
+        <input class="form-check-input me-2" type="checkbox" name="show_sold" id="showSold"
                {% if request.args.get('show_sold') == 'on' %}checked{% endif %} onchange="this.form.submit()">
         <label class="form-check-label" for="showSold">{{ _('Show Sold Cards') }}</label>
     </div>

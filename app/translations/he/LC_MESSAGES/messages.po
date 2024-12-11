@@ -90,13 +90,501 @@ msgstr "פרטים נוספים (אופציונלי)"
 msgid "Submit Report"
 msgstr "שלח דיווח"
 
-
 msgid "No cards found. Try adjusting your search or filters."
-msgstr "לא נמצאו כרטיסים. נסו לשנות את החיפוש או את הפילטרים."
+msgstr "לא נמצאו קלפים. נסו לשנות את החיפוש או את הפילטרים."
 
 msgid "English"
 msgstr "אנגלית"
 
 msgid "Hebrew"
 msgstr "עברית"
+
+msgid "Home"
+msgstr "דף הבית"
+
+msgid "Dashboard"
+msgstr "לוח בקרה"
+
+msgid "My Profile"
+msgstr "הפרופיל שלי"
+
+msgid "My Account"
+msgstr "החשבון שלי"
+
+msgid "My Orders"
+msgstr "ההזמנות שלי"
+
+msgid "Pending Orders"
+msgstr "הזמנות ממתינות"
+
+msgid "My Cards"
+msgstr "הקלפים שלי"
+
+msgid "Upload"
+msgstr "העלאה"
+
+msgid "Manage Users"
+msgstr "ניהול משתמשים"
+
+msgid "Cart"
+msgstr "עגלת קניות"
+
+msgid "About Us"
+msgstr "עלינו"
+
+msgid "Contact Us"
+msgstr "צור קשר"
+
+msgid "Welcome,"
+msgstr "ברוך הבא,"
+
+msgid "Logout"
+msgstr "התנתקות"
+
+msgid "Search by Pokémon Name"
+msgstr "חיפוש לפי שם של פוקימון"
+
+msgid "Filter by Set Name"
+msgstr "סינון לפי שם סט"
+
+msgid "Graded?"
+msgstr "מדורג?"
+
+msgid "Filter by Location"
+msgstr "סינון לפי מיקום"
+
+msgid "Sort By"
+msgstr "מיון לפי"
+
+msgid "Price: Low to High"
+msgstr "מחיר: מהנמוך לגבוה"
+
+msgid "Price: High to Low"
+msgstr "מחיר: מהגבוה לנמוך"
+
+msgid "Card Number"
+msgstr "מספר קלף"
+
+msgid "Show Sold Cards"
+msgstr "הצג קליפם שנמכרו"
+
+msgid "Search"
+msgstr "חפש"
+
+msgid "Location:"
+msgstr "מיקום:"
+
+msgid "Rating:"
+msgstr "דירוג:"
+
+msgid "No ratings yet"
+msgstr "אין דירוגים עדיין"
+
+msgid "feedback"
+msgstr "ביקורות"
+
+msgid "Status:"
+msgstr "סטטוס:"
+
+msgid "Banned"
+msgstr "חסום"
+
+msgid "Report User"
+msgstr "דווח על משתמש"
+
+msgid "Spam"
+msgstr "ספאם"
+
+msgid "Abusive Behavior"
+msgstr "התנהגות פוגענית"
+
+msgid "Feedbacks"
+msgstr "ביקורות"
+
+msgid "Feedback:"
+msgstr "ביקורת:"
+
+msgid "No feedback available yet."
+msgstr "אין משובים זמינים עדיין."
+
+msgid "Uploaded Cards"
+msgstr "קלפים שהועלו"
+
+msgid "This user has not uploaded any cards yet."
+msgstr "משתמש זה עדיין לא העלה קלפים."
+
+msgid "Page navigation"
+msgstr "ניווט עמודים"
+
+msgid "Previous"
+msgstr "קודם"
+
+msgid "Next"
+msgstr "הבא"
+
+msgid "Profile"
+msgstr "הפרופיל שלי"
+
+msgid "Username"
+msgstr "שם משתמש"
+
+msgid "Email"
+msgstr "אימייל"
+
+msgid "Location"
+msgstr "מיקום"
+
+msgid "Select Your Location"
+msgstr "בחר את המיקום שלך"
+
+msgid "Contact Preference"
+msgstr "דרך תקשורת"
+
+msgid "Phone"
+msgstr "טלפון"
+
+msgid "Contact Details"
+msgstr "פרטי קשר"
+
+msgid "Update Profile"
+msgstr "עדכן פרופיל"
+
+msgid "Uploader Role Request"
+msgstr "בקשה להעלאת קלפים"
+
+msgid "You already have the {role} role. No further action is required."
+msgstr "כבר יש לך את תפקיד {role}. אין צורך בפעולה נוספת."
+
+msgid "Your request to become an uploader is currently {status}."
+msgstr "הבקשה שלך להפוך למעלה קלפים נמצאת כרגע במצב {status}."
+
+msgid "Your request to become an uploader has been {status}. Welcome to the team!"
+msgstr "הבקשה שלך להפוך למעלה קלפים אושרה. ברוך הבא לצוות!"
+
+msgid "Rules for Uploaders"
+msgstr "חוקי מעלה תוכן"
+
+msgid "I have read and accept the rules for becoming an uploader."
+msgstr "קראתי ואני מסכים לחוקי הלאת קלפים."
+
+msgid "Order History"
+msgstr "היסטוריית הזמנות"
+
+msgid "Order ID"
+msgstr "מזהה הזמנה"
+
+msgid "Status"
+msgstr "סטטוס"
+
+msgid "Total"
+msgstr "סה\"כ"
+
+msgid "ILS"
+msgstr "ש\"ח"
+
+msgid "Date"
+msgstr "תאריך"
+
+msgid "No orders found."
+msgstr "לא נמצאו הזמנות."
+
+msgid "Change Password"
+msgstr "שינוי סיסמא"
+
+msgid "Old Password"
+msgstr "סיסמא ישנה"
+
+msgid "New Password"
+msgstr "סיסמא חדשה"
+
+msgid "Delete Account"
+msgstr "מחיקת חשבון"
+
+msgid "Deleting your account is permanent and cannot be undone."
+msgstr "מחיקת החשבון תמחק את החשבון לתמיד ולא יהיה ניתן לשחזר"
+
+msgid "Order ID:"
+msgstr "מספר הזמנה:"
+
+msgid "Seller:"
+msgstr "מוכר:"
+
+msgid "Status:"
+msgstr "סטטוס:"
+
+msgid "Card"
+msgstr "קלף"
+
+msgid "Set"
+msgstr "סט"
+
+msgid "N/A"
+msgstr "לא זמין"
+
+msgid "Price"
+msgstr "מחיר"
+
+msgid "Actions"
+msgstr "פעולות"
+
+msgid "View Card"
+msgstr "צפה בקלף"
+
+msgid "Total Amount:"
+msgstr "סכום כולל:"
+
+msgid "Write your feedback"
+msgstr "כתוב את הביקורת שלך"
+
+msgid "Rate the seller"
+msgstr "דרג את המוכר"
+
+msgid "Excellent"
+msgstr "מצוין"
+
+msgid "Good"
+msgstr "טוב"
+
+msgid "Average"
+msgstr "בינוני"
+
+msgid "Poor"
+msgstr "גרוע"
+
+msgid "Very Poor"
+msgstr "גרוע מאוד"
+
+msgid "Submit Feedback"
+msgstr "שלח ביקורת"
+
+msgid "No feedback provided."
+msgstr "לא סופק ביקורת."
+
+msgid "You have no orders."
+msgstr "אין לך הזמנות."
+
+msgid "Start shopping!"
+msgstr "התחל לקנות!"
+
+msgid "Pending Orders"
+msgstr "הזמנות ממתינות"
+
+msgid "Buyer:"
+msgstr "קונה:"
+
+msgid "Date:"
+msgstr "תאריך:"
+
+msgid "Grade"
+msgstr "דירוג"
+
+msgid "Confirm"
+msgstr "אישור"
+
+msgid "Reject"
+msgstr "דחייה"
+
+msgid "No pending orders available."
+msgstr "אין הזמנות ממתינות זמינות."
+
+msgid "My Uploaded Cards"
+msgstr "הקלפים שלי"
+
+msgid "Available Cards"
+msgstr "קלפים זמינים"
+
+msgid "Edit"
+msgstr "ערוך"
+
+msgid "Delete"
+msgstr "מחק"
+
+msgid "Are you sure you want to delete this card?"
+msgstr "האם אתה בטוח שברצונך למחוק כרטיס זה?"
+
+msgid "No available cards."
+msgstr "אין כרטיסים זמינים."
+
+msgid "Sold Cards"
+msgstr "קלפים שנמכרו"
+
+msgid "No sold cards."
+msgstr "אין קלפים שנמכרו."
+
+msgid "Upload New Pokémon Card"
+msgstr "העלאת קלף פוקימון חדש"
+
+msgid "Set Name:"
+msgstr "שם סט:"
+
+msgid "Type to search..."
+msgstr "הקלד כדי לחפש..."
+
+msgid "Select Card Type"
+msgstr "בחר סוג קלף"
+
+msgid "Card Name:"
+msgstr "שם הקלף:"
+
+msgid "Card name will be auto-filled"
+msgstr "שם הקלף יושלם אוטומטית"
+
+msgid "Enter price manually"
+msgstr "הזן מחיר ידנית"
+
+msgid "Follow TCGPlayer Price (The price is for Ungraded in NM condition)"
+msgstr "עקוב אחרי מחיר TCGPlayer (המחיר הוא עבור קלף במצב NM ולא מדורג)"
+
+msgid "To follow TCGPlayer Price, the condition must be 'Near Mint (NM)'."
+msgstr "כדי לעקוב אחרי מחיר TCGPlayer, המצב חייב להיות NM."
+
+msgid "Is Graded?"
+msgstr "מדורג?"
+
+msgid "Grade (1-10):"
+msgstr "דירוג (1-10):"
+
+msgid "Enter grade"
+msgstr "הזן דירוג"
+
+msgid "Card Image:"
+msgstr "תמונת קלף:"
+
+msgid "Upload"
+msgstr "העלה"
+
+msgid "My Cart"
+msgstr "העגלה שלי"
+
+msgid "Remove"
+msgstr "הסר"
+
+msgid "Total Price:"
+msgstr "סה״כ:"
+
+msgid "Checkout"
+msgstr "בצע הזמנה"
+
+msgid "Your cart is empty."
+msgstr "העגלה שלך ריקה."
+
+msgid "We'd love to hear from you! Please fill out the form below and we'll get back to you soon."
+msgstr "נשמח לשמוע ממך! אנא מלא את הטופס למטה ונחזור אליך בהקדם."
+
+msgid "Your Name"
+msgstr "השם שלך"
+
+msgid "Your Email"
+msgstr "האימייל שלך"
+
+msgid "Your Message"
+msgstr "ההודעה שלך"
+
+msgid "Send Message"
+msgstr "שלח הודעה"
+
+msgid "Login"
+msgstr "התחבר"
+
+msgid "Enter your email"
+msgstr "הזן את האימייל שלך"
+
+msgid "Password"
+msgstr "סיסמא"
+
+msgid "Enter your password"
+msgstr "הזן את הסיסמא שלך"
+
+msgid "Choose a username"
+msgstr "בחר שם משתמש"
+
+msgid "Choose a password"
+msgstr "בחר סיסמא"
+
+msgid "Select your area"
+msgstr "בחר את האזור שלך"
+
+msgid "Phone or Facebook Link"
+msgstr "מספר טלפון או קישור לפייסבוק"
+
+msgid "Enter phone number or Facebook link"
+msgstr "הזן מספר טלפון או קישור לפייסבוק"
+
+msgid "Register"
+msgstr "הרשמה"
+
+msgid "Register here"
+msgstr "הירשם כאן"
+
+msgid "Don't have an account? "
+msgstr "אין לך חשבון? "
+
+msgid "Already have an account? "
+msgstr "כבר יש לך חשבון? "
+
+msgid "Login here"
+msgstr "התחבר כאן"
+
+msgid "Welcome to"
+msgstr "ברוכים הבאים אל"
+
+msgid "your ultimate destination for Pokémon card enthusiasts!"
+msgstr "היעד המושלם עבור חובבי קלפי פוקימון!"
+
+msgid "Our Mission"
+msgstr "המשימה שלנו"
+
+msgid "Why Choose Us?"
+msgstr "למה לבחור בנו?"
+
+msgid "Wide selection of Pokémon cards"
+msgstr "מבחר רחב של קלפי פוקימון"
+
+msgid "Seamless user experience"
+msgstr "חוויית משתמש חלקה"
+
+msgid "Secure transactions and trusted sellers"
+msgstr "עסקאות מאובטחות ומוכרים אמינים"
+
+msgid "Community-driven platform"
+msgstr "פלטפורמה מונעת קהילה"
+
+msgid "Contact Us"
+msgstr "צור קשר"
+
+msgid "Made in Israel"
+msgstr "תוצרת כחול-לבן"
+
+msgid "At Pika-Card, we aim to provide the best platform for buying, selling, and showcasing Pokémon cards. Our team is passionate about the Pokémon universe and dedicated to building a vibrant community of collectors and players."
+msgstr "ב-Pika-Card, אנחנו שואפים לספק את הפלטפורמה הטובה ביותר לקנייה, מכירה ותצוגה של קלפי פוקימון. הצוות שלנו נלהב מהעולם של פוקימון ומחויב לבנות קהילה תוססת של אספנים ושחקנים."
+
+msgid "Edit Card"
+msgstr "ערוך קלף"
+
+msgid "This card follows TCGPlayer price."
+msgstr "קלף זה עוקב אחר המחיר של TCGPlayer."
+
+msgid "Card Name"
+msgstr "שם הקלף"
+
+msgid "Condition"
+msgstr "מצב"
+
+msgid "Set Name"
+msgstr "שם הסט"
+
+msgid "Card Type"
+msgstr "סוג הכרטיס"
+
+msgid "Grading Company"
+msgstr "חברת דירוג"
+
+msgid "Grade"
+msgstr "ציון"
+
+msgid "Save Changes"
+msgstr "שמור שינויים"
+
+msgid "Cancel"
+msgstr "ביטול"
 

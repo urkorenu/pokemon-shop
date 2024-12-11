@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2 class="text-center mb-4">Upload New Pokémon Card</h2>
+<h2 class="text-center mb-4">{{ _("Upload New Pokémon Card") }}</h2>
 
 <form action="/admin/upload" method="POST" enctype="multipart/form-data">
     <!-- Set Name -->
     <div class="mb-3">
-        <label for="set_name" class="form-label">Set Name:</label>
-        <input class="form-control" list="sets" id="set_name" name="set_name" placeholder="Type to search..." required>
+        <label for="set_name" class="form-label">{{ _("Set Name:") }}</label>
+        <input class="form-control" list="sets" id="set_name" name="set_name" placeholder="{{ _('Type to search...') }}" required>
         <datalist id="sets">
             {% for set in sets %}
             <option value="{{ set.name }}">{{ set.name }}</option>
@@ -17,79 +17,78 @@
 
     <!-- Card Number -->
     <div class="mb-3">
-        <label for="number" class="form-label">Card Number:</label>
-        <input type="text" id="number" name="number" class="form-control" placeholder="Enter card number" required>
+        <label for="number" class="form-label">{{ _("Card Number:") }}</label>
+        <input type="text" id="number" name="number" class="form-control" placeholder="{{ _('Enter card number') }}" required>
     </div>
 
     <!-- Card Type -->
     <div class="mb-3">
-        <label for="card_type" class="form-label">Card Type:</label>
+        <label for="card_type" class="form-label">{{ _("Card Type:") }}</label>
         <select id="card_type" name="card_type" class="form-select" required>
-            <option value="">Select Card Type</option>
+            <option value="">{{ _("Select Card Type") }}</option>
         </select>
     </div>
 
     <!-- Card Name -->
     <div class="mb-3">
-        <label for="name" class="form-label">Card Name:</label>
-        <input type="text" id="name" name="name" class="form-control" placeholder="Card name will be auto-filled" readonly required>
+        <label for="name" class="form-label">{{ _("Card Name:") }}</label>
+        <input type="text" id="name" name="name" class="form-control" placeholder="{{ _('Card name will be auto-filled') }}" readonly required>
     </div>
 
     <!-- Price or Follow TCGPlayer -->
     <div class="mb-3">
-        <label for="price" class="form-label">Price:</label>
+        <label for="price" class="form-label">{{ _("Price:") }}</label>
         <div class="input-group">
-            <span class="input-group-text">ILS</span>
-            <input type="number" id="price" name="price" step="0.01" class="form-control" placeholder="Enter price manually">
+            <span class="input-group-text">{{ _("ILS") }}</span>
+            <input type="number" id="price" name="price" step="0.01" class="form-control" placeholder="{{ _('Enter price manually') }}">
         </div>
         <div class="form-check mt-2">
             <input type="checkbox" id="follow_tcg" name="follow_tcg" class="form-check-input">
-            <label for="follow_tcg" class="form-check-label">Follow TCGPlayer Price (The price is for Ungraded in NM condition)</label>
+            <label for="follow_tcg" class="form-check-label">{{ _("Follow TCGPlayer Price (The price is for Ungraded in NM condition)") }}</label>
         </div>
     </div>
 
     <!-- Condition -->
     <div class="mb-3">
-        <label for="condition" class="form-label">Condition:</label>
+        <label for="condition" class="form-label">{{ _("Condition:") }}</label>
         <select id="condition" name="condition" class="form-select" required>
-            <option value="NM">Near Mint (NM)</option>
-            <option value="LP">Lightly Played (LP)</option>
-            <option value="MP">Moderately Played (MP)</option>
-            <option value="HP">Heavily Played (HP)</option>
-            <option value="DMG">Damaged (DMG)</option>
+            <option value="NM">{{ _("Near Mint (NM)") }}</option>
+            <option value="LP">{{ _("Lightly Played (LP)") }}</option>
+            <option value="MP">{{ _("Moderately Played (MP)") }}</option>
+            <option value="HP">{{ _("Heavily Played (HP)") }}</option>
+            <option value="DMG">{{ _("Damaged (DMG)") }}</option>
         </select>
         <small class="text-muted" id="tcg_warning" style="display: none;">
-            To follow TCGPlayer Price, the condition must be "Near Mint (NM)".
+            {{ _("To follow TCGPlayer Price, the condition must be 'Near Mint (NM)'.") }}
         </small>
     </div>
 
     <!-- Is Graded -->
     <div class="form-check mb-3">
         <input type="checkbox" id="is_graded" name="is_graded" class="form-check-input">
-        <label for="is_graded" class="form-check-label">Is Graded?</label>
+        <label for="is_graded" class="form-check-label">{{ _("Is Graded?") }}</label>
     </div>
-
     <!-- Grade -->
     <div id="graded_fields" class="mb-3" style="display: none;">
-        <label for="grade" class="form-label">Grade (1-10):</label>
-        <input type="number" id="grade" name="grade" step="0.5" min="1" max="10" class="form-control" placeholder="Enter grade">
-        <label for="grading_company" class="form-label mt-3">Grading Company:</label>
+        <label for="grade" class="form-label">{{ _("Grade (1-10):") }}</label>
+        <input type="number" id="grade" name="grade" step="0.5" min="1" max="10" class="form-control" placeholder="{{ _('Enter grade') }}">
+        <label for="grading_company" class="form-label mt-3">{{ _("Grading Company:") }}</label>
         <select id="grading_company" name="grading_company" class="form-select">
-            <option value="CGC">CGC</option>
-            <option value="PSA">PSA</option>
-            <option value="Beckett">Beckett</option>
+            <option value="CGC">{{ _("CGC") }}</option>
+            <option value="PSA">{{ _("PSA") }}</option>
+            <option value="Beckett">{{ _("Beckett") }}</option>
         </select>
     </div>
 
     <!-- File Upload -->
     <div class="mb-3">
-        <label for="image" class="form-label">Card Image:</label>
+        <label for="image" class="form-label">{{ _("Card Image:") }}</label>
         <input type="file" id="image" name="image" class="form-control" accept="image/*" required>
     </div>
 
     <!-- Submit -->
     <div class="mt-4">
-        <button type="submit" class="btn btn-primary">Upload</button>
+        <button type="submit" class="btn btn-primary">{{ _("Upload") }}</button>
     </div>
 </form>
 

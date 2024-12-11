@@ -1,56 +1,97 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    /* Style for readonly and disabled input fields */
+    input[readonly], select[readonly], select[disabled] {
+        background-color: #e9ecef; /* Light grey background */
+        cursor: not-allowed;       /* Indicate uneditable field */
+    }
+
+    input[disabled] {
+        background-color: #e9ecef; /* Same grey for disabled fields */
+        cursor: not-allowed;
+    }
+</style>
+
 <div class="container">
-    <h2 class="text-center mb-4">Edit Card</h2>
+    <h2 class="text-center mb-4">{{ _('Edit Card') }}</h2>
     <form method="POST" action="{{ url_for('user.edit_card', card_id=card.id) }}">
-        <div class="mb-3">
-            <label for="name" class="form-label">Card Name</label>
-            <input type="text" class="form-control" id="name" name="name" value="{{ card.name }}">
+        {% if card.follow_tcg %}
+        <div class="alert alert-info" role="alert">
+            {{ _('This card follows TCGPlayer price.') }}
         </div>
+        {% endif %}
+
+        <!-- Card Name -->
         <div class="mb-3">
-            <label for="price" class="form-label">Price (ILS)</label>
-            <input type="number" class="form-control" id="price" name="price" value="{{ card.price }}" step="0.01">
+            <label for="name" class="form-label">{{ _('Card Name') }}</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ card.name }}" readonly>
         </div>
+
+        <!-- Price -->
         <div class="mb-3">
-            <label for="condition" class="form-label">Condition</label>
-            <input type="text" class="form-control" id="condition" name="condition" value="{{ card.condition }}">
+            <label for="price" class="form-label">{{ _('Price') }}</label>
+            <input type="number" class="form-control" id="price" name="price" value="{{ card.price }}" step="0.01"
+                   {% if card.follow_tcg %}readonly{% endif %}>
         </div>
+
+        <!-- Condition -->
         <div class="mb-3">
-            <label for="amount" class="form-label">Amount</label>
-            <input type="number" class="form-control" id="amount" name="amount" value="{{ card.amount }}">
-        </div>
-        <div class="mb-3">
-            <label for="set_name" class="form-label">Set Name</label>
-            <input type="text" class="form-control" id="set_name" name="set_name" value="{{ card.set_name }}">
-        </div>
-        <div class="mb-3">
-            <label for="number" class="form-label">Card Number</label>
-            <input type="text" class="form-control" id="number" name="number" value="{{ card.number }}">
-        </div>
-        <div class="mb-3">
-            <label for="card_type" class="form-label">Card Type</label>
-            <input type="text" class="form-control" id="card_type" name="card_type" value="{{ card.card_type }}">
-        </div>
-        <div class="mb-3">
-            <label for="is_graded" class="form-label">Graded?</label>
-            <select id="is_graded" name="is_graded" class="form-select">
-                <option value="no" {% if not card.is_graded %}selected{% endif %}>No</option>
-                <option value="yes" {% if card.is_graded %}selected{% endif %}>Yes</option>
+            <label for="condition" class="form-label">{{ _('Condition') }}</label>
+            <select id="condition" name="condition" class="form-select" {% if card.follow_tcg %}disabled{% endif %}>
+                <option value="NM" {% if card.condition == "NM" %}selected{% endif %}>{{ _('Near Mint (NM)') }}</option>
+                <option value="LP" {% if card.condition == "LP" %}selected{% endif %}>{{ _('Lightly Played (LP)') }}</option>
+                <option value="MP" {% if card.condition == "MP" %}selected{% endif %}>{{ _('Moderately Played (MP)') }}</option>
+                <option value="HP" {% if card.condition == "HP" %}selected{% endif %}>{{ _('Heavily Played (HP)') }}</option>
+                <option value="DMG" {% if card.condition == "DMG" %}selected{% endif %}>{{ _('Damaged (DMG)') }}</option>
             </select>
         </div>
-        {% if card.is_graded %}
+
+        <!-- Set Name -->
         <div class="mb-3">
-            <label for="grading_company" class="form-label">Grading Company</label>
+            <label for="set_name" class="form-label">{{ _('Set Name') }}</label>
+            <input type="text" class="form-control" id="set_name" name="set_name" value="{{ card.set_name }}" readonly>
+        </div>
+
+        <!-- Card Number -->
+        <div class="mb-3">
+            <label for="number" class="form-label">{{ _('Card Number') }}</label>
+            <input type="text" class="form-control" id="number" name="number" value="{{ card.number }}" readonly>
+        </div>
+
+        <!-- Card Type -->
+        <div class="mb-3">
+            <label for="card_type" class="form-label">{{ _('Card Type') }}</label>
+            <input type="text" class="form-control" id="card_type" name="card_type" value="{{ card.card_type }}" readonly>
+        </div>
+
+        <!-- Graded? -->
+        <div class="mb-3">
+            <label for="is_graded" class="form-label">{{ _('Graded?') }}</label>
+            <select id="is_graded" name="is_graded" class="form-select" readonly>
+                <option value="no" {% if not card.is_graded %}selected{% endif %}>{{ _('No') }}</option>
+                <option value="yes" {% if card.is_graded %}selected{% endif %}>{{ _('Yes') }}</option>
+            </select>
+        </div>
+
+        {% if card.is_graded %}
+        <!-- Grading Company -->
+        <div class="mb-3">
+            <label for="grading_company" class="form-label">{{ _('Grading Company') }}</label>
             <input type="text" class="form-control" id="grading_company" name="grading_company" value="{{ card.grading_company }}">
         </div>
+
+        <!-- Grade -->
         <div class="mb-3">
-            <label for="grade" class="form-label">Grade</label>
+            <label for="grade" class="form-label">{{ _('Grade') }}</label>
             <input type="text" class="form-control" id="grade" name="grade" value="{{ card.grade }}">
         </div>
         {% endif %}
-        <button type="submit" class="btn btn-success">Save Changes</button>
-        <a href="{{ url_for('user.my_cards') }}" class="btn btn-secondary">Cancel</a>
+
+        <!-- Save & Cancel Buttons -->
+        <button type="submit" class="btn btn-success">{{ _('Save Changes') }}</button>
+        <a href="{{ url_for('user.my_cards') }}" class="btn btn-secondary">{{ _('Cancel') }}</a>
     </form>
 </div>
 {% endblock %}
