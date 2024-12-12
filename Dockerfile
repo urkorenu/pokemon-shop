@@ -21,5 +21,5 @@ EXPOSE 5000
 RUN pybabel compile -d app/translations
 
 # Use Gunicorn for production, remove manage.py for simplicity
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "run:app"]
+CMD ["gunicorn", "--worker-class", "gevent", "--timeout", "120", "-w", "4", "-b", "0.0.0.0:5000", "run:app"]
 
