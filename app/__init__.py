@@ -41,7 +41,7 @@ def create_app():
     def load_user(user_id):
         return User.query.get(int(user_id))
 
-    login_manager.login_view = "auth.login"
+    login_manager.login_view = "auth.auth"
     login_manager.login_message = "Please log in to access this page."
 
     # Context processor for injecting counts
