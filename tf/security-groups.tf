@@ -91,3 +91,28 @@ resource "aws_security_group" "elb_sg" {
     Name = "${local.env}-elb-sg"
   }
 }
+
+
+resource "aws_security_group" "app_db_sg" {
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    description = "Allow PostgreSQL access from App Security Group"
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    security_groups = [aws_security_group.app_sg.id]
+  }
+
+  egress {
+    description = "Allow all outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${local.env}-app-db-sg"
+  }
+}
