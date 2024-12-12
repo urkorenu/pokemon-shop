@@ -23,4 +23,4 @@ env/
 instance/
  
 # TF
- **/**/*terraform*
+*terraform*
