@@ -1,0 +1,21 @@
+resource "aws_s3_bucket" "tf_state" {
+  bucket = "pokemon-${local.env}-tf-state"
+
+  versioning {
+    enabled = true
+  }
+
+  lifecycle {
+    prevent_destroy = true
+  }
+
+  tags = {
+    Name = "${local.env}-tf-state"
+    Environment = local.env
+  }
+}
+
+resource "aws_s3_bucket_acl" "tf_state_acl" {
+  bucket = aws_s3_bucket.tf_state.id
+  acl    = "private"
+}

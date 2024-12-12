@@ -17,7 +17,7 @@ BASE_URL = "https://api.pokemontcg.io/v2"
 @admin_bp.route("/upload", methods=["GET", "POST"])
 @roles_required("admin", "uploader")
 def upload_card():
-    @cache.cached(timeout=3600, key_prefix="pokemon_sets")
+    @cache.cached(timeout=86400, key_prefix="pokemon_sets")
     def get_pokemon_sets():
         """Fetch Pokémon TCG sets from the API."""
         response = requests.get(f"{BASE_URL}/sets", headers={"X-Api-Key": API_KEY})
@@ -118,7 +118,7 @@ def upload_card():
 
 
 @admin_bp.route("/card-details", methods=["GET"])
-@cache.cached(timeout=600, query_string=True)
+@cache.cached(timeout=86400, query_string=True)
 def get_card_details():
     """Fetch card details for the selected set and number."""
     set_name = request.args.get("set_name")
@@ -142,11 +142,13 @@ def get_card_details():
         card_name = card["name"]
         card_types = list(card.get("tcgplayer", {}).get("prices", {}).keys())
 
-        return jsonify({
-            "name": card_name,
-            "types": card_types,
-            "prices": card.get("tcgplayer", {}).get("prices", {})
-        })
+        return jsonify(
+            {
+                "name": card_name,
+                "types": card_types,
+                "prices": card.get("tcgplayer", {}).get("prices", {}),
+            }
+        )
 
     except requests.RequestException as e:
         print(f"Error fetching card details: {e}", flush=True)
