@@ -142,11 +142,13 @@ def get_card_details():
         card_name = card["name"]
         card_types = list(card.get("tcgplayer", {}).get("prices", {}).keys())
 
-        return jsonify({
-            "name": card_name,
-            "types": card_types,
-            "prices": card.get("tcgplayer", {}).get("prices", {})
-        })
+        return jsonify(
+            {
+                "name": card_name,
+                "types": card_types,
+                "prices": card.get("tcgplayer", {}).get("prices", {}),
+            }
+        )
 
     except requests.RequestException as e:
         print(f"Error fetching card details: {e}", flush=True)
