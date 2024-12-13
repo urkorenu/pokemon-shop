@@ -338,17 +338,16 @@ def contact_us():
 def about_us():
     return render_template("about.html")
 
-
 @cache.cached(timeout=60, query_string=True)
 def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_page=12):
     """
     Reusable function to filter cards based on search and filter parameters.
-
-    Returns paginated cards, unique set names, and overall stats in one query.
+    Returns paginated cards, unique set names, and overall stats.
     """
     # Use an alias for User table to avoid duplicate joins
     uploader_alias = aliased(User)
 
+    # Start base query
     if base_query is None:
         base_query = Card.query.options(joinedload(Card.uploader)).join(uploader_alias)
 
@@ -360,17 +359,14 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
     sort_option = request.args.get("sort", "")
     show_sold = request.args.get("show_sold", "off") == "on" or show_sold
 
-    # Base filters
+    # Apply filters
     query = base_query.filter(
         or_(uploader_alias.role == "uploader", uploader_alias.role == "admin")
     )
-
     if user_id:
         query = query.filter(Card.uploader_id == user_id)
-
     if not show_sold:
         query = query.filter(Card.amount > 0)
-
     if name_query:
         query = query.filter(Card.name.ilike(f"%{name_query}%"))
     if set_name_query:
@@ -390,24 +386,25 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
     elif sort_option == "card_number":
         query = query.order_by(Card.number.asc())
 
-    # Paginate the query
-    paginated_cards = query.paginate(page=page, per_page=per_page, error_out=False)
-
-    stats_query = query.with_entities(
+    # Stats Query - Execute before caching
+    stats = query.with_entities(
         func.count(Card.id).label("total_cards"),
         func.count(func.distinct(Card.set_name)).label("total_sets"),
         func.count(case((Card.is_graded == True, 1))).label("total_graded")
-    ).one()
+    ).order_by(None).first()
 
-    unique_set_names = {card.set_name for card in query}
-
-
-
-    stats = {
-        "total_cards": stats_query.total_cards,
-        "total_sets": stats_query.total_sets,
-        "total_graded": stats_query.total_graded,
+    # Serialize stats before caching
+    stats_dict = {
+        "total_cards": stats.total_cards,
+        "total_sets": stats.total_sets,
+        "total_graded": stats.total_graded,
     }
 
+    # Paginate the query
+    paginated_cards = query.paginate(page=page, per_page=per_page, error_out=False)
 
-    return paginated_cards, sorted(unique_set_names), stats
+    # Unique set names extracted from paginated results
+    unique_set_names = {card.set_name for card in query}
+
+    return paginated_cards, sorted(unique_set_names), stats_dict
+
