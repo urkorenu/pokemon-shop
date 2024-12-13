@@ -7,7 +7,6 @@ from flask_caching import Cache
 from flask_babel import Babel
 
 
-
 # Initialize extensions
 db = SQLAlchemy()
 migrate = Migrate()
@@ -17,7 +16,7 @@ cache = Cache()
 
 def create_app():
     app = Flask(__name__)
-    app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
+    app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
     app.config.from_object("config.Config")
     app.config["LANGUAGES"] = ["en", "he"]
     babel = Babel(app)
@@ -101,4 +100,3 @@ def create_app():
     app.register_blueprint(order_bp, url_prefix="/order")
 
     return app
-

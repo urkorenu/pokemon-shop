@@ -21,7 +21,9 @@ def upload_card():
     def get_pokemon_sets():
         """Fetch Pokémon TCG sets from the API."""
         try:
-            response = requests.get(f"{BASE_URL}/sets", headers={"X-Api-Key": API_KEY}, timeout=10)
+            response = requests.get(
+                f"{BASE_URL}/sets", headers={"X-Api-Key": API_KEY}, timeout=10
+            )
             response.raise_for_status()
             return [
                 {"name": s["name"], "max_card_number": s.get("printedTotal", 0)}

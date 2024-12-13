@@ -23,7 +23,6 @@ def view_cards():
     paginated_cards, unique_set_names, stats = filter_cards(page=page)
     print("Unique Set Names:", unique_set_names, flush=True)
 
-
     return render_template(
         "cards.html",
         cards=paginated_cards.items,
@@ -398,7 +397,7 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
     # Overall Stats (single query)
     stats_query = query.session.query(
         func.count(Card.id).label("total_cards"),
-        func.count(case((Card.is_graded == True, 1))).label("total_graded")
+        func.count(case((Card.is_graded == True, 1))).label("total_graded"),
     ).one()
 
     # Extract unique set names from paginated results
