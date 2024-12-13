@@ -85,20 +85,24 @@
     {% endif %}
     </div>
 
-    <!-- Change Password -->
+    <!-- Change Password - Disabled Temporarily -->
     <h4 class="mt-5">{{ _("Change Password") }}</h4>
-    <form method="POST" action="{{ url_for('auth.account') }}">
-        <input type="hidden" name="action" value="change_password">
-        <div class="mb-3">
-            <label for="old_password" class="form-label">{{ _("Old Password") }}</label>
-            <input type="password" class="form-control" id="old_password" name="old_password" required>
-        </div>
-        <div class="mb-3">
-            <label for="new_password" class="form-label">{{ _("New Password") }}</label>
-            <input type="password" class="form-control" id="new_password" name="new_password" required>
-        </div>
-        <button type="submit" class="btn btn-warning">{{ _("Change Password") }}</button>
+    <div class="alert alert-info" role="alert">
+	{{ _("This feature is temporarily disabled. We are working on improvements. Please check back later!") }}
+    </div>
+    <form method="POST" action="{{ url_for('auth.account') }}" onsubmit="return false;" style="pointer-events: none; opacity: 0.6;">
+	<input type="hidden" name="action" value="change_password">
+	<div class="mb-3">
+	    <label for="old_password" class="form-label">{{ _("Old Password") }}</label>
+	    <input type="password" class="form-control" id="old_password" name="old_password" disabled>
+	</div>
+	<div class="mb-3">
+	    <label for="new_password" class="form-label">{{ _("New Password") }}</label>
+	    <input type="password" class="form-control" id="new_password" name="new_password" disabled>
+	</div>
+	<button type="submit" class="btn btn-warning" disabled>{{ _("Change Password") }}</button>
     </form>
+
 
     <!-- Delete Account -->
     <h4 class="mt-5">{{ _("Delete Account") }}</h4>
