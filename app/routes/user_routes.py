@@ -17,11 +17,9 @@ user_bp = Blueprint("user", __name__)
 
 
 @user_bp.route("/")
-@cache.cached(timeout=600, query_string=True)
 def view_cards():
     page = request.args.get("page", 1, type=int)
     paginated_cards, unique_set_names, stats = filter_cards(page=page)
-    print("Unique Set Names:", unique_set_names, flush=True)
 
     return render_template(
         "cards.html",
@@ -341,6 +339,7 @@ def about_us():
     return render_template("about.html")
 
 
+@cache.cached(timeout=60, query_string=True)
 def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_page=12):
     """
     Reusable function to filter cards based on search and filter parameters.
@@ -394,19 +393,21 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
     # Paginate the query
     paginated_cards = query.paginate(page=page, per_page=per_page, error_out=False)
 
-    # Overall Stats (single query)
-    stats_query = query.session.query(
+    stats_query = query.with_entities(
         func.count(Card.id).label("total_cards"),
-        func.count(case((Card.is_graded == True, 1))).label("total_graded"),
+        func.count(func.distinct(Card.set_name)).label("total_sets"),
+        func.count(case((Card.is_graded == True, 1))).label("total_graded")
     ).one()
 
-    # Extract unique set names from paginated results
     unique_set_names = {card.set_name for card in query}
+
+
 
     stats = {
         "total_cards": stats_query.total_cards,
-        "total_sets": len(unique_set_names),
+        "total_sets": stats_query.total_sets,
         "total_graded": stats_query.total_graded,
     }
+
 
     return paginated_cards, sorted(unique_set_names), stats
