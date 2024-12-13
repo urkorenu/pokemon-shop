@@ -96,12 +96,15 @@ def create_app():
     from app.routes.auth_routes import auth_bp
     from app.routes.cart_routes import cart_bp
     from app.routes.order_routes import order_bp
+    from app.routes.seller_routes import seller_bp
 
     app.register_blueprint(user_bp, url_prefix="/")
     app.register_blueprint(admin_bp, url_prefix="/admin")
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(cart_bp, url_prefix="/cart")
     app.register_blueprint(order_bp, url_prefix="/order")
+    app.register_blueprint(seller_bp, url_prefix='/seller')
+
 
     return app
 

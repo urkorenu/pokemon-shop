@@ -3,7 +3,7 @@
 {% block content %}
 <h2 class="text-center mb-4">{{ _("Upload New Pokémon Card") }}</h2>
 
-<form action="/admin/upload" method="POST" enctype="multipart/form-data">
+<form action="{{ url_for('seller.upload_card') }}" method="POST" enctype="multipart/form-data">
     <!-- Set Name -->
     <div class="mb-3">
         <label for="set_name" class="form-label">{{ _("Set Name:") }}</label>
@@ -98,28 +98,24 @@
     const tcgWarning = document.getElementById('tcg_warning');
     const cardTypeDropdown = document.getElementById("card_type");
 
-    // Enforce condition logic for "Follow TCGPlayer Price"
     function enforceConditionLogic() {
         if (followTcgCheckbox.checked) {
-            conditionSelect.value = "NM"; // Automatically set to Near Mint
-            conditionSelect.disabled = true; // Lock condition
-            priceInput.value = ''; // Clear manual price
+            conditionSelect.value = "NM";
+            conditionSelect.disabled = true;
+            priceInput.value = '';
             priceInput.disabled = true;
             tcgWarning.style.display = 'block';
         } else {
-            conditionSelect.disabled = false; // Unlock condition
+            conditionSelect.disabled = false;
             priceInput.disabled = false;
             tcgWarning.style.display = 'none';
         }
     }
 
-    // Fetch TCGPlayer price and update the price field
     async function fetchTCGPrice() {
         const setName = document.getElementById("set_name").value.trim();
         const cardNumber = document.getElementById("number").value.trim();
         const cardType = cardTypeDropdown.value.trim();
-
-        console.log("Fetching TCG price for:", { setName, cardNumber, cardType });
 
         if (!setName || !cardNumber || !cardType) {
             alert("Please fill Set Name, Card Number, and select Card Type to fetch the price.");
@@ -129,19 +125,14 @@
         }
 
         try {
-            const apiUrl = `/admin/card-details?set_name=${encodeURIComponent(setName)}&number=${encodeURIComponent(cardNumber)}`;
-            console.log("API URL:", apiUrl);
-
+            const apiUrl = `/seller/card-details?set_name=${encodeURIComponent(setName)}&number=${encodeURIComponent(cardNumber)}`;
             const response = await fetch(apiUrl);
 
             if (!response.ok) {
-                console.error("Failed to fetch card details:", response.status);
                 throw new Error("Failed to fetch card details");
             }
 
             const data = await response.json();
-            console.log("API Response:", data);
-
             const normalizedCardType = cardType.toLowerCase();
             const availablePrices = data.prices || {};
 
@@ -157,20 +148,17 @@
             if (tcgPriceUSD > 0) {
                 const conversionRate = 3.56;
                 const tcgPriceILS = Math.round(tcgPriceUSD * conversionRate);
-                priceInput.value = tcgPriceILS; // Update the price field
-                console.log("TCG Price in ILS:", tcgPriceILS);
+                priceInput.value = tcgPriceILS;
             } else {
                 throw new Error("TCGPlayer price not found for this card type.");
             }
         } catch (error) {
-            console.error("Error fetching TCGPlayer price:", error.message);
             alert("Failed to fetch TCGPlayer price. Please try again.");
             followTcgCheckbox.checked = false;
             enforceConditionLogic();
         }
     }
 
-    // Event Listeners
     followTcgCheckbox.addEventListener('change', async () => {
         enforceConditionLogic();
         if (followTcgCheckbox.checked) {
@@ -205,18 +193,16 @@
         if (!setName || !cardNumber) return;
 
         try {
-            const apiUrl = `/admin/card-details?set_name=${encodeURIComponent(setName)}&number=${encodeURIComponent(cardNumber)}`;
+            const apiUrl = `/seller/card-details?set_name=${encodeURIComponent(setName)}&number=${encodeURIComponent(cardNumber)}`;
             const response = await fetch(apiUrl);
 
             if (!response.ok) {
-                console.error("Failed to fetch card details:", response.status);
                 return;
             }
 
             const data = await response.json();
 
             if (data.error) {
-                console.error("Error in API response:", data.error);
                 return;
             }
 
@@ -241,4 +227,3 @@
     });
 </script>
 {% endblock %}
-
