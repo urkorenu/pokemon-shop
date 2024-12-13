@@ -1,3 +1,4 @@
+from sqlalchemy.sql import func, case
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from ..models import Card, Cart, db, User, Order
 from flask_login import login_required, current_user
@@ -6,21 +7,21 @@ from sqlalchemy.orm import joinedload, aliased
 from sqlalchemy import or_
 import boto3
 from config import Config
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urlparse
 from ..cities import CITIES_IN_ISRAEL
 from ..mail_service import send_email
+from app import cache
 
 
 user_bp = Blueprint("user", __name__)
 
 
 @user_bp.route("/")
+@cache.cached(timeout=600, query_string=True)
 def view_cards():
-    # Get the page number from request args (default to page 1)
     page = request.args.get("page", 1, type=int)
-
-    # Call filter_cards with pagination
-    paginated_cards, unique_set_names = filter_cards(page=page)
+    paginated_cards, unique_set_names, stats = filter_cards(page=page)
+    print("Unique Set Names:", unique_set_names, flush=True)
 
     return render_template(
         "cards.html",
@@ -28,6 +29,9 @@ def view_cards():
         unique_set_names=unique_set_names,
         pagination=paginated_cards,
         cities=CITIES_IN_ISRAEL,
+        total_cards=stats["total_cards"],
+        total_sets=stats["total_sets"],
+        total_graded=stats["total_graded"],
         show_sold_checkbox=False,
     )
 
@@ -87,7 +91,7 @@ def profile(user_id):
     show_sold = request.args.get("show_sold") == "on"
     page = request.args.get("page", 1, type=int)
 
-    paginated_cards, unique_set_names = filter_cards(
+    paginated_cards, unique_set_names, stats = filter_cards(
         user_id=user_id, show_sold=show_sold, page=page
     )
 
@@ -106,6 +110,9 @@ def profile(user_id):
         feedback=completed_orders,
         unique_set_names=unique_set_names,
         pagination=paginated_cards,
+        total_cards=stats["total_cards"],
+        total_sets=stats["total_sets"],
+        total_graded=stats["total_graded"],
         show_sold_checkbox=True,
     )
 
@@ -338,10 +345,7 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
     """
     Reusable function to filter cards based on search and filter parameters.
 
-    :param base_query: Optional base query to filter on (defaults to all cards).
-    :param user_id: Optional user_id to filter cards by uploader.
-    :param show_sold: Boolean indicating whether to include sold cards (amount == 0).
-    :return: Filtered query and unique set names.
+    Returns paginated cards, unique set names, and overall stats in one query.
     """
     # Use an alias for User table to avoid duplicate joins
     uploader_alias = aliased(User)
@@ -365,7 +369,6 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
     if user_id:
         query = query.filter(Card.uploader_id == user_id)
 
-    # Only exclude sold cards if 'show_sold' is False
     if not show_sold:
         query = query.filter(Card.amount > 0)
 
@@ -391,7 +394,19 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
     # Paginate the query
     paginated_cards = query.paginate(page=page, per_page=per_page, error_out=False)
 
-    # Extract unique set names for the current page
-    unique_set_names = {card.set_name for card in paginated_cards.items}
+    # Overall Stats (single query)
+    stats_query = query.session.query(
+        func.count(Card.id).label("total_cards"),
+        func.count(case((Card.is_graded == True, 1))).label("total_graded"),
+    ).one()
 
-    return paginated_cards, sorted(unique_set_names)
+    # Extract unique set names from paginated results
+    unique_set_names = {card.set_name for card in query}
+
+    stats = {
+        "total_cards": stats_query.total_cards,
+        "total_sets": len(unique_set_names),
+        "total_graded": stats_query.total_graded,
+    }
+
+    return paginated_cards, sorted(unique_set_names), stats

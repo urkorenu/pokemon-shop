@@ -20,13 +20,19 @@ def upload_card():
     @cache.cached(timeout=86400, key_prefix="pokemon_sets")
     def get_pokemon_sets():
         """Fetch Pokémon TCG sets from the API."""
-        response = requests.get(f"{BASE_URL}/sets", headers={"X-Api-Key": API_KEY})
-        response.raise_for_status()
-        return [
-            {"name": s["name"], "max_card_number": s.get("printedTotal", 0)}
-            for s in response.json().get("data", [])
-            if s.get("printedTotal")
-        ]
+        try:
+            response = requests.get(
+                f"{BASE_URL}/sets", headers={"X-Api-Key": API_KEY}, timeout=10
+            )
+            response.raise_for_status()
+            return [
+                {"name": s["name"], "max_card_number": s.get("printedTotal", 0)}
+                for s in response.json().get("data", [])
+                if s.get("printedTotal")
+            ]
+        except (requests.RequestException, Timeout) as e:
+            print(f"Error fetching sets: {e}", flush=True)
+            return []
 
     try:
         sets = get_pokemon_sets()

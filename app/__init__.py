@@ -16,6 +16,7 @@ cache = Cache()
 
 def create_app():
     app = Flask(__name__)
+    app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
     app.config.from_object("config.Config")
     app.config["LANGUAGES"] = ["en", "he"]
     babel = Babel(app)
@@ -41,7 +42,7 @@ def create_app():
     def load_user(user_id):
         return User.query.get(int(user_id))
 
-    login_manager.login_view = "auth.login"
+    login_manager.login_view = "auth.auth"
     login_manager.login_message = "Please log in to access this page."
 
     # Context processor for injecting counts
