@@ -588,3 +588,12 @@ msgstr "שמור שינויים"
 msgid "Cancel"
 msgstr "ביטול"
 
+msgid "Total Graded Cards"
+msgstr "סה״כ קלפים מדורגים"
+
+msgid "Total Sets"
+msgstr "סה״כ סטים"
+
+msgid "Total Cards"
+msgstr "סה״כ קלפים"
+
