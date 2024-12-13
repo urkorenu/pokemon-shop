@@ -5,7 +5,9 @@ from flask_migrate import Migrate
 from flask_login import LoginManager, current_user
 from flask_caching import Cache
 from flask_babel import Babel
-
+from flask_session import Session
+from redis import Redis
+import os
 
 # Initialize extensions
 db = SQLAlchemy()
@@ -13,31 +15,43 @@ migrate = Migrate()
 login_manager = LoginManager()
 cache = Cache()
 
-
 def create_app():
     app = Flask(__name__)
-    app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
+    
+    # General App Configuration
     app.config.from_object("config.Config")
+    app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024  # 10 MB upload limit
     app.config["LANGUAGES"] = ["en", "he"]
+    
+    # Redis for Session Management
+    app.config['SESSION_TYPE'] = 'redis'
+    app.config['SESSION_PERMANENT'] = True
+    app.config['SESSION_USE_SIGNER'] = True
+    app.config['SESSION_KEY_PREFIX'] = 'pokemon-shop:'
+    app.config['SESSION_COOKIE_SECURE'] = os.getenv('FLASK_ENV') == 'production'
+    app.config['SESSION_REDIS'] = Redis(host='redis', port=6379)
+    Session(app)
+
+    # Babel for Localization
     babel = Babel(app)
-
     def get_locale():
-        return session.get("lang") or request.accept_languages.best_match(
-            app.config["LANGUAGES"]
-        )
-
+        return session.get("lang") or request.accept_languages.best_match(app.config["LANGUAGES"])
     babel.init_app(app, locale_selector=get_locale)
 
-    # Initialize extensions
+    # Initialize Extensions
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
-    cache.init_app(app)
+    cache.init_app(app, config={
+        "CACHE_TYPE": "RedisCache",
+        "CACHE_REDIS_URL": "redis://redis:6379/0",
+        "CACHE_DEFAULT_TIMEOUT": 300  # Cache timeout in seconds
+    })
 
     # Import models after db is initialized to avoid circular imports
-    from app.models import Cart, Order, User  # Import models here
+    from app.models import Cart, Order, User
 
-    # User loader function for Flask-Login
+    # Flask-Login User Loader
     @login_manager.user_loader
     def load_user(user_id):
         return User.query.get(int(user_id))
@@ -45,7 +59,7 @@ def create_app():
     login_manager.login_view = "auth.auth"
     login_manager.login_message = "Please log in to access this page."
 
-    # Context processor for injecting counts
+    # Inject counts into Jinja templates (cached for 60 seconds)
     @app.context_processor
     def inject_counts():
         if current_user.is_authenticated:
@@ -56,25 +70,15 @@ def create_app():
 
             if cart_items_count is None:
                 cart_items_count = Cart.query.filter_by(user_id=user_id).count()
-                cache.set(
-                    f"cart_count_{user_id}", cart_items_count, timeout=60
-                )  # Cache for 60 seconds
+                cache.set(f"cart_count_{user_id}", cart_items_count, timeout=60)
 
             if pending_orders is None and current_user.role in ["uploader", "admin"]:
-                pending_orders = Order.query.filter_by(
-                    seller_id=user_id, status="Pending"
-                ).count()
+                pending_orders = Order.query.filter_by(seller_id=user_id, status="Pending").count()
                 cache.set(f"pending_orders_{user_id}", pending_orders, timeout=60)
 
             if orders_without_feedback is None:
-                orders_without_feedback = Order.query.filter_by(
-                    buyer_id=user_id, status="Confirmed", feedback=None
-                ).count()
-                cache.set(
-                    f"orders_without_feedback_{user_id}",
-                    orders_without_feedback,
-                    timeout=60,
-                )
+                orders_without_feedback = Order.query.filter_by(buyer_id=user_id, status="Confirmed", feedback=None).count()
+                cache.set(f"orders_without_feedback_{user_id}", orders_without_feedback, timeout=60)
         else:
             cart_items_count = 0
             pending_orders = 0
@@ -86,7 +90,7 @@ def create_app():
             "orders_without_feedback": orders_without_feedback,
         }
 
-    # Register blueprints
+    # Register Blueprints
     from app.routes.user_routes import user_bp
     from app.routes.admin_routes import admin_bp
     from app.routes.auth_routes import auth_bp
@@ -100,3 +104,4 @@ def create_app():
     app.register_blueprint(order_bp, url_prefix="/order")
 
     return app
+
