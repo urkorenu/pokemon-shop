@@ -5,7 +5,6 @@ from flask_migrate import Migrate
 from flask_login import LoginManager, current_user
 from flask_caching import Cache
 from flask_babel import Babel
-from werkzeug.middleware.shared_data import SharedDataMiddleware
 
 
 

@@ -7,7 +7,7 @@ from sqlalchemy.orm import joinedload, aliased
 from sqlalchemy import or_
 import boto3
 from config import Config
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urlparse
 from ..cities import CITIES_IN_ISRAEL
 from ..mail_service import send_email
 from app import cache
