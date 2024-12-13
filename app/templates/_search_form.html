@@ -1,17 +1,52 @@
-<form method="GET" action="{{ request.path }}" class="row g-3 mb-4">
-    <div class="col-md-2">
+<!-- Showcase Section -->
+<div class="row mb-4 text-center">
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">{{ _('Total Cards') }}</h5>
+                <p class="card-text fs-3 fw-bold">{{ total_cards }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">{{ _('Total Sets') }}</h5>
+                <p class="card-text fs-3 fw-bold">{{ total_sets }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">{{ _('Total Graded Cards') }}</h5>
+                <p class="card-text fs-3 fw-bold">{{ total_graded }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search Form -->
+<form method="GET" action="{{ request.path }}" class="row g-3 mb-4" id="search-form">
+    <!-- Name Search -->
+    <div class="col-md-3">
         <input type="text" name="name" class="form-control" placeholder="{{ _('Search by Pokémon Name') }}" value="{{ request.args.get('name', '') }}">
     </div>
-    <div class="col-md-2">
-        <select name="set_name" class="form-select">
-            <option value="">{{ _('Filter by Set Name') }}</option>
-            {% for set_name in unique_set_names|unique %}
-            <option value="{{ set_name }}" {% if request.args.get('set_name') == set_name %}selected{% endif %}>
-                {{ set_name }}
-            </option>
-            {% endfor %}
-        </select>
+
+    <!-- Set Name with Autocomplete -->
+    <div class="col-md-3">
+	<input class="form-control" list="set_names" id="set_name" name="set_name" 
+	       placeholder="{{ _('Type to search...') }}" 
+	       value="{{ request.args.get('set_name', '') }}">
+	<datalist id="set_names">
+	    {% for set_name in unique_set_names %}
+	    <option value="{{ set_name }}">{{ set_name }}</option>
+	    {% endfor %}
+	</datalist>
     </div>
+
+
+    <!-- Graded Filter -->
     <div class="col-md-2">
         <select name="is_graded" class="form-select">
             <option value="">{{ _('Graded?') }}</option>
@@ -19,16 +54,18 @@
             <option value="no" {% if request.args.get('is_graded') == 'no' %}selected{% endif %}>{{ _('No') }}</option>
         </select>
     </div>
+
+    <!-- Location Filter -->
     <div class="col-md-2">
         <select name="location" class="form-select">
             <option value="">{{ _('Filter by Location') }}</option>
             {% for city in cities %}
-            <option value="{{ city }}" {% if request.args.get('location') == city %}selected{% endif %}>
-                {{ city }}
-            </option>
+            <option value="{{ city }}" {% if request.args.get('location') == city %}selected{% endif %}>{{ city }}</option>
             {% endfor %}
         </select>
     </div>
+
+    <!-- Sort Options -->
     <div class="col-md-2">
         <select name="sort" class="form-select">
             <option value="">{{ _('Sort By') }}</option>
@@ -46,8 +83,21 @@
     </div>
     {% endif %}
 
-    <div class="col-md-2">
+    <!-- Buttons -->
+    <div class="col-md-2 d-flex gap-2">
         <button type="submit" class="btn btn-primary w-100">{{ _('Search') }}</button>
+        <a href="{{ request.path }}" class="btn btn-secondary w-100">{{ _('Reset') }}</a>
     </div>
 </form>
+
+<!-- Autocomplete Script -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const setNames = {{ unique_set_names|tojson }};
+    const setNameInput = document.getElementById("set_name");
+    new Awesomplete(setNameInput, { list: setNames });
+});
+</script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.5/awesomplete.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.5/awesomplete.min.js"></script>
 
