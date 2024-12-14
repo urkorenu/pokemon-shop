@@ -5,7 +5,6 @@ on:
     branches:
       - main
       - dev*
-
   pull_request:
     branches:
       - main
@@ -13,181 +12,139 @@ on:
 
 jobs:
   lint:
-    name: Lint and Format Code
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      # Checkout the repository
+      - uses: actions/checkout@v3
+      # Set up Python environment
+      - uses: actions/setup-python@v4
         with:
           python-version: 3.10.12
-
-      - name: Install Dependencies
-        run: |
-          pip install flake8 black
-
-      - name: Run Black (Apply Formatting)
-        run: |
-          black .
-
-      - name: Run Flake8 (Linting)
-        run: |
-          flake8 --exit-zero .
-
-      - name: Commit and Push Changes
-        if: success() && github.event_name == 'pull_request'
+      # Install linting tools
+      - run: pip install flake8 black
+      # Run Black code formatter
+      - run: black .
+      # Run Flake8 linter
+      - run: flake8 --exit-zero .
+      # If successful and it's a pull request, apply Black formatting and push changes
+      - if: success() && github.event_name == 'pull_request'
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
           BRANCH_NAME=${{ github.head_ref || github.ref_name }}
-      
           git stash --include-untracked
-      
           git fetch origin $BRANCH_NAME
           git rebase origin/$BRANCH_NAME
-      
           git stash pop || echo "No stashed changes to apply"
-      
           git add .
           git commit -m "Apply black formatting via GitHub Actions" || echo "No changes to commit"
-          
           git push --force-with-lease origin HEAD:$BRANCH_NAME
 
-
   test:
-    name: Run Tests on Dynamic EC2 Agent
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
-
-    - name: Set up AWS CLI
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: eu-north-1
-
-    - name: Launch EC2 Instance
-      id: launch-ec2
-      run: |
-        INSTANCE_ID=$(aws ec2 run-instances \
-          --image-id ami-0fcbdd3ee4f67a0a0 \
-          --instance-type t3.micro \
-          --key-name kafka \
-          --security-group-ids sg-0010efc35354a2f24 \
-          --subnet-id subnet-01b84be40c8c42cfc \
-          --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=Test-Agent}]' \
-          --query 'Instances[0].InstanceId' \
-          --output text)
-        echo "INSTANCE_ID=${INSTANCE_ID}" >> $GITHUB_ENV
-        echo "EC2 instance launched: $INSTANCE_ID"
-
-    - name: Wait for Instance to be Running
-      run: |
-        aws ec2 wait instance-running --instance-ids ${{ env.INSTANCE_ID }}
-        echo "EC2 instance is running."
-
-    - name: Get Public IP Address
-      run: |
-        PUBLIC_IP=$(aws ec2 describe-instances \
-          --instance-ids ${{ env.INSTANCE_ID }} \
-          --query 'Reservations[0].Instances[0].PublicIpAddress' \
-          --output text)
-        echo "PUBLIC_IP=${PUBLIC_IP}" >> $GITHUB_ENV
-        echo "EC2 instance public IP: $PUBLIC_IP"
-
-    - name: Run Tests on EC2
-      uses: appleboy/ssh-action@v0.1.10
-      with:
-        host: ${{ env.PUBLIC_IP }}
-        username: ec2-user
-        key: ${{ secrets.EC2_PRIVATE_KEY }}
-        script: |
-          set -e
-          mkdir -p /home/ec2-user/git
-          cd /home/ec2-user/git
-          if [ -d "pokemon-shop" ]; then
-            rm -rf pokemon-shop
-          fi
-          
-          BRANCH_NAME=${{ github.head_ref || github.ref_name }}
-
-          git clone --branch $BRANCH_NAME https://github.com/urkorenu/pokemon-shop.git
-          cd pokemon-shop
-
-          export DB_USERNAME=${{ secrets.DB_USERNAME }}
-          export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-          export DB_HOST=${{ secrets.DB_HOST }}
-          export DB_NAME=${{ secrets.DB_NAME }}
-          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          export AWS_REGION=${{ secrets.AWS_REGION }}
-          export S3_BUCKET=${{ secrets.S3_BUCKET }}
-          export API_KEY=${{ secrets.API_KEY }}
-          export ADMIN_MAIL=${{ secrets.ADMIN_MAIL }}
-
-          docker-compose --env-file <(printenv) up --build test
-
-    - name: Terminate EC2 Instance
-      if: always()
-      run: |
-        aws ec2 terminate-instances --instance-ids ${{ env.INSTANCE_ID }}
-        aws ec2 wait instance-terminated --instance-ids ${{ env.INSTANCE_ID }}
-        echo "EC2 instance terminated."
-
-
-  build:
-    name: Build and Push Docker Image
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Build and Push Docker Image
-        env:
-          COMMIT_HASH: ${{ github.sha }}
-        run: |
-          BRANCH_NAME=${{ github.ref_name }}
-          IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/pokemon-shop"
-
-          if [ "$BRANCH_NAME" == "main" ]; then
-            TAG="latest"
-          else
-            TAG="dev"
-          fi
-
-          docker build -t $IMAGE_NAME:$COMMIT_HASH .
-          docker tag $IMAGE_NAME:$COMMIT_HASH $IMAGE_NAME:$TAG
-
-          docker push $IMAGE_NAME:$COMMIT_HASH
-          docker push $IMAGE_NAME:$TAG
-
-  deploy:
-    name: Deploy to Production
-    runs-on: ubuntu-latest
-    needs: build
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Set up AWS CLI
-        uses: aws-actions/configure-aws-credentials@v2
+      # Checkout the repository
+      - uses: actions/checkout@v3
+      # Configure AWS credentials
+      - uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-north-1
-
-      - name: Deploy Using AWS SSM
+      # Launch an EC2 instance
+      - id: launch-ec2
         run: |
+          INSTANCE_ID=$(aws ec2 run-instances \
+            --image-id ami-0fcbdd3ee4f67a0a0 \
+            --instance-type t3.micro \
+            --key-name kafka \
+            --security-group-ids sg-0010efc35354a2f24 \
+            --subnet-id subnet-0f682fcb7d40627db \
+            --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=Test-Agent}]' \
+            --query 'Instances[0].InstanceId' \
+            --output text)
+          echo "INSTANCE_ID=${INSTANCE_ID}" >> $GITHUB_ENV
+      # Wait for the EC2 instance to be running
+      - run: aws ec2 wait instance-running --instance-ids ${{ env.INSTANCE_ID }}
+      # Get the public IP of the EC2 instance
+      - run: |
+          PUBLIC_IP=$(aws ec2 describe-instances \
+            --instance-ids ${{ env.INSTANCE_ID }} \
+            --query 'Reservations[0].Instances[0].PublicIpAddress' \
+            --output text)
+          echo "PUBLIC_IP=${PUBLIC_IP}" >> $GITHUB_ENV
+      # SSH into the EC2 instance and run tests
+      - uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ env.PUBLIC_IP }}
+          username: ec2-user
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |
+            set -e
+            mkdir -p /home/ec2-user/git
+            cd /home/ec2-user/git
+            if [ -d "pokemon-shop" ]; then
+              rm -rf pokemon-shop
+            fi
+            BRANCH_NAME=${{ github.head_ref || github.ref_name }}
+            git clone --branch $BRANCH_NAME https://github.com/urkorenu/pokemon-shop.git
+            cd pokemon-shop
+            export $(cat <<EOF
+              DB_USERNAME=${{ secrets.DB_USERNAME }}
+              DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+              DB_HOST=${{ secrets.DB_HOST }}
+              DB_NAME=${{ secrets.DB_NAME }}
+              AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+              AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+              AWS_REGION=${{ secrets.AWS_REGION }}
+              S3_BUCKET=${{ secrets.S3_BUCKET }}
+              API_KEY=${{ secrets.API_KEY }}
+              ADMIN_MAIL=${{ secrets.ADMIN_MAIL }}
+            EOF
+            )
+            docker-compose --env-file <(printenv) up --build test
+      # Terminate the EC2 instance after tests
+      - if: always()
+        run: |
+          aws ec2 terminate-instances --instance-ids ${{ env.INSTANCE_ID }}
+          aws ec2 wait instance-terminated --instance-ids ${{ env.INSTANCE_ID }}
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      # Checkout the repository
+      - uses: actions/checkout@v3
+      # Log in to Docker Hub
+      - uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      # Build and push Docker images
+      - env:
+          COMMIT_HASH: ${{ github.sha }}
+        run: |
+          BRANCH_NAME=${{ github.ref_name }}
+          IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/pokemon-shop"
+          TAG=$([ "$BRANCH_NAME" == "main" ] && echo "latest" || echo "dev")
+          docker build -t $IMAGE_NAME:$COMMIT_HASH .
+          docker tag $IMAGE_NAME:$COMMIT_HASH $IMAGE_NAME:$TAG
+          docker push $IMAGE_NAME:$COMMIT_HASH
+          docker push $IMAGE_NAME:$TAG
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    steps:
+      # Configure AWS credentials
+      - uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-north-1
+      # Deploy the application using AWS SSM
+      - run: |
           aws ssm send-command \
             --instance-ids ${{ secrets.EC2_INSTANCE_ID }} \
             --document-name "AWS-RunShellScript" \
@@ -203,23 +160,13 @@ jobs:
               \"export S3_BUCKET=${{ secrets.S3_BUCKET }}\",
               \"export API_KEY=${{ secrets.API_KEY }}\",
               \"export ADMIN_MAIL=${{ secrets.ADMIN_MAIL }}\",
-
               \"docker pull ${{ secrets.DOCKER_USERNAME }}/pokemon-shop:latest\",
-
               \"cd /home/ec2-user/\",
               \"if [ -d pokemon-shop ]; then cd pokemon-shop && git pull; else git clone -b main https://github.com/urkorenu/pokemon-shop.git && cd pokemon-shop; fi\",
-
               \"docker stop pokemon-shop-app-1 || true\",
               \"docker rm pokemon-shop-app-1 || true\",
-
               \"docker-compose pull\",
-
               \"docker-compose --env-file <(printenv) up app -d\",
-
               \"docker ps --filter name=pokemon-shop-app-1 --format '{{.Status}}'\"
             ]" \
             --output text
-
-
-
-
