@@ -7,6 +7,8 @@ html, body {
     font-family: Arial, sans-serif;
 }
 body {
+    direction: ltr;
+    text-align: left;
     {% if session.get('lang', 'en') == 'he' %}
     direction: rtl;
     text-align: right;
@@ -14,6 +16,8 @@ body {
 }
 .navbar {
     margin-bottom: 0;
+    flex-direction: row;
+    text-align: left;
     {% if session.get('lang', 'en') == 'he' %}
     flex-direction: row-reverse;
     text-align: right;
@@ -24,7 +28,9 @@ body {
     height: auto;
 }
 .navbar-nav .nav-link, .dropdown-menu .dropdown-item {
-    {% if session.get('lang', 'he') == 'he' %}
+    text-align: left;
+    margin-left: 10px;
+    {% if session.get('lang', 'en') == 'he' %}
     text-align: right;
     margin-right: 10px;
     {% endif %}
@@ -33,10 +39,10 @@ body {
     vertical-align: middle;
 }
 .nav-link i {
-    {% if session.get('lang', 'he') == 'he' %}
-    margin-left: 5px;
-    {% else %}
     margin-right: 5px;
+    {% if session.get('lang', 'en') == 'he' %}
+    margin-left: 5px;
+    margin-right: 0;
     {% endif %}
 }
 .container {
@@ -130,6 +136,7 @@ body.bg-dark .card {
     }
 }
 .dropdown-menu {
+    text-align: left;
     {% if session.get('lang', 'en') == 'he' %}
     text-align: right;
     {% endif %}
