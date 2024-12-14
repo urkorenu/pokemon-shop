@@ -9,20 +9,25 @@ html, body {
 body {
     direction: ltr;
     text-align: left;
-    {% if session.get('lang', 'en') == 'he' %}
+}
+{% if session.get('lang', 'en') == 'he' %}
+body {
     direction: rtl;
     text-align: right;
-    {% endif %}
 }
+{% endif %}
 .navbar {
     margin-bottom: 0;
     flex-direction: row;
     text-align: left;
-    {% if session.get('lang', 'en') == 'he' %}
+}
+
+{% if session.get('lang', 'en') == 'he' %}
+.navbar {
     flex-direction: row-reverse;
     text-align: right;
-    {% endif %}
 }
+{% endif %}
 .navbar-brand img {
     width: 50px;
     height: auto;
@@ -30,21 +35,27 @@ body {
 .navbar-nav .nav-link, .dropdown-menu .dropdown-item {
     text-align: left;
     margin-left: 10px;
-    {% if session.get('lang', 'en') == 'he' %}
+}
+
+{% if session.get('lang', 'en') == 'he' %}
+.navbar-nav .nav-link, .dropdown-menu .dropdown-item {
     text-align: right;
     margin-right: 10px;
-    {% endif %}
 }
+{% endif %}
 .badge {
     vertical-align: middle;
 }
 .nav-link i {
     margin-right: 5px;
-    {% if session.get('lang', 'en') == 'he' %}
+}
+
+{% if session.get('lang', 'en') == 'he' %}
+.nav-link i {
     margin-left: 5px;
     margin-right: 0;
-    {% endif %}
 }
+{% endif %}
 .container {
     flex: 1;
     padding-top: 20px;
@@ -137,10 +148,13 @@ body.bg-dark .card {
 }
 .dropdown-menu {
     text-align: left;
-    {% if session.get('lang', 'en') == 'he' %}
-    text-align: right;
-    {% endif %}
 }
+
+{% if session.get('lang', 'en') == 'he' %}
+.dropdown-menu {
+    text-align: right;
+}
+{% endif %}
 .flash-container {
     z-index: 1050;
 }
