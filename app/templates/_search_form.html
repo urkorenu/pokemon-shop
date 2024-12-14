@@ -1,3 +1,30 @@
+<!-- Showcase Section -->
+<div class="row mb-4 text-center">
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">{{ _('Total Cards') }}</h5>
+                <p class="card-text fs-3 fw-bold">{{ total_cards }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">{{ _('Total Sets') }}</h5>
+                <p class="card-text fs-3 fw-bold">{{ total_sets }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">{{ _('Total Graded Cards') }}</h5>
+                <p class="card-text fs-3 fw-bold">{{ total_graded }}</p>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Search Form -->
 <form method="GET" action="{{ request.path }}" class="row g-3 mb-4" id="search-form">
     <div class="col-md-3">
