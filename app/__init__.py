@@ -90,6 +90,20 @@ def create_app():
             "orders_without_feedback": orders_without_feedback,
         }
 
+    # Register the dict_without filter
+    @app.template_filter("dict_without")
+    def dict_without(d, key):
+        """
+        Remove a key from a dictionary.
+
+        Args:
+            d (dict): The dictionary to remove the key from.
+            key: The key to remove from the dictionary.
+
+        Returns:
+            dict: A new dictionary without the specified key.
+        """
+        return {k: v for k, v in d.items() if k != key}
     # Register blueprints for different routes
     from app.routes.user_routes import user_bp
     from app.routes.admin_routes import admin_bp
