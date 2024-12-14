@@ -4,7 +4,7 @@ __pycache__/  # Cache files created by Python
 env/          # Environment directory
 .venv/        # Virtual environment directory
 *.idea        # IDE configuration files
-*.DS_STORE    # macOS directory attribute files
+*.DS_Store    # macOS directory attribute files
 
 # Docker-related files to ignore
 *.log         # Log files
@@ -22,3 +22,7 @@ instance/     # Database instance directory
 
 # Terraform files to ignore
 *terraform*   # All Terraform-related files
+
+# Ignore .DS_Store files and .idea directory recursively
+**/.DS_Store
+**/.idea/

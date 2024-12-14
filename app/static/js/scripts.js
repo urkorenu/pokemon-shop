@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Get references to DOM elements
     const darkModeSwitch = document.getElementById('darkModeSwitch');
     const priceInput = document.getElementById('price');
     const followTcgCheckbox = document.getElementById('follow_tcg');
@@ -6,6 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const tcgWarning = document.getElementById('tcg_warning');
     const cardTypeDropdown = document.getElementById("card_type");
 
+    /**
+     * Apply the selected theme to the document body and save it to localStorage.
+     * @param {string} theme - The theme to apply ('dark' or 'light').
+     */
     function applyTheme(theme) {
         document.body.classList.toggle('bg-dark', theme === 'dark');
         document.body.classList.toggle('text-light', theme === 'dark');
@@ -14,6 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('theme', theme);
     }
 
+    /**
+     * Enforce the logic for condition and price input based on the followTcgCheckbox state.
+     */
     function enforceConditionLogic() {
         const isDisabled = followTcgCheckbox.checked;
         conditionSelect.value = isDisabled ? "NM" : conditionSelect.value;
@@ -23,6 +31,9 @@ document.addEventListener('DOMContentLoaded', () => {
         tcgWarning.style.display = isDisabled ? 'block' : 'none';
     }
 
+    /**
+     * Fetch the TCGPlayer price for the specified card and update the price input.
+     */
     async function fetchTCGPrice() {
         const setName = document.getElementById("set_name").value.trim();
         const cardNumber = document.getElementById("number").value.trim();
@@ -53,6 +64,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    /**
+     * Fetch the card details based on the set name and card number, and update the form fields.
+     */
     async function fetchCardDetails() {
         const setName = document.getElementById("set_name").value;
         const cardNumber = document.getElementById("number").value;
@@ -81,6 +95,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    /**
+     * Toggle between login and registration forms.
+     */
     function toggleAuthForms() {
         const loginForm = document.getElementById('login-form');
         const registerForm = document.getElementById('register-form');
@@ -99,21 +116,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    /**
+     * Show the card image in a modal.
+     * @param {string} imageUrl - The URL of the card image.
+     * @param {string} cardName - The name of the card.
+     */
     function showCardImage(imageUrl, cardName) {
         document.getElementById('cardImage').src = imageUrl;
         document.getElementById('modalCardTitle').innerText = cardName || "Card";
         new bootstrap.Modal(document.getElementById('cardViewModal')).show();
     }
 
+    // Apply the saved theme on page load
     const savedTheme = localStorage.getItem('theme') || 'light';
     applyTheme(savedTheme);
+
+    // Event listener for dark mode switch
     darkModeSwitch.addEventListener('click', () => applyTheme(document.body.classList.contains('bg-dark') ? 'light' : 'dark'));
 
+    // Event listener for follow TCG checkbox
     followTcgCheckbox.addEventListener('change', async () => {
         enforceConditionLogic();
         if (followTcgCheckbox.checked) await fetchTCGPrice();
     });
 
+    // Event listener for condition select
     conditionSelect.addEventListener('change', () => {
         if (conditionSelect.value !== "NM") {
             followTcgCheckbox.checked = false;
@@ -124,6 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Event listener for form submission
     document.querySelector('form').addEventListener('submit', (e) => {
         if (!priceInput.value && !followTcgCheckbox.checked) {
             e.preventDefault();
@@ -131,11 +159,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Event listeners for fetching card details
     document.getElementById("set_name").addEventListener("input", fetchCardDetails);
     document.getElementById("number").addEventListener("input", fetchCardDetails);
+
+    // Event listener for graded checkbox
     document.getElementById("is_graded").addEventListener("change", function () {
         document.getElementById("graded_fields").style.display = this.checked ? "block" : "none";
     });
 
+    // Initialize the authentication form toggle functionality
     toggleAuthForms();
 });
