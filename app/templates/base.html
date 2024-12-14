@@ -10,6 +10,58 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.9.1/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="{{ url_for('static', filename='css/styles.css.jinja') }}" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            {% if session.get('lang', 'en') == 'he' %}
+            direction: rtl;
+            text-align: right;
+            {% endif %}
+        }
+
+        .navbar {
+	    margin-bottom: 0;
+	    {% if session.get('lang', 'en') == 'he' %}
+	    flex-direction: row-reverse;
+	    text-align: right;
+	    {% endif %}
+        }
+
+        .navbar-nav .nav-link, .dropdown-menu .dropdown-item {
+        {% if session.get('lang', 'he') == 'he' %}
+            text-align: right;
+            margin-right: 10px; /* Adjust spacing */
+        {% endif %}
+        }
+
+        .nav-link i {
+	    {% if session.get('lang', 'he') == 'he' %}
+	    margin-left: 5px; /* Fix icon spacing */
+	    margin-right: 0;
+	    {% else %}
+	    margin-right: 5px;
+	    margin-left: 0;
+	    {% endif %}
+        }
+
+        .dropdown-menu {
+        {% if session.get('lang', 'en') == 'he' %}
+        text-align: right;
+        {% endif %}
+        }
+    </style>
+
+	}
+	}
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
