@@ -336,7 +336,7 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
     unique_set_names = {card.set_name for card in query}
     return paginated_cards, sorted(unique_set_names), stats_dict
 
-@user_bp.route('/static/css/styles.css.jinja')
+@user_bp.route('/templates/css/styles.css.jinja')
 def styles():
     """
     Serve the CSS styles.
