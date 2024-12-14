@@ -28,6 +28,12 @@ resource "aws_db_instance" "app_rds" {
   skip_final_snapshot     = true               # Skip final snapshot before deletion
   deletion_protection     = true               # Enable deletion protection
 
+  lifecycle {
+    ignore_changes = [
+      username,
+      password
+    ]
+  }
   # Add tags to the RDS instance
   tags = {
     Environment = "production"  # Environment tag
