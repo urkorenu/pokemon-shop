@@ -33,8 +33,6 @@ services:
 
   test:
     build: .
-    depends_on:
-      - app
     environment:
       FLASK_ENV: testing
       DB_USERNAME: "${DB_USERNAME}"
