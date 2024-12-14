@@ -2,6 +2,7 @@ import pytest
 from flask import session, url_for
 from app import create_app, db
 from app.models import User, Card, Cart, Order
+from app.routes.cart_routes import view_cart, remove_from_cart, checkout
 
 @pytest.fixture
 def test_app():
@@ -19,6 +20,95 @@ def test_app():
         db.create_all()  # Creates tables for the test
         yield app  # Test runs here
         db.session.remove()
+
+@pytest.fixture
+def user():
+    user = User(email='user@example.com', password='password')
+    db.session.add(user)
+    db.session.commit()
+    return user
+
+@pytest.fixture
+def cart_item(user):
+    card = Card(name='Pikachu', price=10.0)
+    db.session.add(card)
+    db.session.commit()
+    cart_item = Cart(user_id=user.id, card_id=card.id)
+    db.session.add(cart_item)
+    db.session.commit()
+    return cart_item
+
+@pytest.fixture
+def cart_items(user):
+    cards = [Card(name=f'Card {i}', price=10.0) for i in range(3)]
+    db.session.add_all(cards)
+    db.session.commit()
+    cart_items = [Cart(user_id=user.id, card_id=card.id) for card in cards]
+    db.session.add_all(cart_items)
+    db.session.commit()
+    return cart_items
+
+@pytest.fixture
+def total_price(cart_items):
+    return sum(item.card.price for item in cart_items)
+
+@pytest.fixture
+def other_user_cart_item():
+    other_user = User(email='other_user@example.com', password='password')
+    db.session.add(other_user)
+    db.session.commit()
+    card = Card(name='Pikachu', price=10.0)
+    db.session.add(card)
+    db.session.commit()
+    cart_item = Cart(user_id=other_user.id, card_id=card.id)
+    db.session.add(cart_item)
+    db.session.commit()
+    return cart_item
+
+@pytest.fixture
+def order(user):
+    order = Order(buyer_id=user.id, status='Pending')
+    db.session.add(order)
+    db.session.commit()
+    return order
+
+@pytest.fixture
+def other_user_order():
+    other_user = User(email='other_user@example.com', password='password')
+    db.session.add(other_user)
+    db.session.commit()
+    order = Order(buyer_id=other_user.id, status='Pending')
+    db.session.add(order)
+    db.session.commit()
+    return order
+
+@pytest.fixture
+def card():
+    card = Card(name='Pikachu', price=10.0)
+    db.session.add(card)
+    db.session.commit()
+    return card
+
+@pytest.fixture
+def own_card(user):
+    card = Card(name='Pikachu', price=10.0, uploader_id=user.id)
+    db.session.add(card)
+    db.session.commit()
+    return card
+
+@pytest.fixture
+def card_without_seller():
+    card = Card(name='Pikachu', price=10.0)
+    db.session.add(card)
+    db.session.commit()
+    return card
+
+@pytest.fixture
+def uploader_user():
+    user = User(email='uploader@example.com', password='password', role='uploader')
+    db.session.add(user)
+    db.session.commit()
+    return user
 
 @pytest.fixture
 def client(test_app):
