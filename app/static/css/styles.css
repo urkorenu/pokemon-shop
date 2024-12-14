@@ -6,25 +6,61 @@ html, body {
     flex-direction: column;
     font-family: Arial, sans-serif;
 }
+
 body {
     direction: ltr;
     text-align: left;
 }
-{% if session.get('lang', 'en') == 'he' %}
+
+{% if session.get('lang') == 'he' %}
 body {
     direction: rtl;
     text-align: right;
 }
 {% endif %}
+
 .navbar {
     margin-bottom: 0;
     flex-direction: row;
     text-align: left;
 }
 
-{% if session.get('lang', 'en') == 'he' %}
+{% if session.get('lang') == 'he' %}
 .navbar {
     flex-direction: row-reverse;
+    text-align: right;
+}
+{% endif %}
+
+.navbar-nav .nav-link, .dropdown-menu .dropdown-item {
+    text-align: left;
+    margin-left: 10px;
+}
+
+{% if session.get('lang') == 'he' %}
+.navbar-nav .nav-link, .dropdown-menu .dropdown-item {
+    text-align: right;
+    margin-right: 10px;
+}
+{% endif %}
+
+.nav-link i {
+    margin-right: 5px;
+}
+
+{% if session.get('lang') == 'he' %}
+.nav-link i {
+    margin-left: 5px;
+    margin-right: 0;
+}
+{% endif %}
+
+.dropdown-menu {
+    text-align: left;
+}
+
+{% if session.get('lang') == 'he' %}
+.dropdown-menu {
     text-align: right;
 }
 {% endif %}
@@ -32,30 +68,10 @@ body {
     width: 50px;
     height: auto;
 }
-.navbar-nav .nav-link, .dropdown-menu .dropdown-item {
-    text-align: left;
-    margin-left: 10px;
-}
 
-{% if session.get('lang', 'en') == 'he' %}
-.navbar-nav .nav-link, .dropdown-menu .dropdown-item {
-    text-align: right;
-    margin-right: 10px;
-}
-{% endif %}
 .badge {
     vertical-align: middle;
 }
-.nav-link i {
-    margin-right: 5px;
-}
-
-{% if session.get('lang', 'en') == 'he' %}
-.nav-link i {
-    margin-left: 5px;
-    margin-right: 0;
-}
-{% endif %}
 .container {
     flex: 1;
     padding-top: 20px;
@@ -146,15 +162,6 @@ body.bg-dark .card {
         font-size: 0.9rem;
     }
 }
-.dropdown-menu {
-    text-align: left;
-}
-
-{% if session.get('lang', 'en') == 'he' %}
-.dropdown-menu {
-    text-align: right;
-}
-{% endif %}
 .flash-container {
     z-index: 1050;
 }
