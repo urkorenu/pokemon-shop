@@ -48,7 +48,5 @@ services:
       API_KEY: "${API_KEY}"
       ADMIN_MAIL: "${ADMIN_MAIL}"
       PYTHONPATH: "./"
-    volumes:
-      - /home/ec2-user/git/pokemon-shop/test-results:/app/test-results
     command: pytest --junitxml=/app/test-results/results.xml -q
 

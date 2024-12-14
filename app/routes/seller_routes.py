@@ -7,6 +7,7 @@ from config import Config
 from app import cache
 from app.utils import roles_required
 
+# Create a Blueprint for the seller routes
 seller_bp = Blueprint("seller", __name__)
 
 API_KEY = Config.API_KEY
@@ -15,8 +16,23 @@ BASE_URL = "https://api.pokemontcg.io/v2"
 @seller_bp.route("/upload", methods=["GET", "POST"])
 @roles_required("admin", "uploader")
 def upload_card():
+    """
+    Upload a new card.
+
+    GET: Fetches and displays the available Pokémon sets.
+    POST: Uploads a new card with the provided details.
+
+    Returns:
+        Rendered template for the upload card page with a flash message indicating success or failure.
+    """
     @cache.cached(timeout=86400, key_prefix="pokemon_sets")
     def get_pokemon_sets():
+        """
+        Fetches Pokémon sets from the API and caches the result for 24 hours.
+
+        Returns:
+            list: A list of dictionaries containing set names and max card numbers.
+        """
         try:
             response = requests.get(f"{BASE_URL}/sets", headers={"X-Api-Key": API_KEY}, timeout=10)
             response.raise_for_status()
@@ -87,6 +103,16 @@ def upload_card():
 @roles_required("admin", "uploader")
 @cache.cached(timeout=86400, query_string=True)
 def get_card_details():
+    """
+    Get details of a specific card.
+
+    Args:
+        set_name (str): The name of the set the card belongs to.
+        number (str): The number of the card in the set.
+
+    Returns:
+        JSON response containing card details or an error message.
+    """
     set_name = request.args.get("set_name")
     number = request.args.get("number")
 

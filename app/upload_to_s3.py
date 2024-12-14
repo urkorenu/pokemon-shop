@@ -7,87 +7,78 @@ from PIL import Image, ImageOps
 from io import BytesIO
 from config import Config
 
-
 def create_s3_client():
+    """
+    Create an S3 client using the AWS region specified in the configuration.
+
+    Returns:
+        boto3.client: The S3 client.
+    """
     return boto3.client("s3", region_name=Config.AWS_REGION)
 
-
 def generate_unique_filename(original_filename):
-    """Generate a unique file name using UUID, timestamp,
-    and a hash of the original filename."""
-    # Get the file extension
+    """
+    Generate a unique file name using UUID, timestamp, and a hash of the original filename.
+
+    Args:
+        original_filename (str): The original file name.
+
+    Returns:
+        str: The generated unique file name.
+    """
     file_extension = os.path.splitext(original_filename)[1]
-
-    # Generate UUID
     unique_id = uuid.uuid4()
-
-    # Get the current timestamp
     timestamp = int(time.time())
-
-    # Hash the original filename
     file_hash = hashlib.sha256(original_filename.encode()).hexdigest()[:10]
-
-    # Combine them to create a unique filename
-    unique_filename = f"{unique_id}_{timestamp}_{file_hash}{file_extension}"
-    return unique_filename
-
+    return f"{unique_id}_{timestamp}_{file_hash}{file_extension}"
 
 def optimize_image(file, max_width=1200, quality=85):
     """
     Optimize the image to reduce its size while maintaining quality.
-    - max_width: The maximum width of the image.
-    - quality: The image quality (1-100), where 100 is the best quality.
+
+    Args:
+        file (file-like object): The image file to optimize.
+        max_width (int, optional): The maximum width of the image. Defaults to 1200.
+        quality (int, optional): The quality of the optimized image. Defaults to 85.
+
+    Returns:
+        BytesIO: The optimized image file.
     """
     try:
-        # Open the image using Pillow
         img = Image.open(file)
-
-        # Correct orientation using EXIF data (prevents unwanted rotation)
         img = ImageOps.exif_transpose(img)
-
-        # Convert to RGB if the image has an alpha channel
         if img.mode in ("RGBA", "P"):
             img = img.convert("RGB")
-
-        # Resize the image if it's larger than max_width
         if img.width > max_width:
             aspect_ratio = img.height / img.width
-            new_height = int(max_width * aspect_ratio)
-            img = img.resize((max_width, new_height), Image.Resampling.LANCZOS)
-
-        # Save the optimized image to a BytesIO object
+            img = img.resize((max_width, int(max_width * aspect_ratio)), Image.Resampling.LANCZOS)
         optimized_image = BytesIO()
         img.save(optimized_image, format="JPEG", optimize=True, quality=quality)
         optimized_image.seek(0)
-
         return optimized_image
     except Exception as e:
         print(f"Error optimizing image: {e}", flush=True)
         return None
 
-
 def upload_to_s3(file, bucket_name):
-    """Uploads an optimized file to the specified S3 bucket
-    with a unique name and returns the URL."""
-    try:
-        # Generate a unique file name
-        original_filename = file.filename
-        unique_filename = generate_unique_filename(original_filename)
+    """
+    Upload an optimized file to the specified S3 bucket with a unique name and return the URL.
 
-        # Optimize the image
+    Args:
+        file (file-like object): The file to upload.
+        bucket_name (str): The name of the S3 bucket.
+
+    Returns:
+        str: The URL of the uploaded file, or None if the upload failed.
+    """
+    try:
+        unique_filename = generate_unique_filename(file.filename)
         optimized_file = optimize_image(file)
         if not optimized_file:
             return None
-
-        # Initialize S3 client and upload the optimized file
         s3 = create_s3_client()
         s3.upload_fileobj(optimized_file, bucket_name, unique_filename)
-
-        # Construct and return the URL of the uploaded file
-        return (
-            f"https://{bucket_name}.s3.{Config.AWS_REGION}"
-            f".amazonaws.com/{unique_filename}"
-        )
+        return f"https://{bucket_name}.s3.{Config.AWS_REGION}.amazonaws.com/{unique_filename}"
     except Exception as e:
         print(f"Error uploading to S3: {e}", flush=True)
         return None

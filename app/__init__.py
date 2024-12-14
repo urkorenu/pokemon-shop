@@ -1,4 +1,3 @@
-# app/__init__.py
 from flask import Flask, session, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -16,14 +15,16 @@ login_manager = LoginManager()
 cache = Cache()
 
 def create_app():
+    """
+    Create and configure the Flask application.
+
+    Returns:
+        Flask: The configured Flask application instance.
+    """
     app = Flask(__name__)
-    
-    # General App Configuration
     app.config.from_object("config.Config")
-    app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024  # 10 MB upload limit
+    app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
     app.config["LANGUAGES"] = ["en", "he"]
-    
-    # Redis for Session Management
     app.config['SESSION_TYPE'] = 'redis'
     app.config['SESSION_PERMANENT'] = True
     app.config['SESSION_USE_SIGNER'] = True
@@ -32,57 +33,56 @@ def create_app():
     app.config['SESSION_REDIS'] = Redis(host='redis', port=6379)
     Session(app)
 
-    # Babel for Localization
+    # Initialize Babel for internationalization
     babel = Babel(app)
-    def get_locale():
-        return session.get("lang") or request.accept_languages.best_match(app.config["LANGUAGES"])
-    babel.init_app(app, locale_selector=get_locale)
+    babel.init_app(app, locale_selector=lambda: session.get("lang") or request.accept_languages.best_match(app.config["LANGUAGES"]))
 
-    # Initialize Extensions
+    # Initialize extensions with the app
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
     cache.init_app(app, config={
         "CACHE_TYPE": "RedisCache",
         "CACHE_REDIS_URL": "redis://redis:6379/0",
-        "CACHE_DEFAULT_TIMEOUT": 300  # Cache timeout in seconds
+        "CACHE_DEFAULT_TIMEOUT": 300
     })
 
-    # Import models after db is initialized to avoid circular imports
     from app.models import Cart, Order, User
 
-    # Flask-Login User Loader
     @login_manager.user_loader
     def load_user(user_id):
+        """
+        Load a user by their user ID.
+
+        Args:
+            user_id (int): The ID of the user to load.
+
+        Returns:
+            User: The user instance if found, otherwise None.
+        """
         return User.query.get(int(user_id))
 
     login_manager.login_view = "auth.auth"
     login_manager.login_message = "Please log in to access this page."
 
-    # Inject counts into Jinja templates (cached for 60 seconds)
     @app.context_processor
     def inject_counts():
+        """
+        Inject counts of cart items, pending orders, and orders without feedback into the template context.
+
+        Returns:
+            dict: A dictionary with counts of cart items, pending orders, and orders without feedback.
+        """
         if current_user.is_authenticated:
             user_id = current_user.id
-            cart_items_count = cache.get(f"cart_count_{user_id}")
-            pending_orders = cache.get(f"pending_orders_{user_id}")
-            orders_without_feedback = cache.get(f"orders_without_feedback_{user_id}")
-
-            if cart_items_count is None:
-                cart_items_count = Cart.query.filter_by(user_id=user_id).count()
-                cache.set(f"cart_count_{user_id}", cart_items_count, timeout=60)
-
-            if pending_orders is None and current_user.role in ["uploader", "admin"]:
-                pending_orders = Order.query.filter_by(seller_id=user_id, status="Pending").count()
-                cache.set(f"pending_orders_{user_id}", pending_orders, timeout=60)
-
-            if orders_without_feedback is None:
-                orders_without_feedback = Order.query.filter_by(buyer_id=user_id, status="Confirmed", feedback=None).count()
-                cache.set(f"orders_without_feedback_{user_id}", orders_without_feedback, timeout=60)
+            cart_items_count = cache.get(f"cart_count_{user_id}") or Cart.query.filter_by(user_id=user_id).count()
+            pending_orders = cache.get(f"pending_orders_{user_id}") or Order.query.filter_by(seller_id=user_id, status="Pending").count()
+            orders_without_feedback = cache.get(f"orders_without_feedback_{user_id}") or Order.query.filter_by(buyer_id=user_id, status="Confirmed", feedback=None).count()
+            cache.set(f"cart_count_{user_id}", cart_items_count, timeout=60)
+            cache.set(f"pending_orders_{user_id}", pending_orders, timeout=60)
+            cache.set(f"orders_without_feedback_{user_id}", orders_without_feedback, timeout=60)
         else:
-            cart_items_count = 0
-            pending_orders = 0
-            orders_without_feedback = 0
+            cart_items_count = pending_orders = orders_without_feedback = 0
 
         return {
             "cart_items_count": cart_items_count,
@@ -90,7 +90,7 @@ def create_app():
             "orders_without_feedback": orders_without_feedback,
         }
 
-    # Register Blueprints
+    # Register blueprints for different routes
     from app.routes.user_routes import user_bp
     from app.routes.admin_routes import admin_bp
     from app.routes.auth_routes import auth_bp
@@ -105,6 +105,4 @@ def create_app():
     app.register_blueprint(order_bp, url_prefix="/order")
     app.register_blueprint(seller_bp, url_prefix='/seller')
 
-
     return app
-

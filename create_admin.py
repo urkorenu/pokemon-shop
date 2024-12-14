@@ -9,17 +9,13 @@ with app.app_context():
     email = os.getenv("ADMIN_EMAIL", "admin@example.com")
     password = os.getenv("ADMIN_PASSWORD", "password")
 
-    # Default contact information for admin
-    contact_preference = "email"  # Assuming "email" as the default preference
-    contact_details = email  # Using the admin email as contact details
-
     if not User.query.filter_by(email=email).first():
         admin = User(
             username=username,
             email=email,
             role="admin",
-            contact_preference=contact_preference,
-            contact_details=contact_details,
+            contact_preference="email",
+            contact_details=email,
         )
         admin.set_password(password)
         db.session.add(admin)
