@@ -21,8 +21,13 @@ env/          # Environment directory
 instance/     # Database instance directory
 
 # Terraform files to ignore
-tf/*terraform*   # All Terraform-related files
-tf/ip.tfvars     # Terraform variable files
+tf/.terraform/          # Ignore Terraform internal files
+tf/*.tfvars             # Ignore Terraform variable files
+tf/.terraform.lock.hcl  # Ignore Terraform lock file
+tf/*.tfstate            # Ignore Terraform state files
+tf/*.tfstate.*          # Ignore Terraform state backups
+tf/providers/           # Ignore providers directory
+
 
 # Ignore .DS_Store files and .idea directory recursively
 **/.DS_Store
