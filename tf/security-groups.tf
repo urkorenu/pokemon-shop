@@ -1,3 +1,21 @@
+# Run the script to fetch the current IP address
+resource "null_resource" "fetch_ip" {
+  provisioner "local-exec" {
+    command = "./fetch_ip.sh"
+  }
+}
+
+# Load the IP address from the file
+data "local_file" "ip" {
+  filename = "ip.tfvars"
+  depends_on = [null_resource.fetch_ip]
+}
+
+# Parse the IP address from the file
+locals {
+  pc_ip = regex("pc_ip = \"(.*)\"", data.local_file.ip.content)[0]
+}
+
 # Security Group for NAT Instance and Bastion Host
 resource "aws_security_group" "nat_bastion_sg" {
   vpc_id = aws_vpc.main.id  # VPC ID
@@ -8,7 +26,7 @@ resource "aws_security_group" "nat_bastion_sg" {
     from_port   = 22  # Starting port
     to_port     = 22  # Ending port
     protocol    = "tcp"  # Protocol type
-    cidr_blocks = ["0.0.0.0/0"]  # Allowed CIDR blocks
+    cidr_blocks = ["${local.pc_ip}/32"] # Allowed CIDR blocks
   }
   # Allow all traffic from private subnet (for NAT forwarding)
   ingress {
