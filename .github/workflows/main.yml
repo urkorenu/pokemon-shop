@@ -58,7 +58,7 @@ jobs:
             --image-id ami-0fcbdd3ee4f67a0a0 \
             --instance-type t3.micro \
             --key-name kafka \
-            --security-group-ids sg-0010efc35354a2f24 \
+            --security-group-ids sg-026da6b89501fad53 \
             --subnet-id subnet-0f682fcb7d40627db \
             --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=Test-Agent}]' \
             --query 'Instances[0].InstanceId' \
