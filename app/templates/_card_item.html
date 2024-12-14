@@ -1,38 +1,9 @@
-<style>
-    /* Lock card size */
-    .card {
-        height: 100%; /* Ensures equal height for cards */
-    }
-
-    .card-body {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        height: 100%;
-    }
-
-    /* Lock text size and prevent overflow */
-    .card-title,
-    .card-text {
-        white-space: nowrap; /* Prevent text from wrapping */
-        overflow: hidden;    /* Hide overflowed text */
-        text-overflow: ellipsis; /* Add ellipsis (...) for long text */
-    }
-
-    /* Set a fixed height for images */
-    .card-img-top {
-        height: 270px;
-        object-fit: cover;
-    }
-</style>
+<link href="{{ url_for('static', filename='css/styles.css') }}" rel="stylesheet">
 <div class="col-md-3 mb-4">
     <div class="card shadow-sm position-relative" id="card-{{ card.id }}">
-        <!-- Upload Date Label -->
         <span class="badge bg-secondary position-absolute top-0 start-0 m-2">
             {{ _('Uploaded:') }} {{ card.uploaded_at.strftime('%Y-%m-%d') if card.uploaded_at else _('N/A') }}
         </span>
-
-        <!-- Admin Delete Button -->
         {% if current_user.is_authenticated and current_user.role == "admin" %}
         <form method="POST" action="{{ url_for('user.delete_card', card_id=card.id) }}">
             <button type="submit" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2">
@@ -40,13 +11,9 @@
             </button>
         </form>
         {% endif %}
-
-        <!-- Card Image -->
         <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}"
              style="height: 270px; object-fit: cover; cursor: pointer;"
              data-bs-toggle="modal" data-bs-target="#cardModal{{ card.id }}">
-
-        <!-- Card Body -->
         <div class="card-body">
             <h5 class="card-title">{{ card.name }}</h5>
             <p class="card-text">
@@ -54,14 +21,7 @@
                 <strong>{{ _('Set:') }}</strong> {{ card.set_name }}<br>
                 <strong>{{ _('Card Number:') }}</strong> {{ card.number }}<br>
                 <strong>{{ _('Condition:') }}</strong>
-                <span class="badge
-                    {% if card.condition == 'NM' %} bg-success
-                    {% elif card.condition == 'LP' %} bg-primary
-                    {% elif card.condition == 'MP' %} bg-warning text-dark
-                    {% elif card.condition == 'HP' %} bg-danger
-                    {% elif card.condition == 'DMG' %} bg-dark text-white
-                    {% else %} bg-secondary
-                    {% endif %}">
+                <span class="badge bg-{{ 'success' if card.condition == 'NM' else 'primary' if card.condition == 'LP' else 'warning text-dark' if card.condition == 'MP' else 'danger' if card.condition == 'HP' else 'dark text-white' if card.condition == 'DMG' else 'secondary' }}">
                     {{ card.condition }}
                 </span><br>
                 <strong>{{ _('Price:') }}</strong> {{ card.price }} {{ _('ILS') }}<br>
@@ -72,22 +32,16 @@
                 </a>
                 {% endif %}
             </p>
-
-            <!-- Add to Cart or Sold Button -->
             {% if card.amount > 0 %}
-            <!-- Add to Cart Button -->
             <form method="POST" action="{{ url_for('user.add_to_cart') }}">
                 <input type="hidden" name="card_id" value="{{ card.id }}">
                 <button type="submit" class="btn btn-primary btn-sm w-100 mt-2">{{ _('Add to Cart') }}</button>
             </form>
             {% else %}
-            <!-- Sold Button -->
             <button class="btn btn-danger btn-sm w-100 mt-2" disabled>{{ _('Sold') }}</button>
             {% endif %}
         </div>
     </div>
-
-    <!-- Card Modal -->
     <div class="modal fade" id="cardModal{{ card.id }}" tabindex="-1" aria-labelledby="cardModalLabel{{ card.id }}" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -117,8 +71,6 @@
                         {% endif %}
                         <strong>{{ _('TCGPlayer Price (NM):') }}</strong> ${{ card.tcg_price if card.tcg_price else _('N/A') }}
                     </p>
-
-                    <!-- Report Button -->
                     <button type="button" class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#reportModal{{ card.id }}">
                         <i class="bi bi-flag"></i> {{ _('Report') }}
                     </button>
@@ -126,8 +78,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Report Modal -->
     <div class="modal fade" id="reportModal{{ card.id }}" tabindex="-1" aria-labelledby="reportModalLabel{{ card.id }}" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

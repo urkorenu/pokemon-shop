@@ -29,13 +29,7 @@
                         <td>{{ item.card.name }}</td>
                         <td>{{ item.card.set_name }}</td>
                         <td>{{ item.card.number }}</td>
-                        <td>
-                            {% if item.card.is_graded %}
-                                {{ item.card.grade }}
-                            {% else %}
-                                {{ _('N/A') }}
-                            {% endif %}
-                        </td>
+                        <td>{{ item.card.is_graded and item.card.grade or _('N/A') }}</td>
                         <td>{{ item.card.price }} {{ _('ILS') }}</td>
                         <td>
                             <form method="POST" action="{{ url_for('cart.remove_from_cart', cart_id=item.id) }}" class="d-inline">
@@ -64,4 +58,3 @@
     {% endif %}
 </div>
 {% endblock %}
-

@@ -29,19 +29,10 @@
                         <td>{{ card.name }}</td>
                         <td>{{ card.set_name }}</td>
                         <td>{{ card.number }}</td>
-                        <td>
-                            {% if card.is_graded %}
-                                {{ card.grade }}
-                            {% else %}
-                                {{ _("N/A") }}
-                            {% endif %}
-                        </td>
+                        <td>{{ card.is_graded and card.grade or _("N/A") }}</td>
                         <td>{{ card.price }} {{ _("ILS") }}</td>
                         <td>
-                            <button
-                                type="button"
-                                class="btn btn-sm btn-primary"
-                                onclick="showCardImage('{{ card.image_url }}')">
+                            <button type="button" class="btn btn-sm btn-primary" onclick="showCardImage('{{ card.image_url }}')">
                                 {{ _("View Card") }}
                             </button>
                         </td>
@@ -66,4 +57,3 @@
     {% endif %}
 </div>
 {% endblock %}
-

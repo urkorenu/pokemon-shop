@@ -4,7 +4,6 @@
 <h2 class="text-center mb-4">{{ _("Upload New Pokémon Card") }}</h2>
 
 <form action="{{ url_for('seller.upload_card') }}" method="POST" enctype="multipart/form-data">
-    <!-- Set Name -->
     <div class="mb-3">
         <label for="set_name" class="form-label">{{ _("Set Name:") }}</label>
         <input class="form-control" list="sets" id="set_name" name="set_name" placeholder="{{ _('Type to search...') }}" required>
@@ -15,19 +14,16 @@
         </datalist>
     </div>
 
-    <!-- Card Number -->
     <div class="mb-3">
         <label for="number" class="form-label">{{ _("Card Number:") }}</label>
         <input type="text" id="number" name="number" class="form-control" placeholder="{{ _('Enter card number') }}" required>
     </div>
 
-    <!-- Card Name -->
     <div class="mb-3">
         <label for="name" class="form-label">{{ _("Card Name:") }}</label>
         <input type="text" id="name" name="name" class="form-control" placeholder="{{ _('Card name will be auto-filled') }}" readonly required>
     </div>
 
-    <!-- Card Type -->
     <div class="mb-3">
         <label for="card_type" class="form-label">{{ _("Card Type:") }}</label>
         <select id="card_type" name="card_type" class="form-select" required>
@@ -35,7 +31,6 @@
         </select>
     </div>
 
-    <!-- Price or Follow TCGPlayer -->
     <div class="mb-3">
         <label for="price" class="form-label">{{ _("Price:") }}</label>
         <div class="input-group">
@@ -48,7 +43,6 @@
         </div>
     </div>
 
-    <!-- Condition -->
     <div class="mb-3">
         <label for="condition" class="form-label">{{ _("Condition:") }}</label>
         <select id="condition" name="condition" class="form-select" required>
@@ -63,12 +57,11 @@
         </small>
     </div>
 
-    <!-- Is Graded -->
     <div class="form-check mb-3">
         <input type="checkbox" id="is_graded" name="is_graded" class="form-check-input">
         <label for="is_graded" class="form-check-label">{{ _("Is Graded?") }}</label>
     </div>
-    <!-- Grade -->
+
     <div id="graded_fields" class="mb-3" style="display: none;">
         <label for="grade" class="form-label">{{ _("Grade (1-10):") }}</label>
         <input type="number" id="grade" name="grade" step="0.5" min="1" max="10" class="form-control" placeholder="{{ _('Enter grade') }}">
@@ -80,150 +73,13 @@
         </select>
     </div>
 
-    <!-- File Upload -->
     <div class="mb-3">
         <label for="image" class="form-label">{{ _("Card Image:") }}</label>
         <input type="file" id="image" name="image" class="form-control" accept="image/*" required>
     </div>
 
-    <!-- Submit -->
     <div class="mt-4">
         <button type="submit" class="btn btn-primary">{{ _("Upload") }}</button>
     </div>
 </form>
-<script>
-    const priceInput = document.getElementById('price');
-    const followTcgCheckbox = document.getElementById('follow_tcg');
-    const conditionSelect = document.getElementById('condition');
-    const tcgWarning = document.getElementById('tcg_warning');
-    const cardTypeDropdown = document.getElementById("card_type");
-
-    function enforceConditionLogic() {
-        if (followTcgCheckbox.checked) {
-            conditionSelect.value = "NM";
-            conditionSelect.disabled = true;
-            priceInput.value = '';
-            priceInput.disabled = true;
-            tcgWarning.style.display = 'block';
-        } else {
-            conditionSelect.disabled = false;
-            priceInput.disabled = false;
-            tcgWarning.style.display = 'none';
-        }
-    }
-
-    async function fetchTCGPrice() {
-        const setName = document.getElementById("set_name").value.trim();
-        const cardNumber = document.getElementById("number").value.trim();
-        const cardType = cardTypeDropdown.value.trim();
-
-        if (!setName || !cardNumber || !cardType) {
-            alert("Please fill Set Name, Card Number, and select Card Type to fetch the price.");
-            followTcgCheckbox.checked = false;
-            enforceConditionLogic();
-            return;
-        }
-
-        try {
-            const apiUrl = `/seller/card-details?set_name=${encodeURIComponent(setName)}&number=${encodeURIComponent(cardNumber)}`;
-            const response = await fetch(apiUrl);
-
-            if (!response.ok) {
-                throw new Error("Failed to fetch card details");
-            }
-
-            const data = await response.json();
-            const normalizedCardType = cardType.toLowerCase();
-            const availablePrices = data.prices || {};
-
-            let tcgPriceUSD = 0.0;
-
-            for (const key of Object.keys(availablePrices)) {
-                if (key.toLowerCase() === normalizedCardType) {
-                    tcgPriceUSD = parseFloat(availablePrices[key]?.market || 0.0);
-                    break;
-                }
-            }
-
-            if (tcgPriceUSD > 0) {
-                const conversionRate = 3.56;
-                const tcgPriceILS = Math.round(tcgPriceUSD * conversionRate);
-                priceInput.value = tcgPriceILS;
-            } else {
-                throw new Error("TCGPlayer price not found for this card type.");
-            }
-        } catch (error) {
-            alert("Failed to fetch TCGPlayer price. Please try again.");
-            followTcgCheckbox.checked = false;
-            enforceConditionLogic();
-        }
-    }
-
-    followTcgCheckbox.addEventListener('change', async () => {
-        enforceConditionLogic();
-        if (followTcgCheckbox.checked) {
-            await fetchTCGPrice();
-        }
-    });
-
-    conditionSelect.addEventListener('change', () => {
-        if (conditionSelect.value !== "NM") {
-            followTcgCheckbox.checked = false;
-            followTcgCheckbox.disabled = true;
-            enforceConditionLogic();
-        } else {
-            followTcgCheckbox.disabled = false;
-        }
-    });
-
-    document.querySelector('form').addEventListener('submit', (e) => {
-        if (!priceInput.value && !followTcgCheckbox.checked) {
-            e.preventDefault();
-            alert('You must either enter a manual price or choose to follow TCGPlayer price.');
-        }
-    });
-
-    async function fetchCardDetails() {
-        const setName = document.getElementById("set_name").value;
-        const cardNumber = document.getElementById("number").value;
-
-        document.getElementById("name").value = "";
-        cardTypeDropdown.innerHTML = '<option value="">Select Card Type</option>';
-
-        if (!setName || !cardNumber) return;
-
-        try {
-            const apiUrl = `/seller/card-details?set_name=${encodeURIComponent(setName)}&number=${encodeURIComponent(cardNumber)}`;
-            const response = await fetch(apiUrl);
-
-            if (!response.ok) {
-                return;
-            }
-
-            const data = await response.json();
-
-            if (data.error) {
-                return;
-            }
-
-            document.getElementById("name").value = data.name;
-            data.types.forEach((type) => {
-                const option = document.createElement("option");
-                option.value = type;
-                option.textContent = type.replace("_", " ").toUpperCase();
-                cardTypeDropdown.appendChild(option);
-            });
-        } catch (error) {
-            console.error("Error fetching card details:", error);
-        }
-    }
-
-    document.getElementById("set_name").addEventListener("input", fetchCardDetails);
-    document.getElementById("number").addEventListener("input", fetchCardDetails);
-
-    document.getElementById("is_graded").addEventListener("change", function () {
-        const gradedFields = document.getElementById("graded_fields");
-        gradedFields.style.display = this.checked ? "block" : "none";
-    });
-</script>
 {% endblock %}
