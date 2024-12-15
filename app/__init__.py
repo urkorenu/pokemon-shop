@@ -76,48 +76,40 @@ def create_app():
     @app.context_processor
     def inject_counts():
         """
-        Inject counts of cart items, pending orders, and orders without feedback into the template context.
-
-        Returns:
-            dict: A dictionary with counts of cart items, pending orders, and orders without feedback.
+        Inject counts of cart items, pending orders, orders without feedback,
+        and users who requested uploader role into the template context.
         """
         if current_user.is_authenticated:
             user_id = current_user.id
-            cart_items_count = (
-                cache.get(f"cart_count_{user_id}")
-                or Cart.query.filter_by(user_id=user_id).count()
-            )
-            pending_orders = (
-                cache.get(f"pending_orders_{user_id}")
-                or Order.query.filter_by(seller_id=user_id, status="Pending").count()
-            )
-            orders_without_feedback = (
-                cache.get(f"orders_without_feedback_{user_id}")
-                or Order.query.filter_by(
+
+            # Fetch counts or get from cache
+            cart_items_count = cache.get(f"cart_count_{user_id}")
+            if cart_items_count is None:
+                cart_items_count = Cart.query.filter_by(user_id=user_id).count()
+                cache.set(f"cart_count_{user_id}", cart_items_count, timeout=60)
+
+            pending_orders = cache.get(f"pending_orders_{user_id}")
+            if pending_orders is None:
+                pending_orders = Order.query.filter_by(seller_id=user_id, status="Pending").count()
+                cache.set(f"pending_orders_{user_id}", pending_orders, timeout=60)
+
+            orders_without_feedback = cache.get(f"orders_without_feedback_{user_id}")
+            if orders_without_feedback is None:
+                orders_without_feedback = Order.query.filter_by(
                     buyer_id=user_id, status="Confirmed", feedback=None
                 ).count()
-            )
-            users_want_uploader_role = 0
-            if current_user.role == "admin":
-                users_want_uploader_role = (
-                    cache.get("users_want_uploader_role")
-                    or User.query.filter_by(request_status="pending").count()
-                )
-                cache.set(
-                    f"users_want_uploader_role",
-                    users_want_uploader_role,
-                    timeout=60,
-                )
-            cache.set(f"cart_count_{user_id}", cart_items_count, timeout=60)
-            cache.set(f"pending_orders_{user_id}", pending_orders, timeout=60)
-            cache.set(
-                f"orders_without_feedback_{user_id}",
-                orders_without_feedback,
-                timeout=60,
-            )
+                cache.set(f"orders_without_feedback_{user_id}", orders_without_feedback, timeout=60)
+
+            users_want_uploader_role = cache.get("users_want_uploader_role")
+            if users_want_uploader_role is None and current_user.role == "admin":
+                # Make the query more robust to match '0' or "pending"
+                users_want_uploader_role = User.query.filter(
+                    (User.request_status == "Pending") | (User.request_status == 0)
+                ).count()
+                cache.set("users_want_uploader_role", users_want_uploader_role, timeout=60)
 
         else:
-            cart_items_count = pending_orders = orders_without_feedback = users_want_uploader_role =0
+            cart_items_count = pending_orders = orders_without_feedback = users_want_uploader_role = 0
 
         return {
             "cart_items_count": cart_items_count,
