@@ -1,4 +1,13 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session, jsonify
+from flask import (
+    Blueprint,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    flash,
+    session,
+    jsonify,
+)
 from flask_login import login_required, current_user
 from sqlalchemy.sql import func, case
 from sqlalchemy.orm import joinedload, aliased
@@ -15,6 +24,7 @@ from app.utils import roles_required
 # Create a Blueprint for user routes
 user_bp = Blueprint("user", __name__)
 
+
 class Pagination:
     """
     A class to handle pagination of items.
@@ -25,6 +35,7 @@ class Pagination:
         per_page (int): Number of items per page.
         total (int): Total number of items.
     """
+
     def __init__(self, items, page, per_page, total):
         self.items = items
         self.page = page
@@ -73,6 +84,7 @@ class Pagination:
                 yield num
                 last = num
 
+
 @user_bp.route("/")
 def view_cards():
     """
@@ -86,9 +98,22 @@ def view_cards():
     """
     page = request.args.get("page", 1, type=int)
     filtered_data = filter_cards(page=page)
-    cards_list, unique_set_names, stats = filtered_data["cards"], filtered_data["unique_set_names"], filtered_data["stats"]
+    cards_list, unique_set_names, stats = (
+        filtered_data["cards"],
+        filtered_data["unique_set_names"],
+        filtered_data["stats"],
+    )
     pagination = Pagination(cards_list, page, 12, stats["total_cards"])
-    return render_template("cards.html", cards=cards_list, unique_set_names=unique_set_names, pagination=pagination, cities=CITIES_IN_ISRAEL, **stats, show_sold_checkbox=False)
+    return render_template(
+        "cards.html",
+        cards=cards_list,
+        unique_set_names=unique_set_names,
+        pagination=pagination,
+        cities=CITIES_IN_ISRAEL,
+        **stats,
+        show_sold_checkbox=False,
+    )
+
 
 @user_bp.route("/set-language", methods=["POST"])
 def set_language():
@@ -108,7 +133,12 @@ def set_language():
     else:
         flash(_("Invalid language selection."), "danger")
     parsed_referrer = urlparse(referrer)
-    return redirect(referrer if not parsed_referrer.netloc and not parsed_referrer.scheme else url_for("user.view_cards"))
+    return redirect(
+        referrer
+        if not parsed_referrer.netloc and not parsed_referrer.scheme
+        else url_for("user.view_cards")
+    )
+
 
 @user_bp.route("/report_user/<int:user_id>", methods=["POST"])
 @login_required
@@ -130,9 +160,14 @@ def report_user(user_id):
     if not reason:
         flash("Please provide a reason for the report.", "danger")
         return redirect(url_for("user.profile", user_id=user_id))
-    send_email(Config.ADMIN_MAIL, f"User Report - {user.username}", f"User '{current_user.username}' reported the user '{user.username}'.\nReason: {reason}\nDetails: {details if details else 'No additional details provided.'}")
+    send_email(
+        Config.ADMIN_MAIL,
+        f"User Report - {user.username}",
+        f"User '{current_user.username}' reported the user '{user.username}'.\nReason: {reason}\nDetails: {details if details else 'No additional details provided.'}",
+    )
     flash("User has been reported successfully. Thank you!", "success")
     return redirect(url_for("user.profile", user_id=user_id))
+
 
 @user_bp.route("/profile/<int:user_id>")
 def profile(user_id):
@@ -148,13 +183,35 @@ def profile(user_id):
     Returns:
         Rendered template for the user's profile.
     """
-    page, show_sold = request.args.get("page", 1, type=int), request.args.get("show_sold") == "on"
+    page, show_sold = (
+        request.args.get("page", 1, type=int),
+        request.args.get("show_sold") == "on",
+    )
     user = User.query.get_or_404(user_id)
     filtered_data = filter_cards(user_id=user_id, show_sold=show_sold, page=page)
-    cards_list, unique_set_names, stats = filtered_data["cards"], filtered_data["unique_set_names"], filtered_data["stats"]
+    cards_list, unique_set_names, stats = (
+        filtered_data["cards"],
+        filtered_data["unique_set_names"],
+        filtered_data["stats"],
+    )
     pagination = Pagination(cards_list, page, 12, stats["total_cards"])
-    completed_orders = db.session.query(User.username, Order.feedback, Order.rating).join(Order, Order.buyer_id == User.id).filter(Order.seller_id == user_id, Order.status == "Completed").all()
-    return render_template("profile.html", user=user, cards=cards_list, feedback=completed_orders, unique_set_names=unique_set_names, pagination=pagination, **stats, show_sold_checkbox=True)
+    completed_orders = (
+        db.session.query(User.username, Order.feedback, Order.rating)
+        .join(Order, Order.buyer_id == User.id)
+        .filter(Order.seller_id == user_id, Order.status == "Completed")
+        .all()
+    )
+    return render_template(
+        "profile.html",
+        user=user,
+        cards=cards_list,
+        feedback=completed_orders,
+        unique_set_names=unique_set_names,
+        pagination=pagination,
+        **stats,
+        show_sold_checkbox=True,
+    )
+
 
 @user_bp.route("/my-cards")
 @login_required
@@ -171,9 +228,16 @@ def my_cards():
     if current_user.role == "normal":
         flash("You do not have permission to access this page.", "danger")
         return redirect(url_for("user.view_cards"))
-    available_cards = Card.query.filter_by(uploader_id=current_user.id).filter(Card.amount > 0).all()
-    sold_cards = Card.query.filter_by(uploader_id=current_user.id).filter(Card.amount == 0).all()
-    return render_template("my_cards.html", available_cards=available_cards, sold_cards=sold_cards)
+    available_cards = (
+        Card.query.filter_by(uploader_id=current_user.id).filter(Card.amount > 0).all()
+    )
+    sold_cards = (
+        Card.query.filter_by(uploader_id=current_user.id).filter(Card.amount == 0).all()
+    )
+    return render_template(
+        "my_cards.html", available_cards=available_cards, sold_cards=sold_cards
+    )
+
 
 @user_bp.route("/edit-card/<int:card_id>", methods=["GET", "POST"])
 @login_required
@@ -211,6 +275,7 @@ def edit_card(card_id):
         return redirect(url_for("user.my_cards"))
     return render_template("edit_card.html", card=card)
 
+
 @user_bp.route("/delete-card/<int:card_id>", methods=["POST"])
 @login_required
 def delete_card(card_id):
@@ -233,19 +298,26 @@ def delete_card(card_id):
     s3 = boto3.client("s3", region_name=Config.AWS_REGION)
     if card.image_url:
         try:
-            s3.delete_object(Bucket=Config.S3_BUCKET, Key=urlparse(card.image_url).path.lstrip("/"))
+            s3.delete_object(
+                Bucket=Config.S3_BUCKET, Key=urlparse(card.image_url).path.lstrip("/")
+            )
         except Exception as e:
             print(f"Failed to delete {card.image_url} from S3: {e}", flush=True)
             flash("Failed to delete the image from S3.", "danger")
     if current_user.role == "admin" and card.uploader_id != current_user.id:
         uploader = User.query.get(card.uploader_id)
         if uploader and uploader.email:
-            send_email(uploader.email, "Your Card Has Been Deleted", f"Hello {uploader.username},\n\nYour card '{card.name}' (Card Number: {card.number}, Set: {card.set_name}) has been deleted by an administrator.\n\nIf you have any questions, please contact support.\n\nBest regards,\nThe Pika-Card Team")
+            send_email(
+                uploader.email,
+                "Your Card Has Been Deleted",
+                f"Hello {uploader.username},\n\nYour card '{card.name}' (Card Number: {card.number}, Set: {card.set_name}) has been deleted by an administrator.\n\nIf you have any questions, please contact support.\n\nBest regards,\nThe Pika-Card Team",
+            )
     Cart.query.filter_by(card_id=card.id).delete()
     db.session.delete(card)
     db.session.commit()
     flash("Card deleted successfully!", "success")
     return redirect(url_for("user.my_cards"))
+
 
 @user_bp.route("/report_card/<int:card_id>", methods=["POST"])
 @login_required
@@ -264,9 +336,14 @@ def report_card(card_id):
     """
     card = Card.query.get_or_404(card_id)
     reason, details = request.form.get("reason"), request.form.get("details", "")
-    send_email(Config.ADMIN_MAIL, f"Report: Card #{card.id} - {reason}", f"Card Name: {card.name}\nReason: {reason}\nDetails: {details}\nUser: {current_user.username}")
+    send_email(
+        Config.ADMIN_MAIL,
+        f"Report: Card #{card.id} - {reason}",
+        f"Card Name: {card.name}\nReason: {reason}\nDetails: {details}\nUser: {current_user.username}",
+    )
     flash("Report submitted successfully. Admin will review it.", "success")
     return redirect(url_for("user.view_cards"))
+
 
 @user_bp.route("/cart", methods=["POST"])
 @login_required
@@ -289,7 +366,10 @@ def add_to_cart():
             db.session.commit()
             flash(f"{card.name} has been added to your cart.", "success")
         else:
-            flash(f"You cannot add more {card.name} cards. Only {card.amount} available.", "danger")
+            flash(
+                f"You cannot add more {card.name} cards. Only {card.amount} available.",
+                "danger",
+            )
     else:
         if card.amount > 0:
             db.session.add(Cart(user_id=current_user.id, card_id=card.id, quantity=1))
@@ -298,6 +378,7 @@ def add_to_cart():
         else:
             flash(f"{card.name} is out of stock.", "danger")
     return redirect(url_for("user.view_cards"))
+
 
 @user_bp.route("/cart")
 @login_required
@@ -317,7 +398,10 @@ def view_cart():
     for item in cart_items:
         grouped_cart.setdefault(item.card.uploader_id, []).append(item)
     total_price = sum(item.card.price * item.quantity for item in cart_items)
-    return render_template("cart.html", grouped_cart=grouped_cart, total_price=total_price)
+    return render_template(
+        "cart.html", grouped_cart=grouped_cart, total_price=total_price
+    )
+
 
 @user_bp.route("/contact", methods=["GET", "POST"])
 def contact_us():
@@ -332,7 +416,11 @@ def contact_us():
         Rendered template for the contact us page or redirect to the contact us page.
     """
     if request.method == "POST":
-        name, email, message_content = request.form.get("name"), request.form.get("email"), request.form.get("message")
+        name, email, message_content = (
+            request.form.get("name"),
+            request.form.get("email"),
+            request.form.get("message"),
+        )
         if not (name and email and message_content):
             flash("All fields are required!", "danger")
             return redirect(url_for("user.contact_us"))
@@ -354,6 +442,7 @@ def contact_us():
         return redirect(url_for("user.contact_us"))
     return render_template("contact.html")
 
+
 @user_bp.route("/about", methods=["GET"])
 def about_us():
     """
@@ -367,6 +456,7 @@ def about_us():
     """
     return render_template("about.html")
 
+
 @user_bp.route("/templates/css/styles.css.jinja")
 def styles():
     """
@@ -379,6 +469,7 @@ def styles():
         Rendered template for the CSS styles.
     """
     return render_template("css/styles.css.jinja")
+
 
 @cache.cached(timeout=60, query_string=True)
 def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_page=12):
@@ -396,11 +487,23 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
         dict: Filtered cards, unique set names, and statistics.
     """
     uploader_alias = aliased(User)
-    base_query = base_query or Card.query.options(joinedload(Card.uploader)).join(uploader_alias)
-    name_query, set_name_query, location_query = request.args.get("name", "").strip(), request.args.get("set_name", ""), request.args.get("location", "").strip()
-    is_graded, sort_option, show_sold = request.args.get("is_graded", ""), request.args.get("sort", ""), request.args.get("show_sold", "off") == "on" or show_sold
+    base_query = base_query or Card.query.options(joinedload(Card.uploader)).join(
+        uploader_alias
+    )
+    name_query, set_name_query, location_query = (
+        request.args.get("name", "").strip(),
+        request.args.get("set_name", ""),
+        request.args.get("location", "").strip(),
+    )
+    is_graded, sort_option, show_sold = (
+        request.args.get("is_graded", ""),
+        request.args.get("sort", ""),
+        request.args.get("show_sold", "off") == "on" or show_sold,
+    )
 
-    query = base_query.filter(or_(uploader_alias.role == "uploader", uploader_alias.role == "admin"))
+    query = base_query.filter(
+        or_(uploader_alias.role == "uploader", uploader_alias.role == "admin")
+    )
     if user_id:
         query = query.filter(Card.uploader_id == user_id)
     if not show_sold:
@@ -423,11 +526,15 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
     elif sort_option == "card_number":
         query = query.order_by(Card.number.asc())
 
-    stats = query.with_entities(
-        func.count(Card.id).label("total_cards"),
-        func.count(func.distinct(Card.set_name)).label("total_sets"),
-        func.count(case((Card.is_graded == True, 1))).label("total_graded"),
-    ).order_by(None).first()
+    stats = (
+        query.with_entities(
+            func.count(Card.id).label("total_cards"),
+            func.count(func.distinct(Card.set_name)).label("total_sets"),
+            func.count(case((Card.is_graded == True, 1))).label("total_graded"),
+        )
+        .order_by(None)
+        .first()
+    )
 
     paginated_cards = query.paginate(page=page, per_page=per_page, error_out=False)
     cards_list = [
@@ -445,14 +552,26 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
             "tcg_price": card.tcg_price,
             "grading_company": card.grading_company,
             "grade": card.grade,
-            "uploader": {
-                "id": card.uploader.id,
-                "username": card.uploader.username,
-                "location": card.uploader.location,
-            } if card.uploader else None,
+            "uploader": (
+                {
+                    "id": card.uploader.id,
+                    "username": card.uploader.username,
+                    "location": card.uploader.location,
+                }
+                if card.uploader
+                else None
+            ),
         }
         for card in paginated_cards.items
     ]
     unique_set_names = sorted({card["set_name"] for card in cards_list})
 
-    return {"cards": cards_list, "unique_set_names": unique_set_names, "stats": {"total_cards": int(stats.total_cards), "total_sets": int(stats.total_sets), "total_graded": int(stats.total_graded)}}
+    return {
+        "cards": cards_list,
+        "unique_set_names": unique_set_names,
+        "stats": {
+            "total_cards": int(stats.total_cards),
+            "total_sets": int(stats.total_sets),
+            "total_graded": int(stats.total_graded),
+        },
+    }

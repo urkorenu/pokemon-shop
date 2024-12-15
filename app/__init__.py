@@ -15,6 +15,7 @@ migrate = Migrate()
 login_manager = LoginManager()
 cache = Cache()
 
+
 def create_app():
     """
     Create and configure the Flask application.
@@ -32,19 +33,30 @@ def create_app():
         SESSION_USE_SIGNER=True,
         SESSION_KEY_PREFIX="pokemon-shop:",
         SESSION_COOKIE_SECURE=os.getenv("FLASK_ENV") == "production",
-        SESSION_REDIS=Redis(host="redis", port=6379)
+        SESSION_REDIS=Redis(host="redis", port=6379),
     )
     Session(app)
 
     # Initialize Babel for internationalization
     babel = Babel(app)
-    babel.init_app(app, locale_selector=lambda: session.get("lang") or request.accept_languages.best_match(app.config["LANGUAGES"]))
+    babel.init_app(
+        app,
+        locale_selector=lambda: session.get("lang")
+        or request.accept_languages.best_match(app.config["LANGUAGES"]),
+    )
 
     # Initialize extensions with the app
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
-    cache.init_app(app, config={"CACHE_TYPE": "RedisCache", "CACHE_REDIS_URL": "redis://redis:6379/0", "CACHE_DEFAULT_TIMEOUT": 300})
+    cache.init_app(
+        app,
+        config={
+            "CACHE_TYPE": "RedisCache",
+            "CACHE_REDIS_URL": "redis://redis:6379/0",
+            "CACHE_DEFAULT_TIMEOUT": 300,
+        },
+    )
 
     from app.models import Cart, Order, User
 
@@ -74,17 +86,47 @@ def create_app():
         """
         if current_user.is_authenticated:
             user_id = current_user.id
-            cart_items_count = db.session.query(func.count()).select_from(Cart).filter(Cart.user_id == user_id).scalar()
-            pending_orders = cache.get(f"pending_orders_{user_id}") or Order.query.filter_by(seller_id=user_id, status="Pending").count()
+            cart_items_count = (
+                db.session.query(func.count())
+                .select_from(Cart)
+                .filter(Cart.user_id == user_id)
+                .scalar()
+            )
+            pending_orders = (
+                cache.get(f"pending_orders_{user_id}")
+                or Order.query.filter_by(seller_id=user_id, status="Pending").count()
+            )
             cache.set(f"pending_orders_{user_id}", pending_orders, timeout=60)
-            orders_without_feedback = cache.get(f"orders_without_feedback_{user_id}") or Order.query.filter_by(buyer_id=user_id, status="Confirmed", feedback=None).count()
-            cache.set(f"orders_without_feedback_{user_id}", orders_without_feedback, timeout=60)
-            users_want_uploader_role = cache.get("users_want_uploader_role") or (current_user.role == "admin" and User.query.filter((User.request_status == "Pending") | (cast(User.request_status, String) == "0")).count())
+            orders_without_feedback = (
+                cache.get(f"orders_without_feedback_{user_id}")
+                or Order.query.filter_by(
+                    buyer_id=user_id, status="Confirmed", feedback=None
+                ).count()
+            )
+            cache.set(
+                f"orders_without_feedback_{user_id}",
+                orders_without_feedback,
+                timeout=60,
+            )
+            users_want_uploader_role = cache.get("users_want_uploader_role") or (
+                current_user.role == "admin"
+                and User.query.filter(
+                    (User.request_status == "Pending")
+                    | (cast(User.request_status, String) == "0")
+                ).count()
+            )
             cache.set("users_want_uploader_role", users_want_uploader_role, timeout=60)
         else:
-            cart_items_count = pending_orders = orders_without_feedback = users_want_uploader_role = 0
+            cart_items_count = pending_orders = orders_without_feedback = (
+                users_want_uploader_role
+            ) = 0
 
-        return {"cart_items_count": cart_items_count, "pending_orders": pending_orders, "orders_without_feedback": orders_without_feedback, "users_want_uploader_role": users_want_uploader_role}
+        return {
+            "cart_items_count": cart_items_count,
+            "pending_orders": pending_orders,
+            "orders_without_feedback": orders_without_feedback,
+            "users_want_uploader_role": users_want_uploader_role,
+        }
 
     @app.template_filter("dict_without")
     def dict_without(d, key):

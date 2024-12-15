@@ -6,6 +6,7 @@ from ..mail_service import send_email
 # Create a Blueprint for admin routes
 admin_bp = Blueprint("admin", __name__)
 
+
 @admin_bp.route("/users", methods=["GET", "POST"])
 @roles_required("admin")
 def manage_users():
@@ -24,11 +25,15 @@ def manage_users():
     search_query = request.args.get("search", "")
 
     # Filter users based on the search query or get all users
-    users = User.query.filter(
-        User.username.ilike(f"%{search_query}%") |
-        User.email.ilike(f"%{search_query}%") |
-        User.location.ilike(f"%{search_query}%")
-    ).all() if search_query else User.query.all()
+    users = (
+        User.query.filter(
+            User.username.ilike(f"%{search_query}%")
+            | User.email.ilike(f"%{search_query}%")
+            | User.location.ilike(f"%{search_query}%")
+        ).all()
+        if search_query
+        else User.query.all()
+    )
 
     if request.method == "POST":
         # Handle user deletion
@@ -49,7 +54,9 @@ def manage_users():
             user.contact_details = request.form.get(f"contact_details_{user_id}")
             user.rating = float(request.form.get(f"rating_{user_id}", 0))
             user.feedback_count = int(request.form.get(f"feedback_count_{user_id}", 0))
-            user.request_status = request.form.get(f"request_status_{user_id}", "").strip()
+            user.request_status = request.form.get(
+                f"request_status_{user_id}", ""
+            ).strip()
 
             new_role = request.form.get(f"role_{user_id}")
             ban_reason = request.form.get(f"ban_reason_{user_id}")
@@ -60,13 +67,25 @@ def manage_users():
                 if old_role != new_role:
                     if new_role == "uploader":
                         user.request_status = "None"
-                        send_email(user.email, "Uploader Role Granted", f"Congratulations {user.username}, you have been granted the uploader role!")
+                        send_email(
+                            user.email,
+                            "Uploader Role Granted",
+                            f"Congratulations {user.username}, you have been granted the uploader role!",
+                        )
                     elif new_role == "banned":
                         Card.query.filter_by(uploader_id=user.id).delete()
-                        send_email(user.email, "Account Banned", f"Dear {user.username}, your account has been banned.\nReason: {ban_reason}")
+                        send_email(
+                            user.email,
+                            "Account Banned",
+                            f"Dear {user.username}, your account has been banned.\nReason: {ban_reason}",
+                        )
                         flash(f"User {user.username} has been banned.", "warning")
                     elif old_role == "banned":
-                        send_email(user.email, "Account Unbanned", f"Dear {user.username}, your account has been unbanned. You can access your account now.")
+                        send_email(
+                            user.email,
+                            "Account Unbanned",
+                            f"Dear {user.username}, your account has been unbanned. You can access your account now.",
+                        )
                 db.session.commit()
                 flash(f"User {user.username}'s role updated to {new_role}.", "success")
             else:

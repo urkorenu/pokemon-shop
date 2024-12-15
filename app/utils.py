@@ -39,9 +39,6 @@ def roles_required(*roles):
     return wrapper
 
 
-
-
-
 def delete_user_account(user_id, is_admin=False):
     """
     Deletes a user account and cleans up associated data.
@@ -60,9 +57,11 @@ def delete_user_account(user_id, is_admin=False):
 
     try:
         # Step 1: Remove user's cards from carts
-        Cart.query.filter(Cart.card_id.in_(
-            Card.query.with_entities(Card.id).filter_by(uploader_id=user.id)
-        )).delete(synchronize_session=False)
+        Cart.query.filter(
+            Cart.card_id.in_(
+                Card.query.with_entities(Card.id).filter_by(uploader_id=user.id)
+            )
+        ).delete(synchronize_session=False)
 
         # Step 2: Delete all cards uploaded by the user
         Card.query.filter_by(uploader_id=user.id).delete(synchronize_session=False)
@@ -79,9 +78,11 @@ def delete_user_account(user_id, is_admin=False):
         if not is_admin:
             logout_user()
 
-        return True, f"User '{user.username}' and all associated data have been deleted."
+        return (
+            True,
+            f"User '{user.username}' and all associated data have been deleted.",
+        )
 
     except Exception as e:
         db.session.rollback()
         return False, f"An error occurred while deleting the account: {str(e)}"
-

@@ -10,6 +10,7 @@ from app.utils import delete_user_account
 # Create a Blueprint for authentication routes
 auth_bp = Blueprint("auth", __name__)
 
+
 @auth_bp.route("/sign-in", methods=["GET", "POST"])
 def auth():
     """
@@ -41,8 +42,16 @@ def auth():
             flash("Invalid email or password.", "error")
 
         elif form_type == "register":
-            username, email, password = request.form.get("username"), request.form.get("email"), request.form.get("password")
-            location, contact_preference, contact_details = request.form.get("location"), request.form.get("contact_preference"), request.form.get("contact_details")
+            username, email, password = (
+                request.form.get("username"),
+                request.form.get("email"),
+                request.form.get("password"),
+            )
+            location, contact_preference, contact_details = (
+                request.form.get("location"),
+                request.form.get("contact_preference"),
+                request.form.get("contact_details"),
+            )
 
             if not all([username, email, password, location]):
                 flash("All fields are required.", "error")
@@ -60,7 +69,14 @@ def auth():
                 flash("Email already registered. Please log in.", "error")
                 return redirect(url_for("auth.auth"))
 
-            user = User(username=username, email=email, location=location, role="normal", contact_preference=contact_preference, contact_details=contact_details)
+            user = User(
+                username=username,
+                email=email,
+                location=location,
+                role="normal",
+                contact_preference=contact_preference,
+                contact_details=contact_details,
+            )
             user.set_password(password)
             db.session.add(user)
 
@@ -70,10 +86,13 @@ def auth():
                 return redirect(url_for("auth.auth"))
             except Exception as e:
                 db.session.rollback()
-                flash("An error occurred during registration. Please try again.", "error")
+                flash(
+                    "An error occurred during registration. Please try again.", "error"
+                )
                 print(f"Error during registration: {e}")
 
     return render_template("auth.html", cities=CITIES_IN_ISRAEL)
+
 
 @auth_bp.route("/logout")
 @login_required
@@ -90,6 +109,7 @@ def logout():
     logout_user()
     flash("You have been logged out.", "success")
     return redirect(url_for("auth.auth"))
+
 
 @auth_bp.route("/account", methods=["GET", "POST"])
 @login_required
@@ -111,13 +131,19 @@ def account():
             current_user.username = request.form.get("username", current_user.username)
             current_user.email = request.form.get("email", current_user.email)
             current_user.location = request.form.get("location", current_user.location)
-            current_user.contact_preference = request.form.get("contact_preference", current_user.contact_preference)
-            current_user.contact_details = request.form.get("contact_details", current_user.contact_details)
+            current_user.contact_preference = request.form.get(
+                "contact_preference", current_user.contact_preference
+            )
+            current_user.contact_details = request.form.get(
+                "contact_details", current_user.contact_details
+            )
             db.session.commit()
             flash("Profile updated successfully!", "success")
 
         elif action == "change_password":
-            old_password, new_password = request.form.get("old_password"), request.form.get("new_password")
+            old_password, new_password = request.form.get(
+                "old_password"
+            ), request.form.get("new_password")
 
             if not check_password_hash(current_user.password_hash, old_password):
                 flash("Old password is incorrect.", "danger")
@@ -136,6 +162,7 @@ def account():
 
     orders = Order.query.filter_by(buyer_id=current_user.id).all()
     return render_template("account.html", orders=orders, cities=CITIES_IN_ISRAEL)
+
 
 @auth_bp.route("/request_uploader", methods=["POST"])
 @login_required
@@ -161,8 +188,13 @@ def request_uploader():
         flash("You must accept the rules before submitting your request.", "danger")
         return redirect(url_for("auth.account"))
 
-    if not all([current_user.email, current_user.location, current_user.contact_details]):
-        flash("Please ensure your profile details (email, location, and contact details) are updated.", "danger")
+    if not all(
+        [current_user.email, current_user.location, current_user.contact_details]
+    ):
+        flash(
+            "Please ensure your profile details (email, location, and contact details) are updated.",
+            "danger",
+        )
         return redirect(url_for("auth.account"))
 
     message_body = f"""
@@ -177,15 +209,23 @@ def request_uploader():
     Please review the request.
     """
     try:
-        send_email(recipient=Config.ADMIN_MAIL, subject=f"Uploader Role Request from {current_user.username}", body=message_body)
+        send_email(
+            recipient=Config.ADMIN_MAIL,
+            subject=f"Uploader Role Request from {current_user.username}",
+            body=message_body,
+        )
         current_user.request_status = "Pending"
         db.session.commit()
-        flash("Your request to become an uploader has been submitted successfully!", "success")
+        flash(
+            "Your request to become an uploader has been submitted successfully!",
+            "success",
+        )
     except Exception as e:
         flash("Failed to send the request. Please try again later.", "danger")
         print(str(e))
 
     return redirect(url_for("auth.account"))
+
 
 @auth_bp.route("/change_password", methods=["POST"])
 @login_required
@@ -199,7 +239,9 @@ def change_password():
     Returns:
         Redirect to the account management page with a flash message.
     """
-    old_password, new_password = request.form.get("old_password"), request.form.get("new_password")
+    old_password, new_password = request.form.get("old_password"), request.form.get(
+        "new_password"
+    )
 
     if not check_password_hash(current_user.password_hash, old_password):
         flash("Old password is incorrect.", "error")
@@ -209,6 +251,7 @@ def change_password():
     db.session.commit()
     flash("Password updated successfully!", "success")
     return redirect(url_for("auth.account"))
+
 
 @auth_bp.route("/auth/delete_account", methods=["POST"])
 @login_required
