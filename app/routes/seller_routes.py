@@ -53,7 +53,7 @@ def upload_card():
     def get_japanese_sets():
         """Fetches Japanese sets."""
         try:
-            response = requests.get("https://www.jpn-cards.com/set", timeout=10)
+            response = requests.get("https://www.jpn-cards.com/v2/set", timeout=10)
             response.raise_for_status()
             return response.json()
         except requests.RequestException as e:
@@ -127,9 +127,9 @@ def upload_card():
                     return render_template("upload.html", sets=sets)
 
                 # Fetch cards from the set
-                response = requests.get(f"https://www.jpn-cards.com/card/set_id={set_id}", timeout=10)
+                response = requests.get(f"https://www.jpn-cards.com/v2/card/set_id={set_id}", timeout=10)
                 response.raise_for_status()
-                cards = response.json()
+                cards = response.json().get("data", [])  # Extract the 'data' key containing cards
 
                 # Find the matching card
                 card_data = next((card for card in cards if str(card["sequenceNumber"]) == number), None)
@@ -145,7 +145,6 @@ def upload_card():
                 print(f"Error fetching Japanese card details: {e}", flush=True)
                 flash("Failed to fetch Japanese card details. Please try again later.", "danger")
                 return render_template("upload.html", sets=sets)
-
         else:
             flash("Invalid language selection.", "danger")
             return render_template("upload.html", sets=sets)
@@ -197,7 +196,7 @@ def get_english_sets():
 def get_japanese_sets():
     """Fetch Japanese Pokémon sets."""
     try:
-        response = requests.get("https://www.jpn-cards.com/set", timeout=10)
+        response = requests.get("https://www.jpn-cards.com/v2/set", timeout=10)
         response.raise_for_status()
         sets = [{"name": s["name"]} for s in response.json()]
         return jsonify(sets)
@@ -279,7 +278,7 @@ def get_card_details():
                 return None
             # Japanese Card Logic
             # Step 1: Fetch all sets and parse JSON
-            response = requests.get("https://www.jpn-cards.com/set", timeout=10)
+            response = requests.get("https://www.jpn-cards.com/v2/set", timeout=10)
             response.raise_for_status()
             sets_data = response.json()  # Parse the JSON response
 
@@ -289,21 +288,22 @@ def get_card_details():
                 return jsonify({"error": "Set name not found"}), 404
 
             # Step 3: Fetch all cards in the set using the set ID
-            set_response = requests.get(f"https://www.jpn-cards.com/card/set_id={set_id}")
+            set_response = requests.get(f"https://www.jpn-cards.com/v2/card/set_id={set_id}")
             set_response.raise_for_status()
-            cards = set_response.json()  # Parse JSON for cards in the set
+            cards_data = set_response.json().get("data", [])  # Extract the 'data' key
 
-            # Step 2: Filter by card number
-            card_data = next((card for card in cards if str(card["sequenceNumber"]) == number), None)
+            # Step 4: Filter by card number
+            card_data = next((card for card in cards_data if str(card["sequenceNumber"]) == number), None)
 
             if not card_data:
                 return jsonify({"error": "No card found"}), 404
 
+            # Build and return the response
             return jsonify(
                 {
                     "name": card_data["name"],
                     "types": ["Normal", "Holofoil", "Reverseholofoil", "1steditionholofoil", "1stedition"],
-                    "prices": {},  # No prices for Japanese cards
+                    "prices": {},  
                 }
             )
 
