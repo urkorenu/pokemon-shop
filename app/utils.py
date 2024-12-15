@@ -39,8 +39,7 @@ def roles_required(*roles):
     return wrapper
 
 
-from app.models import User, Cart, Card, Order, db
-from flask_login import logout_user
+
 
 
 def delete_user_account(user_id, is_admin=False):

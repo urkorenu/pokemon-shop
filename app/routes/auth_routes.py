@@ -7,29 +7,26 @@ from ..mail_service import send_email
 from config import Config
 from app.utils import delete_user_account
 
-
 # Create a Blueprint for authentication routes
 auth_bp = Blueprint("auth", __name__)
-
 
 @auth_bp.route("/sign-in", methods=["GET", "POST"])
 def auth():
     """
-    Handle user authentication (login and registration).
+    Route for user authentication (login and registration).
 
-    GET: Render the authentication page.
-    POST: Process login or registration based on form data.
+    Methods:
+        GET: Renders the authentication page.
+        POST: Handles login and registration form submissions.
 
     Returns:
-        A rendered template for GET requests.
-        A redirect to the appropriate page for POST requests.
+        Rendered template for authentication or redirects based on form submission.
     """
     form_type = request.form.get("form_type")
 
     if request.method == "POST":
         if form_type == "login":
-            email = request.form.get("email")
-            password = request.form.get("password")
+            email, password = request.form.get("email"), request.form.get("password")
             user = User.query.filter_by(email=email).first()
 
             if user and user.check_password(password):
@@ -44,12 +41,8 @@ def auth():
             flash("Invalid email or password.", "error")
 
         elif form_type == "register":
-            username = request.form.get("username")
-            email = request.form.get("email")
-            password = request.form.get("password")
-            location = request.form.get("location")
-            contact_preference = request.form.get("contact_preference")
-            contact_details = request.form.get("contact_details")
+            username, email, password = request.form.get("username"), request.form.get("email"), request.form.get("password")
+            location, contact_preference, contact_details = request.form.get("location"), request.form.get("contact_preference"), request.form.get("contact_details")
 
             if not all([username, email, password, location]):
                 flash("All fields are required.", "error")
@@ -67,14 +60,7 @@ def auth():
                 flash("Email already registered. Please log in.", "error")
                 return redirect(url_for("auth.auth"))
 
-            user = User(
-                username=username,
-                email=email,
-                location=location,
-                role="normal",
-                contact_preference=contact_preference,
-                contact_details=contact_details,
-            )
+            user = User(username=username, email=email, location=location, role="normal", contact_preference=contact_preference, contact_details=contact_details)
             user.set_password(password)
             db.session.add(user)
 
@@ -84,68 +70,54 @@ def auth():
                 return redirect(url_for("auth.auth"))
             except Exception as e:
                 db.session.rollback()
-                flash(
-                    "An error occurred during registration. Please try again.", "error"
-                )
+                flash("An error occurred during registration. Please try again.", "error")
                 print(f"Error during registration: {e}")
 
     return render_template("auth.html", cities=CITIES_IN_ISRAEL)
-
 
 @auth_bp.route("/logout")
 @login_required
 def logout():
     """
-    Log out the current user.
+    Route for logging out the current user.
+
+    Methods:
+        GET: Logs out the user and redirects to the authentication page.
 
     Returns:
-        A redirect to the authentication page.
+        Redirect to the authentication page.
     """
     logout_user()
     flash("You have been logged out.", "success")
     return redirect(url_for("auth.auth"))
 
-
 @auth_bp.route("/account", methods=["GET", "POST"])
 @login_required
 def account():
     """
-    Handle user account management (profile update, password change, account deletion).
+    Route for managing user account details.
 
-    GET: Render the account management page.
-    POST: Process profile update, password change, or account deletion based on form data.
+    Methods:
+        GET: Renders the account management page.
+        POST: Handles profile updates, password changes, and account deletion.
 
     Returns:
-        A rendered template for GET requests.
-        A redirect to the appropriate page for POST requests.
+        Rendered template for account management or redirects based on form submission.
     """
     if request.method == "POST":
         action = request.form.get("action")
 
         if action == "update_profile":
-            username = request.form.get("username")
-            email = request.form.get("email")
-            location = request.form.get("location")
-            contact_preference = request.form.get("contact_preference")
-            contact_details = request.form.get("contact_details")
-
-            if username:
-                current_user.username = username
-            if email:
-                current_user.email = email
-            if location:
-                current_user.location = location
-            if contact_preference:
-                current_user.contact_preference = contact_preference
-            if contact_details:
-                current_user.contact_details = contact_details
-
+            current_user.username = request.form.get("username", current_user.username)
+            current_user.email = request.form.get("email", current_user.email)
+            current_user.location = request.form.get("location", current_user.location)
+            current_user.contact_preference = request.form.get("contact_preference", current_user.contact_preference)
+            current_user.contact_details = request.form.get("contact_details", current_user.contact_details)
             db.session.commit()
             flash("Profile updated successfully!", "success")
 
         elif action == "change_password":
-            old_password = request.form.get("old_password")
-            new_password = request.form.get("new_password")
+            old_password, new_password = request.form.get("old_password"), request.form.get("new_password")
 
             if not check_password_hash(current_user.password_hash, old_password):
                 flash("Old password is incorrect.", "danger")
@@ -165,17 +137,17 @@ def account():
     orders = Order.query.filter_by(buyer_id=current_user.id).all()
     return render_template("account.html", orders=orders, cities=CITIES_IN_ISRAEL)
 
-
 @auth_bp.route("/request_uploader", methods=["POST"])
 @login_required
 def request_uploader():
     """
-    Handle uploader role request by the current user.
+    Route for requesting uploader role.
 
-    POST: Process the uploader role request based on form data.
+    Methods:
+        POST: Handles the request for uploader role submission.
 
     Returns:
-        A redirect to the account management page.
+        Redirect to the account management page with a flash message.
     """
     if current_user.role in ["uploader", "admin"]:
         flash("You already have the uploader or admin role.", "info")
@@ -189,13 +161,8 @@ def request_uploader():
         flash("You must accept the rules before submitting your request.", "danger")
         return redirect(url_for("auth.account"))
 
-    if not all(
-        [current_user.email, current_user.location, current_user.contact_details]
-    ):
-        flash(
-            "Please ensure your profile details (email, location, and contact details) are updated.",
-            "danger",
-        )
+    if not all([current_user.email, current_user.location, current_user.contact_details]):
+        flash("Please ensure your profile details (email, location, and contact details) are updated.", "danger")
         return redirect(url_for("auth.account"))
 
     message_body = f"""
@@ -210,37 +177,29 @@ def request_uploader():
     Please review the request.
     """
     try:
-        send_email(
-            recipient=Config.ADMIN_MAIL,
-            subject=f"Uploader Role Request from {current_user.username}",
-            body=message_body,
-        )
+        send_email(recipient=Config.ADMIN_MAIL, subject=f"Uploader Role Request from {current_user.username}", body=message_body)
         current_user.request_status = "Pending"
         db.session.commit()
-        flash(
-            "Your request to become an uploader has been submitted successfully!",
-            "success",
-        )
+        flash("Your request to become an uploader has been submitted successfully!", "success")
     except Exception as e:
         flash("Failed to send the request. Please try again later.", "danger")
         print(str(e))
 
     return redirect(url_for("auth.account"))
 
-
 @auth_bp.route("/change_password", methods=["POST"])
 @login_required
 def change_password():
     """
-    Handle password change for the current user.
+    Route for changing the user's password.
 
-    POST: Process the password change based on form data.
+    Methods:
+        POST: Handles the password change submission.
 
     Returns:
-        A redirect to the account management page.
+        Redirect to the account management page with a flash message.
     """
-    old_password = request.form.get("old_password")
-    new_password = request.form.get("new_password")
+    old_password, new_password = request.form.get("old_password"), request.form.get("new_password")
 
     if not check_password_hash(current_user.password_hash, old_password):
         flash("Old password is incorrect.", "error")
@@ -251,17 +210,17 @@ def change_password():
     flash("Password updated successfully!", "success")
     return redirect(url_for("auth.account"))
 
-
 @auth_bp.route("/auth/delete_account", methods=["POST"])
 @login_required
 def delete_account():
     """
-    Handle account deletion for the current user.
+    Route for deleting the user's account.
 
-    POST: Deletes the current user's account.
+    Methods:
+        POST: Handles the account deletion submission.
 
     Returns:
-        A redirect to the authentication page.
+        Redirect to the authentication page with a flash message.
     """
     success, message = delete_user_account(current_user.id)
     flash(message, "success" if success else "danger")
