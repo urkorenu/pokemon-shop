@@ -49,9 +49,21 @@ def upload_card():
             print(f"Error fetching sets: {e}", flush=True)
             return []
 
+    @cache.cached(timeout=86400, key_prefix="japanese_sets")
+    def get_japanese_sets():
+        """Fetches Japanese sets."""
+        try:
+            response = requests.get("https://www.jpn-cards.com/set", timeout=10)
+            response.raise_for_status()
+            return response.json()
+        except requests.RequestException as e:
+            print(f"Error fetching Japanese sets: {e}", flush=True)
+            return []
+
     sets = get_pokemon_sets() if request.method == "GET" else []
 
     if request.method == "POST":
+        # Collect form data
         name = request.form.get("name")
         follow_tcg = request.form.get("follow_tcg") == "on"
         price = float(request.form.get("price") or 0.0)
@@ -62,48 +74,89 @@ def upload_card():
         is_graded = request.form.get("is_graded") == "on"
         grade = request.form.get("grade") if is_graded else None
         grading_company = request.form.get("grading_company") if is_graded else None
+        language = request.form.get("language")
+        file = request.files.get("image")
 
-        try:
-            query = f'set.name:"{set_name}" number:"{number}"'
-            response = requests.get(
-                f"{BASE_URL}/cards", params={"q": query}, headers={"X-Api-Key": API_KEY}
-            )
-            response.raise_for_status()
-            card_data = response.json().get("data", [])
-
-            if not card_data:
-                flash(
-                    "No card found. Please verify the set name and card number.",
-                    "danger",
+        # Process English cards
+        if language == "en":
+            try:
+                query = f'set.name:"{set_name}" number:"{number}"'
+                response = requests.get(
+                    f"{BASE_URL}/cards", params={"q": query}, headers={"X-Api-Key": API_KEY}
                 )
+                response.raise_for_status()
+                card_data = response.json().get("data", [])
+
+                if not card_data:
+                    flash(
+                        "No card found. Please verify the set name and card number.",
+                        "danger",
+                    )
+                    return render_template("upload.html", sets=sets)
+
+                filtered_cards = [
+                    card for card in card_data
+                    if card.get("set", {}).get("name") == set_name and card.get("number") == number
+                ]
+                card_details = filtered_cards[0]
+                api_card_name = card_details["name"]
+
+                if name.lower() not in api_card_name.lower():
+                    flash(f"Card name does not match. Expected: {api_card_name}", "danger")
+                    return render_template("upload.html", sets=sets)
+
+                tcg_price_data = card_details.get("tcgplayer", {}).get("prices", {})
+                selected_price = tcg_price_data.get(card_type, {}).get("market", 0.0)
+                if follow_tcg:
+                    price = round(selected_price * 3.56 + 0.5, 0)
+                    condition = "NM"
+
+            except requests.RequestException as e:
+                print(f"Error fetching card details: {e}", flush=True)
+                flash("Failed to fetch card details. Please try again later.", "danger")
                 return render_template("upload.html", sets=sets)
 
-            card_details = card_data[0]
-            api_card_name = card_details["name"]
+        # Process Japanese cards
+        elif language == "jp":
+            try:
+                # Fetch the set ID
+                japanese_sets = get_japanese_sets()
+                set_id = next((s["id"] for s in japanese_sets if s["name"] == set_name), None)
+                if not set_id:
+                    flash("Set not found. Please verify the set name.", "danger")
+                    return render_template("upload.html", sets=sets)
 
-            if name.lower() not in api_card_name.lower():
-                flash(f"Card name does not match. Expected: {api_card_name}", "danger")
+                # Fetch cards from the set
+                response = requests.get(f"https://www.jpn-cards.com/card/set_id={set_id}", timeout=10)
+                response.raise_for_status()
+                cards = response.json()
+
+                # Find the matching card
+                card_data = next((card for card in cards if str(card["sequenceNumber"]) == number), None)
+                if not card_data:
+                    flash("No card found. Please verify the card number.", "danger")
+                    return render_template("upload.html", sets=sets)
+
+                # Fill in the card name and append "-jpn" to the card type
+                name = card_data["name"]
+                card_type = f"{card_type} - jpn"
+
+            except requests.RequestException as e:
+                print(f"Error fetching Japanese card details: {e}", flush=True)
+                flash("Failed to fetch Japanese card details. Please try again later.", "danger")
                 return render_template("upload.html", sets=sets)
 
-            tcg_price_data = card_details.get("tcgplayer", {}).get("prices", {})
-            selected_price = tcg_price_data.get(card_type, {}).get("market", 0.0)
-            if follow_tcg:
-                price = round(selected_price * 3.56 + 0.5, 0)
-                condition = "NM"
-
-        except requests.RequestException as e:
-            print(f"Error fetching card details: {e}", flush=True)
-            flash("Failed to fetch card details. Please try again later.", "danger")
+        else:
+            flash("Invalid language selection.", "danger")
             return render_template("upload.html", sets=sets)
 
-        file = request.files.get("image")
         image_url = upload_to_s3(file, bucket_name=Config.S3_BUCKET) if file else None
-
+        # Create and save the card
         card = Card(
             name=name,
             price=price,
             follow_tcg=follow_tcg,
-            tcg_price=selected_price,
+            tcg_price=selected_price if language == "en" else 0,
             condition=condition,
             amount=1,
             set_name=set_name,
@@ -121,6 +174,7 @@ def upload_card():
         return redirect(url_for("seller.upload_card"))
 
     return render_template("upload.html", sets=sets)
+
 
 @seller_bp.route("/en-sets", methods=["GET"])
 @cache.cached(timeout=86400, key_prefix="english_pokemon_sets")
