@@ -352,31 +352,30 @@ def about_us():
     """
     return render_template("about.html")
 
+@user_bp.route("/templates/css/styles.css.jinja")
+def styles():
+    """
+    Serve the CSS styles.
+
+    Returns:
+        Rendered template for the CSS styles.
+    """
+    return render_template("css/styles.css.jinja")
 
 @cache.cached(timeout=60, query_string=True)
 def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_page=12):
-    """
-    Filter and paginate cards based on various criteria.
-
-    Args:
-        base_query (Query): The base query to filter cards.
-        user_id (int): The ID of the user whose cards to filter.
-        show_sold (bool): Whether to show sold cards.
-        page (int): The page number for pagination.
-        per_page (int): The number of cards per page.
-
-    Returns:
-        tuple: Paginated cards, unique set names, and card statistics.
-    """
     uploader_alias = aliased(User)
     if base_query is None:
         base_query = Card.query.options(joinedload(Card.uploader)).join(uploader_alias)
+
     name_query = request.args.get("name", "").strip()
     set_name_query = request.args.get("set_name", "")
     location_query = request.args.get("location", "").strip()
     is_graded = request.args.get("is_graded", "")
     sort_option = request.args.get("sort", "")
     show_sold = request.args.get("show_sold", "off") == "on" or show_sold
+
+    # Apply filters
     query = base_query.filter(
         or_(uploader_alias.role == "uploader", uploader_alias.role == "admin")
     )
@@ -394,37 +393,46 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
         query = query.filter(Card.is_graded.is_(True))
     elif is_graded == "no":
         query = query.filter(Card.is_graded.is_(False))
+
+    # Apply sorting
     if sort_option == "price_asc":
         query = query.order_by(Card.price.asc())
     elif sort_option == "price_desc":
         query = query.order_by(Card.price.desc())
     elif sort_option == "card_number":
         query = query.order_by(Card.number.asc())
-    stats = (
-        query.with_entities(
-            func.count(Card.id).label("total_cards"),
-            func.count(func.distinct(Card.set_name)).label("total_sets"),
-            func.count(case((Card.is_graded == True, 1))).label("total_graded"),
-        )
-        .order_by(None)
-        .first()
-    )
+
+    # Generate stats
+    stats = query.with_entities(
+        func.count(Card.id).label("total_cards"),
+        func.count(func.distinct(Card.set_name)).label("total_sets"),
+        func.count(case((Card.is_graded == True, 1))).label("total_graded"),
+    ).order_by(None).first()
+
     stats_dict = {
         "total_cards": stats.total_cards,
         "total_sets": stats.total_sets,
         "total_graded": stats.total_graded,
     }
+
+    # Convert query results to serializable data
+    cards = query.paginate(page=page, per_page=per_page, error_out=False)
     paginated_cards = query.paginate(page=page, per_page=per_page, error_out=False)
-    unique_set_names = {card.set_name for card in query}
-    return paginated_cards, sorted(unique_set_names), stats_dict
+    cards_data = [
+        {
+            "id": card.id,
+            "name": card.name,
+            "price": card.price,
+            "set_name": card.set_name,
+            "uploader": card.uploader.username if card.uploader else "Unknown",
+        }
+        for card in paginated_cards.items
+    ]
+    stats_dict = {
+        "total_cards": stats.total_cards,
+        "total_sets": stats.total_sets,
+        "total_graded": stats.total_graded,
+    }
+    unique_set_names = sorted({card.set_name for card in paginated_cards.items})
 
-
-@user_bp.route("/templates/css/styles.css.jinja")
-def styles():
-    """
-    Serve the CSS styles.
-
-    Returns:
-        Rendered template for the CSS styles.
-    """
-    return render_template("css/styles.css.jinja")
+    return cards_data, unique_set_names, stats_dict
