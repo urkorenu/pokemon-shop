@@ -36,17 +36,29 @@ def manage_users():
             user.location = request.form.get(f"location_{user_id}")
             user.contact_preference = request.form.get(f"contact_preference_{user_id}")
             user.contact_details = request.form.get(f"contact_details_{user_id}")
-            user.rating = request.form.get(f"rating_{user_id}")
-            user.feedback_count = request.form.get(f"feedback_count_{user_id}")
-            user.request_status = request.form.get(f"request_status_{user_id}")
             new_role = request.form.get(f"role_{user_id}")
             ban_reason = request.form.get(f"ban_reason_{user_id}")
+
+            try:
+                rating = request.form.get(f"rating_{user_id}")
+                user.rating = float(rating) if rating else None
+
+                feedback_count = request.form.get(f"feedback_count_{user_id}")
+                user.feedback_count = int(feedback_count) if feedback_count else 0
+
+                request_status = request.form.get(f"request_status_{user_id}")
+                user.request_status = request_status.strip() if request_status else None
+            except ValueError as e:
+                flash(f"Invalid input: {e}", "danger")
+                return redirect(url_for("admin.manage_users"))
 
             if new_role and new_role in ["normal", "uploader", "banned", "admin"]:
                 old_role = user.role
                 user.role = new_role
                 if old_role != new_role:
                     if new_role == "uploader":
+                        user.request_status = "None"
+                        db.session.commit()
                         send_email(user.email, "Uploader Role Granted", f"Congratulations {user.username}, you have been granted the uploader role!")
                     elif new_role == "banned":
                         Card.query.filter_by(uploader_id=user.id).delete()

@@ -6,6 +6,7 @@ from flask_caching import Cache
 from flask_babel import Babel
 from flask_session import Session
 from redis import Redis
+from sqlalchemy import cast, String
 import os
 
 # Initialize extensions
@@ -104,7 +105,7 @@ def create_app():
             if users_want_uploader_role is None and current_user.role == "admin":
                 # Make the query more robust to match '0' or "pending"
                 users_want_uploader_role = User.query.filter(
-                    (User.request_status == "Pending") | (User.request_status == 0)
+                    (User.request_status == "Pending") | (cast(User.request_status, String) == "0")
                 ).count()
                 cache.set("users_want_uploader_role", users_want_uploader_role, timeout=60)
 
