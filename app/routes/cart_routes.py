@@ -6,6 +6,7 @@ from ..mail_service import send_email
 # Create a Blueprint for the cart routes
 cart_bp = Blueprint("cart", __name__)
 
+
 @cart_bp.route("/view")
 @login_required
 def view_cart():
@@ -23,7 +24,10 @@ def view_cart():
     for item in cart_items:
         grouped_cart.setdefault(item.card.uploader_id, []).append(item)
     total_price = sum(item.card.price * item.quantity for item in cart_items)
-    return render_template("cart.html", grouped_cart=grouped_cart, total_price=total_price)
+    return render_template(
+        "cart.html", grouped_cart=grouped_cart, total_price=total_price
+    )
+
 
 @cart_bp.route("/remove/<int:cart_id>", methods=["POST"])
 @login_required
@@ -45,6 +49,7 @@ def remove_from_cart(cart_id):
     db.session.commit()
     flash("Item removed from cart.", "success")
     return redirect(url_for("cart.view_cart"))
+
 
 @cart_bp.route("/checkout", methods=["POST"])
 @login_required
@@ -74,8 +79,14 @@ def checkout():
 
         for item in items:
             db.session.execute(
-                db.text("INSERT INTO order_cards (order_id, card_id, quantity) VALUES (:order_id, :card_id, :quantity)"),
-                {"order_id": order.id, "card_id": item.card_id, "quantity": item.quantity}
+                db.text(
+                    "INSERT INTO order_cards (order_id, card_id, quantity) VALUES (:order_id, :card_id, :quantity)"
+                ),
+                {
+                    "order_id": order.id,
+                    "card_id": item.card_id,
+                    "quantity": item.quantity,
+                },
             )
 
             seller = User.query.get(seller_id)
@@ -83,10 +94,10 @@ def checkout():
                 recipient=seller.email,
                 subject="New Order Received",
                 body=f"You have received a new order containing the following cards:\n"
-                     + "\n".join(f"- {item.card.name} (x{item.quantity})" for item in items)
-                     + f"\n\nBuyer Details:\nName: {current_user.username}\n"
-                       f"Contact: {current_user.contact_details} ({current_user.contact_preference})\n"
-                       f"Please confirm the order in your dashboard."
+                + "\n".join(f"- {item.card.name} (x{item.quantity})" for item in items)
+                + f"\n\nBuyer Details:\nName: {current_user.username}\n"
+                f"Contact: {current_user.contact_details} ({current_user.contact_preference})\n"
+                f"Please confirm the order in your dashboard.",
             )
 
     Cart.query.filter_by(user_id=current_user.id).delete()

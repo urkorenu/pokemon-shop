@@ -7,6 +7,7 @@ from PIL import Image, ImageOps
 from io import BytesIO
 from config import Config
 
+
 def create_s3_client():
     """
     Create an S3 client using the AWS region specified in the configuration.
@@ -15,6 +16,7 @@ def create_s3_client():
         boto3.client: The S3 client.
     """
     return boto3.client("s3", region_name=Config.AWS_REGION)
+
 
 def generate_unique_filename(original_filename):
     """
@@ -31,6 +33,7 @@ def generate_unique_filename(original_filename):
     timestamp = int(time.time())
     file_hash = hashlib.sha256(original_filename.encode()).hexdigest()[:10]
     return f"{unique_id}_{timestamp}_{file_hash}{file_extension}"
+
 
 def optimize_image(file, max_width=1200, quality=85):
     """
@@ -51,7 +54,9 @@ def optimize_image(file, max_width=1200, quality=85):
             img = img.convert("RGB")
         if img.width > max_width:
             aspect_ratio = img.height / img.width
-            img = img.resize((max_width, int(max_width * aspect_ratio)), Image.Resampling.LANCZOS)
+            img = img.resize(
+                (max_width, int(max_width * aspect_ratio)), Image.Resampling.LANCZOS
+            )
         optimized_image = BytesIO()
         img.save(optimized_image, format="JPEG", optimize=True, quality=quality)
         optimized_image.seek(0)
@@ -59,6 +64,7 @@ def optimize_image(file, max_width=1200, quality=85):
     except Exception as e:
         print(f"Error optimizing image: {e}", flush=True)
         return None
+
 
 def upload_to_s3(file, bucket_name):
     """

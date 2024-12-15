@@ -13,6 +13,7 @@ seller_bp = Blueprint("seller", __name__)
 API_KEY = Config.API_KEY
 BASE_URL = "https://api.pokemontcg.io/v2"
 
+
 @seller_bp.route("/upload", methods=["GET", "POST"])
 @roles_required("admin", "uploader")
 def upload_card():
@@ -25,6 +26,7 @@ def upload_card():
     Returns:
         Rendered template for the upload card page with a flash message indicating success or failure.
     """
+
     @cache.cached(timeout=86400, key_prefix="pokemon_sets")
     def get_pokemon_sets():
         """
@@ -34,9 +36,15 @@ def upload_card():
             list: A list of dictionaries containing set names and max card numbers.
         """
         try:
-            response = requests.get(f"{BASE_URL}/sets", headers={"X-Api-Key": API_KEY}, timeout=10)
+            response = requests.get(
+                f"{BASE_URL}/sets", headers={"X-Api-Key": API_KEY}, timeout=10
+            )
             response.raise_for_status()
-            return [{"name": s["name"], "max_card_number": s.get("printedTotal", 0)} for s in response.json().get("data", []) if s.get("printedTotal")]
+            return [
+                {"name": s["name"], "max_card_number": s.get("printedTotal", 0)}
+                for s in response.json().get("data", [])
+                if s.get("printedTotal")
+            ]
         except requests.RequestException as e:
             print(f"Error fetching sets: {e}", flush=True)
             return []
@@ -57,12 +65,17 @@ def upload_card():
 
         try:
             query = f'set.name:"{set_name}" number:"{number}"'
-            response = requests.get(f"{BASE_URL}/cards", params={"q": query}, headers={"X-Api-Key": API_KEY})
+            response = requests.get(
+                f"{BASE_URL}/cards", params={"q": query}, headers={"X-Api-Key": API_KEY}
+            )
             response.raise_for_status()
             card_data = response.json().get("data", [])
 
             if not card_data:
-                flash("No card found. Please verify the set name and card number.", "danger")
+                flash(
+                    "No card found. Please verify the set name and card number.",
+                    "danger",
+                )
                 return render_template("upload.html", sets=sets)
 
             card_details = card_data[0]
@@ -87,10 +100,20 @@ def upload_card():
         image_url = upload_to_s3(file, bucket_name=Config.S3_BUCKET) if file else None
 
         card = Card(
-            name=name, price=price, follow_tcg=follow_tcg, tcg_price=selected_price,
-            condition=condition, amount=1, set_name=set_name, number=number,
-            image_url=image_url, is_graded=is_graded, grade=grade,
-            grading_company=grading_company, card_type=card_type, uploader_id=current_user.id
+            name=name,
+            price=price,
+            follow_tcg=follow_tcg,
+            tcg_price=selected_price,
+            condition=condition,
+            amount=1,
+            set_name=set_name,
+            number=number,
+            image_url=image_url,
+            is_graded=is_graded,
+            grade=grade,
+            grading_company=grading_company,
+            card_type=card_type,
+            uploader_id=current_user.id,
         )
         db.session.add(card)
         db.session.commit()
@@ -98,6 +121,7 @@ def upload_card():
         return redirect(url_for("seller.upload_card"))
 
     return render_template("upload.html", sets=sets)
+
 
 @seller_bp.route("/card-details", methods=["GET"])
 @roles_required("admin", "uploader")
@@ -121,7 +145,9 @@ def get_card_details():
 
     try:
         query = f'set.name:"{set_name}" number:"{number}"'
-        response = requests.get(f"{BASE_URL}/cards", params={"q": query}, headers={"X-Api-Key": API_KEY})
+        response = requests.get(
+            f"{BASE_URL}/cards", params={"q": query}, headers={"X-Api-Key": API_KEY}
+        )
         response.raise_for_status()
         card_data = response.json().get("data", [])
 
@@ -132,7 +158,13 @@ def get_card_details():
         card_name = card["name"]
         card_types = list(card.get("tcgplayer", {}).get("prices", {}).keys())
 
-        return jsonify({"name": card_name, "types": card_types, "prices": card.get("tcgplayer", {}).get("prices", {})})
+        return jsonify(
+            {
+                "name": card_name,
+                "types": card_types,
+                "prices": card.get("tcgplayer", {}).get("prices", {}),
+            }
+        )
 
     except requests.RequestException as e:
         print(f"Error fetching card details: {e}", flush=True)

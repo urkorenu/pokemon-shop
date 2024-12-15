@@ -9,6 +9,7 @@ from config import Config
 # Create a Blueprint for authentication routes
 auth_bp = Blueprint("auth", __name__)
 
+
 @auth_bp.route("/sign-in", methods=["GET", "POST"])
 def auth():
     """
@@ -81,10 +82,13 @@ def auth():
                 return redirect(url_for("auth.auth"))
             except Exception as e:
                 db.session.rollback()
-                flash("An error occurred during registration. Please try again.", "error")
+                flash(
+                    "An error occurred during registration. Please try again.", "error"
+                )
                 print(f"Error during registration: {e}")
 
     return render_template("auth.html", cities=CITIES_IN_ISRAEL)
+
 
 @auth_bp.route("/logout")
 @login_required
@@ -98,6 +102,7 @@ def logout():
     logout_user()
     flash("You have been logged out.", "success")
     return redirect(url_for("auth.auth"))
+
 
 @auth_bp.route("/account", methods=["GET", "POST"])
 @login_required
@@ -158,6 +163,7 @@ def account():
     orders = Order.query.filter_by(buyer_id=current_user.id).all()
     return render_template("account.html", orders=orders, cities=CITIES_IN_ISRAEL)
 
+
 @auth_bp.route("/request_uploader", methods=["POST"])
 @login_required
 def request_uploader():
@@ -181,8 +187,13 @@ def request_uploader():
         flash("You must accept the rules before submitting your request.", "danger")
         return redirect(url_for("auth.account"))
 
-    if not all([current_user.email, current_user.location, current_user.contact_details]):
-        flash("Please ensure your profile details (email, location, and contact details) are updated.", "danger")
+    if not all(
+        [current_user.email, current_user.location, current_user.contact_details]
+    ):
+        flash(
+            "Please ensure your profile details (email, location, and contact details) are updated.",
+            "danger",
+        )
         return redirect(url_for("auth.account"))
 
     message_body = f"""
@@ -204,12 +215,16 @@ def request_uploader():
         )
         current_user.request_status = "Pending"
         db.session.commit()
-        flash("Your request to become an uploader has been submitted successfully!", "success")
+        flash(
+            "Your request to become an uploader has been submitted successfully!",
+            "success",
+        )
     except Exception as e:
         flash("Failed to send the request. Please try again later.", "danger")
         print(str(e))
 
     return redirect(url_for("auth.account"))
+
 
 @auth_bp.route("/change_password", methods=["POST"])
 @login_required
@@ -233,6 +248,7 @@ def change_password():
     db.session.commit()
     flash("Password updated successfully!", "success")
     return redirect(url_for("auth.account"))
+
 
 @auth_bp.route("/auth/delete_account", methods=["POST"])
 @login_required

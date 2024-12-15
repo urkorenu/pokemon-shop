@@ -2,6 +2,7 @@ from flask_login import UserMixin
 from datetime import datetime
 from app import db
 
+
 class User(db.Model, UserMixin):
     """
     Represents a user in the application.
@@ -57,6 +58,7 @@ class User(db.Model, UserMixin):
 
         return check_password_hash(self.password_hash, password)
 
+
 class Card(db.Model):
     """
     Represents a card in the application.
@@ -99,6 +101,7 @@ class Card(db.Model):
     uploader = db.relationship("User", backref="uploaded_cards")
     follow_tcg = db.Column(db.Boolean, default=False)
 
+
 # Define the association table for orders and cards
 order_cards = db.Table(
     "order_cards",
@@ -106,6 +109,7 @@ order_cards = db.Table(
     db.Column("card_id", db.Integer, db.ForeignKey("card.id"), primary_key=True),
     db.Column("quantity", db.Integer, nullable=False, default=1),
 )
+
 
 class Order(db.Model):
     """
@@ -135,6 +139,7 @@ class Order(db.Model):
     buyer = db.relationship("User", foreign_keys=[buyer_id], backref="orders")
     seller = db.relationship("User", foreign_keys=[seller_id], backref="sales")
     cards = db.relationship("Card", secondary=order_cards, backref="orders")
+
 
 class Cart(db.Model):
     """

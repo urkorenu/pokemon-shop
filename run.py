@@ -3,6 +3,7 @@ from app import create_app
 # Create the Flask application instance
 app = create_app()
 
+
 @app.template_filter("dict_without")
 def dict_without(d, key):
     """
@@ -16,6 +17,7 @@ def dict_without(d, key):
         dict: A new dictionary without the specified key.
     """
     return {k: v for k, v in d.items() if k != key}
+
 
 if __name__ == "__main__":
     # Run the Flask application

@@ -7,6 +7,7 @@ from ..mail_service import send_email
 # Create a Blueprint for admin routes
 admin_bp = Blueprint("admin", __name__)
 
+
 @admin_bp.route("/users", methods=["GET", "POST"])
 @roles_required("admin")
 def manage_users():
@@ -31,7 +32,11 @@ def manage_users():
         ban_reason = request.form.get(f"ban_reason_{user_id}")
 
         # Validate the form data
-        if not user_id or not new_role or new_role not in ["normal", "uploader", "banned", "admin"]:
+        if (
+            not user_id
+            or not new_role
+            or new_role not in ["normal", "uploader", "banned", "admin"]
+        ):
             flash("Invalid user or role data.", "error")
             return redirect(url_for("admin.manage_users"))
 
@@ -48,15 +53,27 @@ def manage_users():
         # Handle role changes and send appropriate emails
         if old_role != new_role:
             if new_role == "uploader":
-                send_email(user.email, "Uploader Role Granted", f"Congratulations {user.username}, you have been granted the uploader role!")
+                send_email(
+                    user.email,
+                    "Uploader Role Granted",
+                    f"Congratulations {user.username}, you have been granted the uploader role!",
+                )
             elif new_role == "banned":
                 # Delete all cards uploaded by the user and commit the changes
                 Card.query.filter_by(uploader_id=user.id).delete()
                 db.session.commit()
-                send_email(user.email, "Account Banned", f"Dear {user.username}, your account has been banned.\nReason: {ban_reason}")
+                send_email(
+                    user.email,
+                    "Account Banned",
+                    f"Dear {user.username}, your account has been banned.\nReason: {ban_reason}",
+                )
                 flash(f"User {user.username} has been banned.", "warning")
             elif old_role == "banned":
-                send_email(user.email, "Account Unbanned", f"Dear {user.username}, your account has been unbanned. You can access your account now.")
+                send_email(
+                    user.email,
+                    "Account Unbanned",
+                    f"Dear {user.username}, your account has been unbanned. You can access your account now.",
+                )
 
         # Commit the changes to the database
         db.session.commit()

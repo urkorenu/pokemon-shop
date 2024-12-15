@@ -1,5 +1,6 @@
 import os
 
+
 class Config:
     """
     Configuration class for setting environment variables and application settings.

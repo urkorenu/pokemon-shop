@@ -14,6 +14,7 @@ migrate = Migrate()
 login_manager = LoginManager()
 cache = Cache()
 
+
 def create_app():
     """
     Create and configure the Flask application.
@@ -25,27 +26,34 @@ def create_app():
     app.config.from_object("config.Config")
     app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
     app.config["LANGUAGES"] = ["en", "he"]
-    app.config['SESSION_TYPE'] = 'redis'
-    app.config['SESSION_PERMANENT'] = True
-    app.config['SESSION_USE_SIGNER'] = True
-    app.config['SESSION_KEY_PREFIX'] = 'pokemon-shop:'
-    app.config['SESSION_COOKIE_SECURE'] = os.getenv('FLASK_ENV') == 'production'
-    app.config['SESSION_REDIS'] = Redis(host='redis', port=6379)
+    app.config["SESSION_TYPE"] = "redis"
+    app.config["SESSION_PERMANENT"] = True
+    app.config["SESSION_USE_SIGNER"] = True
+    app.config["SESSION_KEY_PREFIX"] = "pokemon-shop:"
+    app.config["SESSION_COOKIE_SECURE"] = os.getenv("FLASK_ENV") == "production"
+    app.config["SESSION_REDIS"] = Redis(host="redis", port=6379)
     Session(app)
 
     # Initialize Babel for internationalization
     babel = Babel(app)
-    babel.init_app(app, locale_selector=lambda: session.get("lang") or request.accept_languages.best_match(app.config["LANGUAGES"]))
+    babel.init_app(
+        app,
+        locale_selector=lambda: session.get("lang")
+        or request.accept_languages.best_match(app.config["LANGUAGES"]),
+    )
 
     # Initialize extensions with the app
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
-    cache.init_app(app, config={
-        "CACHE_TYPE": "RedisCache",
-        "CACHE_REDIS_URL": "redis://redis:6379/0",
-        "CACHE_DEFAULT_TIMEOUT": 300
-    })
+    cache.init_app(
+        app,
+        config={
+            "CACHE_TYPE": "RedisCache",
+            "CACHE_REDIS_URL": "redis://redis:6379/0",
+            "CACHE_DEFAULT_TIMEOUT": 300,
+        },
+    )
 
     from app.models import Cart, Order, User
 
@@ -75,12 +83,27 @@ def create_app():
         """
         if current_user.is_authenticated:
             user_id = current_user.id
-            cart_items_count = cache.get(f"cart_count_{user_id}") or Cart.query.filter_by(user_id=user_id).count()
-            pending_orders = cache.get(f"pending_orders_{user_id}") or Order.query.filter_by(seller_id=user_id, status="Pending").count()
-            orders_without_feedback = cache.get(f"orders_without_feedback_{user_id}") or Order.query.filter_by(buyer_id=user_id, status="Confirmed", feedback=None).count()
+            cart_items_count = (
+                cache.get(f"cart_count_{user_id}")
+                or Cart.query.filter_by(user_id=user_id).count()
+            )
+            pending_orders = (
+                cache.get(f"pending_orders_{user_id}")
+                or Order.query.filter_by(seller_id=user_id, status="Pending").count()
+            )
+            orders_without_feedback = (
+                cache.get(f"orders_without_feedback_{user_id}")
+                or Order.query.filter_by(
+                    buyer_id=user_id, status="Confirmed", feedback=None
+                ).count()
+            )
             cache.set(f"cart_count_{user_id}", cart_items_count, timeout=60)
             cache.set(f"pending_orders_{user_id}", pending_orders, timeout=60)
-            cache.set(f"orders_without_feedback_{user_id}", orders_without_feedback, timeout=60)
+            cache.set(
+                f"orders_without_feedback_{user_id}",
+                orders_without_feedback,
+                timeout=60,
+            )
         else:
             cart_items_count = pending_orders = orders_without_feedback = 0
 
@@ -104,6 +127,7 @@ def create_app():
             dict: A new dictionary without the specified key.
         """
         return {k: v for k, v in d.items() if k != key}
+
     # Register blueprints for different routes
     from app.routes.user_routes import user_bp
     from app.routes.admin_routes import admin_bp
@@ -117,6 +141,6 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(cart_bp, url_prefix="/cart")
     app.register_blueprint(order_bp, url_prefix="/order")
-    app.register_blueprint(seller_bp, url_prefix='/seller')
+    app.register_blueprint(seller_bp, url_prefix="/seller")
 
     return app

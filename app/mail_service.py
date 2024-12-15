@@ -1,6 +1,7 @@
 import boto3
 from botocore.exceptions import ClientError
 
+
 def send_email(subject, body, recipient, sender="orders@pika-card.store"):
     """
     Send an email using AWS SES.
@@ -21,7 +22,9 @@ def send_email(subject, body, recipient, sender="orders@pika-card.store"):
             Destination={"ToAddresses": [recipient]},
             Message={
                 "Subject": {"Data": subject},
-                "Body": {"Text": {"Data": f"{body}\nBest regards,\nThe Pika-Card Team"}},
+                "Body": {
+                    "Text": {"Data": f"{body}\nBest regards,\nThe Pika-Card Team"}
+                },
             },
         )
         print("Email sent! Message ID:", response["MessageId"])
