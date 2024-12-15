@@ -1,20 +1,25 @@
+# Define an S3 bucket to store Terraform state files
 resource "aws_s3_bucket" "tf_state" {
   bucket = "pokemon-${local.env}-tf-state"
 
+  # Enable versioning for the S3 bucket
   versioning {
-    enabled = true
+    enabled = false
   }
 
+  # Prevent the S3 bucket from being destroyed
   lifecycle {
     prevent_destroy = true
   }
 
+  # Add tags to the S3 bucket
   tags = {
-    Name = "${local.env}-tf-state"
+    Name        = "${local.env}-tf-state"
     Environment = local.env
   }
 }
 
+# Set the ACL (Access Control List) for the S3 bucket to private
 resource "aws_s3_bucket_acl" "tf_state_acl" {
   bucket = aws_s3_bucket.tf_state.id
   acl    = "private"

@@ -41,13 +41,7 @@
                         <td>{{ card.name }}</td>
                         <td>{{ card.set_name }}</td>
                         <td>{{ card.number }}</td>
-                        <td>
-                            {% if card.is_graded %}
-                                {{ card.grade }}
-                            {% else %}
-                                {{ _('N/A') }}
-                            {% endif %}
-                        </td>
+                        <td>{{ card.is_graded and card.grade or _('N/A') }}</td>
                         <td>{{ card.price }} {{ _('ILS') }}</td>
                         <td>
                             <button
@@ -93,4 +87,3 @@
     {% endif %}
 </div>
 {% endblock %}
-

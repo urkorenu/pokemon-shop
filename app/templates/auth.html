@@ -4,14 +4,12 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <!-- Card Component -->
             <div class="card shadow">
                 <div class="card-header text-center">
-                    <h3 id="form-title">{{ _("Login") }}</h3>
+                    <h3 id="form-title" data-login-text="{{ _('Login') }}" data-register-text="{{ _('Register') }}">{{ _("Login") }}</h3>
                 </div>
                 <div class="card-body">
-
-                    <form id="login-form" action="{{ url_for('auth.auth') }}" method="POST" style="display: block;">
+                    <form id="login-form" action="{{ url_for('auth.auth') }}" method="POST" style="display: block;" data-no-account-text="{{ _("Don't have an account? ") }}" data-register-here-text="{{ _("Register here") }}">
                         <input type="hidden" name="form_type" value="login">
                         <div class="mb-3">
                             <label for="email-login" class="form-label">{{ _("Email") }}</label>
@@ -24,7 +22,7 @@
                         <button type="submit" class="btn btn-primary w-100">{{ _("Login") }}</button>
                     </form>
 
-                    <form id="register-form" action="{{ url_for('auth.auth') }}" method="POST" style="display: none;">
+                    <form id="register-form" action="{{ url_for('auth.auth') }}" method="POST" style="display: none;" data-have-account-text="{{ _('Already have an account? ') }}" data-login-here-text="{{ _('Login here') }}">
                         <input type="hidden" name="form_type" value="register">
                         <div class="mb-3">
                             <label for="username" class="form-label">{{ _("Username") }}</label>
@@ -60,7 +58,6 @@
                         </div>
                         <button type="submit" class="btn btn-success w-100">{{ _("Register") }}</button>
                     </form>
-
                 </div>
                 <div class="card-footer text-center">
                     <small>
@@ -72,33 +69,4 @@
         </div>
     </div>
 </div>
-
-<!-- JavaScript for Form Toggle -->
-<script>
-    const loginForm = document.getElementById('login-form');
-    const registerForm = document.getElementById('register-form');
-    const formTitle = document.getElementById('form-title');
-    const toggleLink = document.getElementById('toggle-link');
-    const toggleText = document.getElementById('toggle-text');
-
-    toggleLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        if (loginForm.style.display === 'none') {
-            // Switch to Login
-            loginForm.style.display = 'block';
-            registerForm.style.display = 'none';
-            formTitle.textContent = "{{ _('Login') }}";
-            toggleText.textContent = "{{ _("Don't have an account? ") }}";
-            toggleLink.textContent = "{{ _('Register here') }}";
-        } else {
-            // Switch to Register
-            loginForm.style.display = 'none';
-            registerForm.style.display = 'block';
-            formTitle.textContent = "{{ _('Register') }}";
-            toggleText.textContent = "{{ _('Already have an account? ') }}";
-            toggleLink.textContent = "{{ _('Login here') }}";
-        }
-    });
-</script>
 {% endblock %}
-

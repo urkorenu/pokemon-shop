@@ -7,10 +7,9 @@
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.9.1/font/bootstrap-icons.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/styles.css.jinja') }}" rel="stylesheet">
     <style>
         html, body {
             height: 100vh;
@@ -37,24 +36,14 @@
 	    {% endif %}
         }
 
-        .navbar-brand img {
-            width: 50px;
-            height: auto;
+        .navbar-nav .nav-link, .dropdown-menu .dropdown-item {
+        {% if session.get('lang', 'he') == 'he' %}
+            text-align: right;
+            margin-right: 10px; /* Adjust spacing */
+        {% endif %}
         }
 
-	.navbar-nav .nav-link, .dropdown-menu .dropdown-item {
-	    {% if session.get('lang', 'he') == 'he' %}
-	    text-align: right;
-	    margin-right: 10px; /* Adjust spacing */
-	    {% endif %}
-	}
-
-	/* Fix alignment for badges and icons */
-	.badge {
-	    vertical-align: middle;
-	}
-
-	.nav-link i {
+        .nav-link i {
 	    {% if session.get('lang', 'he') == 'he' %}
 	    margin-left: 5px; /* Fix icon spacing */
 	    margin-right: 0;
@@ -62,254 +51,108 @@
 	    margin-right: 5px;
 	    margin-left: 0;
 	    {% endif %}
-	}
-
-        .container {
-            flex: 1;
-            padding-top: 20px;
-        }
-
-        .footer {
-            background-color: #343a40;
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-            margin-top: auto;
-        }
-
-        .footer a {
-            color: #f8f9fa; /* Link color */
-            transition: color 0.3s ease-in-out;
-        }
-
-        .footer a:hover {
-            color: #ffc107; /* Hover effect with yellow color */
-        }
-
-        .alert {
-            border-radius: 0.5rem;
-        }
-
-        /* Dark Mode Styles */
-        body.bg-dark {
-            background-color: #121212 !important;
-            color: #e0e0e0 !important;
-        }
-
-        body.bg-dark .navbar {
-            background-color: #212529 !important;
-        }
-
-        body.bg-dark .modal-content {
-            background-color: #2b2b2b;
-            color: #f8f9fa;
-        }
-
-        body.bg-dark .modal-header {
-            border-bottom: 1px solid #444444;
-        }
-
-        body.bg-dark .btn-close {
-            filter: invert(1);
-        }
-
-        /* Flash Messages Dark Mode */
-        body.bg-dark .alert {
-            background-color: #333333 !important;
-            color: #f8f9fa !important;
-            border-color: #555555 !important;
-        }
-
-        body.bg-dark .alert-success {
-            background-color: #285e27 !important;
-            color: #d4edda !important;
-            border-color: #3b7135 !important;
-        }
-
-        body.bg-dark .alert-danger {
-            background-color: #7a1b1b !important;
-            color: #f8d7da !important;
-            border-color: #8b2a2a !important;
-        }
-
-        body.bg-dark .alert-warning {
-            background-color: #846404 !important;
-            color: #ffeeba !important;
-            border-color: #977a05 !important;
-        }
-
-        body.bg-dark .alert-info {
-            background-color: #0c5460 !important;
-            color: #d1ecf1 !important;
-            border-color: #117a8b !important;
-        }
-
-        /* Button Styling */
-        body.bg-dark .btn {
-            border: none;
-        }
-
-        body.bg-dark .btn-warning {
-            background-color: #f0ad4e;
-            color: #212529;
-        }
-
-        body.bg-dark .btn-primary {
-            background-color: #007bff;
-            color: #f8f9fa;
-        }
-
-        body.bg-dark .card {
-            background-color: #1e1e1e;
-            color: #f8f9fa;
-        }
-
-        /* Responsive Fixes for Flash Messages */
-        .alert-container {
-            margin-top: 15px;
-            padding: 0 15px;
-        }
-
-        @media (max-width: 768px) {
-            .navbar-nav .nav-link {
-                text-align: center;
-            }
-            .alert-container {
-                font-size: 0.9rem;
-            }
         }
 
         .dropdown-menu {
-            {% if session.get('lang', 'en') == 'he' %}
-            text-align: right;
-            {% endif %}
-        }
-
-        .flash-container {
-            z-index: 1050;
-        }
-
-        .flash-container .alert {
-            animation: fadeInOut 5s ease-in-out forwards;
-        }
-
-        /* Smooth fade-in-out animation */
-        @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateY(-20px); }
-            10% { opacity: 1; transform: translateY(0); }
-            90% { opacity: 1; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-20px); }
+        {% if session.get('lang', 'en') == 'he' %}
+        text-align: right;
+        {% endif %}
         }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-	<div class="container-fluid">
-	    <!-- Brand -->
-	    <a class="navbar-brand" href="{{ url_for('user.view_cards') }}">
-		<img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="width: 40px;">
-		Pika-Card
-	    </a>
-
-	    <!-- Toggler Button for Mobile -->
-	    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-		<span class="navbar-toggler-icon"></span>
-	    </button>
-
-	    <!-- Navbar Content -->
-	    <div class="collapse navbar-collapse" id="navbarNav">
-		<!-- Left-Aligned Links -->
-		<ul class="navbar-nav me-auto">
-		    <li class="nav-item">
-			<a class="nav-link" href="/">{{ _('Home') }}</a>
-		    </li>
-		    {% if current_user.is_authenticated %}
-		    <li class="nav-item dropdown">
-			<a class="nav-link dropdown-toggle" href="#" id="navbarUserMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-			    {{ _('Dashboard') }}
-			</a>
-			<ul class="dropdown-menu" aria-labelledby="navbarUserMenu">
-			    <li>
-				<a class="dropdown-item" href="{{ url_for('user.profile', user_id=current_user.id) }}">
-				    {{ _('My Profile') }}
-				</a>
-			    </li>
-			    <li>
-				<a class="dropdown-item" href="{{ url_for('auth.account') }}">
-				    {{ _('My Account') }}
-				</a>
-			    </li>
-			    <li>
-			    <li>
-				<a class="dropdown-item" href="{{ url_for('order.my_orders') }}">
-				    {{ _('My Orders') }}
-				    <span class="badge bg-warning text-dark rounded-pill">{{ orders_without_feedback }}</span>
-				</a>
-			    </li>
-			    {% if current_user.role in ["uploader", "admin"] %}
-			    <li>
-				<a class="dropdown-item" href="{{ url_for('order.pending_orders') }}">
-				    {{ _('Pending Orders') }}
-				    <span class="badge bg-danger rounded-pill">{{ pending_orders }}</span>
-				</a>
-			    </li>
-			    <li>
-				<a class="dropdown-item" href="{{ url_for('user.my_cards') }}">{{ _('My Cards') }}</a>
-			    </li>
-			    <li>
-				<a class="dropdown-item" href="/admin/upload">{{ _('Upload') }}</a>
-			    </li>
-			    {% endif %}
-			</ul>
-		    </li>
-		    {% endif %}
-		    {% if current_user.role in ["admin"] %}
-		    <li class="nav-item">
-			<a class="nav-link" href="{{ url_for('admin.manage_users') }}">{{ _('Manage Users') }}</a>
-		    </li>
-		    {% endif %}
-		</ul>
-
-		<!-- Right-Aligned Links -->
-		<ul class="navbar-nav ms-auto">
-		    {% if current_user.is_authenticated %}
-		    <li class="nav-item">
-			<a class="nav-link" href="/cart">
-			    <i class="bi bi-cart-fill"></i> {{ _('Cart') }}
-			    <span class="badge bg-success rounded-pill">{{ cart_items_count }}</span>
-			</a>
-		    </li>
-		    <li class="nav-item">
-			<span class="nav-link disabled">{{ _('Welcome,') }} {{ current_user.username }}!</span>
-		    </li>
-		    <li class="nav-item">
-			<a class="nav-link" href="/auth/logout">{{ _('Logout') }}</a>
-		    </li>
-		    {% else %}
-		    <li class="nav-item">
-			<a class="nav-link" href="/auth/sign-in">{{ _('Sign in') }}</a>
-		    </li>
-		    {% endif %}
-		</ul>
-
-		<!-- Dark Mode Toggle -->
-		<button id="darkModeSwitch" class="btn btn-outline-primary ms-3">
-		    <i class="bi bi-moon"></i>
-		</button>
-
-        <!-- Language Switch Modal Trigger -->
-        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#languageModal">
-            {% if session.get('lang', 'en') == 'he' %}
-                🇮🇱 עברית
-            {% else %}
-                🇺🇸 English
-            {% endif %}
-        </button>
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('user.view_cards') }}">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="width: 40px;">
+                Pika-Card
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">{{ _('Home') }}</a>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarUserMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {{ _('Dashboard') }}
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarUserMenu">
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('user.profile', user_id=current_user.id) }}">
+                                    {{ _('My Profile') }}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('auth.account') }}">
+                                    {{ _('My Account') }}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('order.my_orders') }}">
+                                    {{ _('My Orders') }}
+                                    <span class="badge bg-warning text-dark rounded-pill">{{ orders_without_feedback }}</span>
+                                </a>
+                            </li>
+                            {% if current_user.role in ["uploader", "admin"] %}
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('order.pending_orders') }}">
+                                    {{ _('Pending Orders') }}
+                                    <span class="badge bg-danger rounded-pill">{{ pending_orders }}</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('user.my_cards') }}">{{ _('My Cards') }}</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{{ url_for('seller.upload_card') }}">{{ _('Upload') }}</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    {% endif %}
+                    {% if current_user.role in ["admin"] %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin.manage_users') }}">{{ _('Manage Users') }}</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/cart">
+                            <i class="bi bi-cart-fill"></i> {{ _('Cart') }}
+                            <span class="badge bg-success rounded-pill">{{ cart_items_count }}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link disabled">{{ _('Welcome,') }} {{ current_user.username }}!</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/auth/logout">{{ _('Logout') }}</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/auth/sign-in">{{ _('Sign in') }}</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <button id="darkModeSwitch" class="btn btn-outline-primary ms-3">
+                    <i class="bi bi-moon"></i>
+                </button>
+                <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#languageModal">
+                    {% if session.get('lang', 'en') == 'he' %}
+                        🇮🇱 עברית
+                    {% else %}
+                    {% endif %}
+                        🇺🇸 English
+                </button>
+            </div>
         </div>
-	</div>
     </nav>
-
-        <!-- Language Switch Modal -->
     <div class="modal fade" id="languageModal" tabindex="-1" aria-labelledby="languageModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -318,65 +161,54 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-		    <form method="POST" action="{{ url_for('user.set_language') }}">
-			<!-- Include the current page as a hidden input -->
-			<input type="hidden" name="referrer" value="{{ request.path }}">
-
-			<button type="submit" name="lang" value="en" class="btn btn-outline-primary w-100 mb-2">
-			    🇺🇸 English
-			</button>
-			<button type="submit" name="lang" value="he" class="btn btn-outline-primary w-100">
-			    🇮🇱 עברית
-			</button>
-		    </form>
+                    <form method="POST" action="{{ url_for('user.set_language') }}">
+                        <input type="hidden" name="referrer" value="{{ request.path }}">
+                        <button type="submit" name="lang" value="en" class="btn btn-outline-primary w-100 mb-2">
+                            🇺🇸 English
+                        </button>
+                        <button type="submit" name="lang" value="he" class="btn btn-outline-primary w-100">
+                            🇮🇱 עברית
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Card View Modal -->
     <div class="modal fade" id="cardViewModal" tabindex="-1" aria-labelledby="cardViewModalLabel" aria-hidden="true">
-	<div class="modal-dialog modal-lg">
-	    <div class="modal-content">
-		<div class="modal-header">
-		    <h5 class="modal-title" id="modalCardTitle">Card</h5>
-		    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-		</div>
-		<div class="modal-body text-center">
-		    <img id="cardImage" src="" alt="Card Image" class="img-fluid">
-		</div>
-	    </div>
-	</div>
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCardTitle">Card</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="cardImage" src="" alt="Card Image" class="img-fluid">
+                </div>
+            </div>
+        </div>
     </div>
-
     <div class="container">
         {% block content %}
         {% endblock %}
     </div>
-
-    <!-- Flash Messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-	<div class="flash-container position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 1050; width: auto;">
-	    {% for category, message in messages %}
-		<div class="alert alert-{{ category }} alert-dismissible fade show shadow" role="alert" style="min-width: 300px; max-width: 500px;">
-		    {{ message }}
-		    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-		</div>
-	    {% endfor %}
-	</div>
+    <div class="flash-container position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 1050; width: auto;">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show shadow" role="alert" style="min-width: 300px; max-width: 500px;">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
     {% endif %}
     {% endwith %}
-
     <footer class="footer bg-dark text-light py-4">
         <div class="container text-center">
             <div class="row">
-                <!-- Footer Text -->
                 <div class="col-12 mb-2">
                     <p class="mb-0">&copy; 2024 Pika-Card. All rights reserved.</p>
                 </div>
-
-                <!-- Footer Links -->
                 <div class="col-12">
                     <ul class="list-inline mb-0">
                         <li class="list-inline-item">
@@ -390,36 +222,7 @@
             </div>
         </div>
     </footer>
-
-
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        const darkModeSwitch = document.getElementById('darkModeSwitch');
-
-        function applyTheme(theme) {
-            if (theme === 'dark') {
-                document.body.classList.add('bg-dark', 'text-light');
-            } else {
-                document.body.classList.remove('bg-dark', 'text-light');
-            }
-            localStorage.setItem('theme', theme);
-        }
-
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        applyTheme(savedTheme);
-
-        darkModeSwitch.addEventListener('click', () => {
-            const newTheme = document.body.classList.contains('bg-dark') ? 'light' : 'dark';
-            applyTheme(newTheme);
-        });
-	function showCardImage(imageUrl, cardName) {
-	    document.getElementById('cardImage').src = imageUrl;
-	    document.getElementById('modalCardTitle').innerText = cardName || "Card";
-	    const modal = new bootstrap.Modal(document.getElementById('cardViewModal'));
-	    modal.show();
-	}
-    </script>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 </body>
 </html>
-

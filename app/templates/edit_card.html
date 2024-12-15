@@ -2,14 +2,8 @@
 
 {% block content %}
 <style>
-    /* Style for readonly and disabled input fields */
-    input[readonly], select[readonly], select[disabled] {
-        background-color: #e9ecef; /* Light grey background */
-        cursor: not-allowed;       /* Indicate uneditable field */
-    }
-
-    input[disabled] {
-        background-color: #e9ecef; /* Same grey for disabled fields */
+    input[readonly], select[readonly], select[disabled], input[disabled] {
+        background-color: #e9ecef;
         cursor: not-allowed;
     }
 </style>
@@ -23,20 +17,16 @@
         </div>
         {% endif %}
 
-        <!-- Card Name -->
         <div class="mb-3">
             <label for="name" class="form-label">{{ _('Card Name') }}</label>
             <input type="text" class="form-control" id="name" name="name" value="{{ card.name }}" readonly>
         </div>
 
-        <!-- Price -->
         <div class="mb-3">
             <label for="price" class="form-label">{{ _('Price') }}</label>
-            <input type="number" class="form-control" id="price" name="price" value="{{ card.price }}" step="0.01"
-                   {% if card.follow_tcg %}readonly{% endif %}>
+            <input type="number" class="form-control" id="price" name="price" value="{{ card.price }}" step="0.01" {% if card.follow_tcg %}readonly{% endif %}>
         </div>
 
-        <!-- Condition -->
         <div class="mb-3">
             <label for="condition" class="form-label">{{ _('Condition') }}</label>
             <select id="condition" name="condition" class="form-select" {% if card.follow_tcg %}disabled{% endif %}>
@@ -48,25 +38,21 @@
             </select>
         </div>
 
-        <!-- Set Name -->
         <div class="mb-3">
             <label for="set_name" class="form-label">{{ _('Set Name') }}</label>
             <input type="text" class="form-control" id="set_name" name="set_name" value="{{ card.set_name }}" readonly>
         </div>
 
-        <!-- Card Number -->
         <div class="mb-3">
             <label for="number" class="form-label">{{ _('Card Number') }}</label>
             <input type="text" class="form-control" id="number" name="number" value="{{ card.number }}" readonly>
         </div>
 
-        <!-- Card Type -->
         <div class="mb-3">
             <label for="card_type" class="form-label">{{ _('Card Type') }}</label>
             <input type="text" class="form-control" id="card_type" name="card_type" value="{{ card.card_type }}" readonly>
         </div>
 
-        <!-- Graded? -->
         <div class="mb-3">
             <label for="is_graded" class="form-label">{{ _('Graded?') }}</label>
             <select id="is_graded" name="is_graded" class="form-select" readonly>
@@ -76,23 +62,19 @@
         </div>
 
         {% if card.is_graded %}
-        <!-- Grading Company -->
         <div class="mb-3">
             <label for="grading_company" class="form-label">{{ _('Grading Company') }}</label>
             <input type="text" class="form-control" id="grading_company" name="grading_company" value="{{ card.grading_company }}">
         </div>
 
-        <!-- Grade -->
         <div class="mb-3">
             <label for="grade" class="form-label">{{ _('Grade') }}</label>
             <input type="text" class="form-control" id="grade" name="grade" value="{{ card.grade }}">
         </div>
         {% endif %}
 
-        <!-- Save & Cancel Buttons -->
         <button type="submit" class="btn btn-success">{{ _('Save Changes') }}</button>
         <a href="{{ url_for('user.my_cards') }}" class="btn btn-secondary">{{ _('Cancel') }}</a>
     </form>
 </div>
 {% endblock %}
-

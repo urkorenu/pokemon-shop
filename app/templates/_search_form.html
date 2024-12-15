@@ -25,28 +25,19 @@
         </div>
     </div>
 </div>
-
 <!-- Search Form -->
 <form method="GET" action="{{ request.path }}" class="row g-3 mb-4" id="search-form">
-    <!-- Name Search -->
     <div class="col-md-3">
         <input type="text" name="name" class="form-control" placeholder="{{ _('Search by Pokémon Name') }}" value="{{ request.args.get('name', '') }}">
     </div>
-
-    <!-- Set Name with Autocomplete -->
     <div class="col-md-3">
-	<input class="form-control" list="set_names" id="set_name" name="set_name" 
-	       placeholder="{{ _('Type to search...') }}" 
-	       value="{{ request.args.get('set_name', '') }}">
-	<datalist id="set_names">
-	    {% for set_name in unique_set_names %}
-	    <option value="{{ set_name }}">{{ set_name }}</option>
-	    {% endfor %}
-	</datalist>
+        <input class="form-control" list="set_names" id="set_name" name="set_name" placeholder="{{ _('Type to search...') }}" value="{{ request.args.get('set_name', '') }}">
+        <datalist id="set_names">
+            {% for set_name in unique_set_names %}
+            <option value="{{ set_name }}">{{ set_name }}</option>
+            {% endfor %}
+        </datalist>
     </div>
-
-
-    <!-- Graded Filter -->
     <div class="col-md-2">
         <select name="is_graded" class="form-select">
             <option value="">{{ _('Graded?') }}</option>
@@ -54,8 +45,6 @@
             <option value="no" {% if request.args.get('is_graded') == 'no' %}selected{% endif %}>{{ _('No') }}</option>
         </select>
     </div>
-
-    <!-- Location Filter -->
     <div class="col-md-2">
         <select name="location" class="form-select">
             <option value="">{{ _('Filter by Location') }}</option>
@@ -64,8 +53,6 @@
             {% endfor %}
         </select>
     </div>
-
-    <!-- Sort Options -->
     <div class="col-md-2">
         <select name="sort" class="form-select">
             <option value="">{{ _('Sort By') }}</option>
@@ -74,16 +61,12 @@
             <option value="card_number" {% if request.args.get('sort') == 'card_number' %}selected{% endif %}>{{ _('Card Number') }}</option>
         </select>
     </div>
-
     {% if show_sold_checkbox %}
     <div class="col-md-2 form-check d-flex align-items-center">
-        <input class="form-check-input me-2" type="checkbox" name="show_sold" id="showSold"
-               {% if request.args.get('show_sold') == 'on' %}checked{% endif %} onchange="this.form.submit()">
+        <input class="form-check-input me-2" type="checkbox" name="show_sold" id="showSold" {% if request.args.get('show_sold') == 'on' %}checked{% endif %} onchange="this.form.submit()">
         <label class="form-check-label" for="showSold">{{ _('Show Sold Cards') }}</label>
     </div>
     {% endif %}
-
-    <!-- Buttons -->
     <div class="col-md-2 d-flex gap-2">
         <button type="submit" class="btn btn-primary w-100">{{ _('Search') }}</button>
         <a href="{{ request.path }}" class="btn btn-secondary w-100">{{ _('Reset') }}</a>
@@ -93,11 +76,8 @@
 <!-- Autocomplete Script -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const setNames = {{ unique_set_names|tojson }};
-    const setNameInput = document.getElementById("set_name");
-    new Awesomplete(setNameInput, { list: setNames });
+    initializeAutocomplete({{ unique_set_names|tojson }});
 });
 </script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.5/awesomplete.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.5/awesomplete.min.js"></script>
-

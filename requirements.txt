@@ -15,4 +15,6 @@ flask_caching
 pytest
 Pillow
 Flask-Babel
-gevent
+Flask-Session
+redis
+

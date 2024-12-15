@@ -8,31 +8,31 @@
     <h4>{{ _('Available Cards') }}</h4>
     <div class="row">
         {% if available_cards %}
-        {% for card in available_cards %}
-        <div class="col-md-3 mb-4">
-            <div class="card shadow-sm">
-                <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}" style="height: 200px; object-fit: cover;">
-                <div class="card-body">
-                    <h5 class="card-title">{{ card.name }}</h5>
-                    <p class="card-text">
-                        <strong>{{ _('Set:') }}</strong> {{ card.set_name }}<br>
-                        <strong>{{ _('Price:') }}</strong> {{ card.price }} ILS<br>
-                        <strong>{{ _('Condition:') }}</strong> {{ card.condition }}<br>
-                    </p>
-                    <div class="d-flex justify-content-between">
-                        <a href="{{ url_for('user.edit_card', card_id=card.id) }}" class="btn btn-warning btn-sm">{{ _('Edit') }}</a>
-                        <form method="POST" action="{{ url_for('user.delete_card', card_id=card.id) }}" onsubmit="return confirm('{{ _('Are you sure you want to delete this card?') }}');">
-                            <button type="submit" class="btn btn-danger btn-sm">{{ _('Delete') }}</button>
-                        </form>
+            {% for card in available_cards %}
+                <div class="col-md-3 mb-4">
+                    <div class="card shadow-sm">
+                        <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}" style="height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ card.name }}</h5>
+                            <p class="card-text">
+                                <strong>{{ _('Set:') }}</strong> {{ card.set_name }}<br>
+                                <strong>{{ _('Price:') }}</strong> {{ card.price }} ILS<br>
+                                <strong>{{ _('Condition:') }}</strong> {{ card.condition }}<br>
+                            </p>
+                            <div class="d-flex justify-content-between">
+                                <a href="{{ url_for('user.edit_card', card_id=card.id) }}" class="btn btn-warning btn-sm">{{ _('Edit') }}</a>
+                                <form method="POST" action="{{ url_for('user.delete_card', card_id=card.id) }}" onsubmit="return confirm('{{ _('Are you sure you want to delete this card?') }}');">
+                                    <button type="submit" class="btn btn-danger btn-sm">{{ _('Delete') }}</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        {% endfor %}
+            {% endfor %}
         {% else %}
-        <div class="col-12 text-center">
-            <p>{{ _('No available cards.') }}</p>
-        </div>
+            <div class="col-12 text-center">
+                <p>{{ _('No available cards.') }}</p>
+            </div>
         {% endif %}
     </div>
 
@@ -42,27 +42,26 @@
     <h4>{{ _('Sold Cards') }}</h4>
     <div class="row">
         {% if sold_cards %}
-        {% for card in sold_cards %}
-        <div class="col-md-3 mb-4">
-            <div class="card shadow-sm border-danger">
-                <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}" style="height: 200px; object-fit: cover;">
-                <div class="card-body">
-                    <h5 class="card-title text-danger">{{ card.name }} ({{ _('Sold') }})</h5>
-                    <p class="card-text">
-                        <strong>{{ _('Set:') }}</strong> {{ card.set_name }}<br>
-                        <strong>{{ _('Price:') }}</strong> {{ card.price }} ILS<br>
-                        <strong>{{ _('Condition:') }}</strong> {{ card.condition }}<br>
-                    </p>
+            {% for card in sold_cards %}
+                <div class="col-md-3 mb-4">
+                    <div class="card shadow-sm border-danger">
+                        <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}" style="height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title text-danger">{{ card.name }} ({{ _('Sold') }})</h5>
+                            <p class="card-text">
+                                <strong>{{ _('Set:') }}</strong> {{ card.set_name }}<br>
+                                <strong>{{ _('Price:') }}</strong> {{ card.price }} ILS<br>
+                                <strong>{{ _('Condition:') }}</strong> {{ card.condition }}<br>
+                            </p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-        {% endfor %}
+            {% endfor %}
         {% else %}
-        <div class="col-12 text-center">
-            <p>{{ _('No sold cards.') }}</p>
-        </div>
+            <div class="col-12 text-center">
+                <p>{{ _('No sold cards.') }}</p>
+            </div>
         {% endif %}
     </div>
 </div>
 {% endblock %}
-

@@ -6,9 +6,8 @@
     <div class="row align-items-center mb-4">
         <div class="col-md-9">
             <h2>{{ user.username }}</h2>
-            <p><i class="bi bi-geo-alt-fill"></i> <strong>{{ _('Location:') }}</strong> {{ user.location if user.location else _('N/A') }}</p>
-            <p><i class="bi bi-star-fill text-warning"></i> <strong>{{ _('Rating:') }}</strong> {{ "%.1f" | format(user.rating) if user.rating else _("No ratings yet") }} ({{ user.feedback_count }} {{ _('feedback') }})</p>
-
+            <p><i class="bi bi-geo-alt-fill"></i> <strong>{{ _('Location:') }}</strong> {{ user.location or _('N/A') }}</p>
+            <p><i class="bi bi-star-fill text-warning"></i> <strong>{{ _('Rating:') }}</strong> {{ "%.1f" | format(user.rating) if user.rating else _('No ratings yet') }} ({{ user.feedback_count }} {{ _('feedback') }})</p>
             {% if user.role == 'banned' %}
             <p class="text-danger"><strong>{{ _('Status:') }}</strong> {{ _('Banned') }}</p>
             {% endif %}
@@ -83,8 +82,5 @@
     </div>
 
     {% include "_pagination_form.html" %}
-
 </div>
 {% endblock %}
-
-

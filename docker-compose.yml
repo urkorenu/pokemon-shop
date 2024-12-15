@@ -1,10 +1,22 @@
 services:
+  redis:
+    image: redis:6
+    ports:
+      - "6379:6379"
+
   app:
     image: urkoren/pokemon-shop:latest
+    depends_on:
+      - redis
     ports:
       - "5000:5000"
     environment:
-      FLASK_ENV: development
+      FLASK_ENV: production
+      SESSION_TYPE: "redis"
+      SESSION_PERMANENT: "True"
+      SESSION_USE_SIGNER: "True"
+      SESSION_KEY_PREFIX: "pokemon-shop:"
+      SESSION_REDIS: "redis://redis:6379/0"
       DB_USERNAME: "${DB_USERNAME}"
       DB_PASSWORD: "${DB_PASSWORD}"
       DB_HOST: "${DB_HOST}"
@@ -18,10 +30,9 @@ services:
       PYTHONPATH: "./"
     volumes:
       - ./migrations:/app/migrations
+
   test:
     build: .
-    depends_on:
-      - app
     environment:
       FLASK_ENV: testing
       DB_USERNAME: "${DB_USERNAME}"
@@ -35,7 +46,5 @@ services:
       API_KEY: "${API_KEY}"
       ADMIN_MAIL: "${ADMIN_MAIL}"
       PYTHONPATH: "./"
-    volumes:
-      - /home/ec2-user/git/pokemon-shop/test-results:/app/test-results
     command: pytest --junitxml=/app/test-results/results.xml -q
 

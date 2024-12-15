@@ -4,10 +4,8 @@
 <div class="container">
     <h2 class="text-center mb-4">{{ _('Available Pokémon Cards') }}</h2>
 
-    <!-- Include the Search Form -->
     {% include "_search_form.html" %}
 
-    <!-- Card Display -->
     <div class="row">
         {% if cards %}
             {% for card in cards %}
@@ -20,9 +18,6 @@
         {% endif %}
     </div>
 
-
     {% include "_pagination_form.html" %}
-
 </div>
 {% endblock %}
-
