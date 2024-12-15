@@ -10,8 +10,15 @@ admin_bp = Blueprint("admin", __name__)
 @admin_bp.route("/users", methods=["GET", "POST"])
 @roles_required("admin")
 def manage_users():
-    users = User.query.all()
-    users_want_uploader = User.query.filter_by(request_status="uploader").count()
+    search_query = request.args.get("search", "")
+    if search_query:
+        users = User.query.filter(
+            User.username.ilike(f"%{search_query}%") |
+            User.email.ilike(f"%{search_query}%") |
+            User.location.ilike(f"%{search_query}%")
+        ).all()
+    else:
+        users = User.query.all()
 
     if request.method == "POST":
         user_id = request.form.get("user_id")
@@ -46,4 +53,4 @@ def manage_users():
             else:
                 flash("Invalid role data.", "error")
 
-    return render_template("manage_users.html", users=users, users_want_uploader=users_want_uploader)
+    return render_template("manage_users.html", users=users)

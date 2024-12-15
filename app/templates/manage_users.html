@@ -3,6 +3,12 @@
 {% block content %}
 <div class="container mt-4">
     <h2 class="text-center mb-4">Manage Users</h2>
+    <form method="GET" action="{{ url_for('admin.manage_users') }}" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="search" class="form-control" placeholder="Search users..." value="{{ request.args.get('search', '') }}">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+    </form>
     <form method="POST" action="{{ url_for('admin.manage_users') }}">
         <table class="table table-striped">
             <thead>
