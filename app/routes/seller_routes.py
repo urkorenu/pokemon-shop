@@ -144,6 +144,7 @@ def get_card_details():
         return jsonify({"error": "Missing required parameters"}), 400
 
     try:
+        # Construct the query
         query = f'set.name:"{set_name}" number:"{number}"'
         response = requests.get(
             f"{BASE_URL}/cards", params={"q": query}, headers={"X-Api-Key": API_KEY}
@@ -154,7 +155,17 @@ def get_card_details():
         if not card_data:
             return jsonify({"error": "No card found"}), 404
 
-        card = card_data[0]
+        # Filter the cards to ensure we match the set name and card number strictly
+        filtered_cards = [
+            card for card in card_data
+            if card.get("set", {}).get("name") == set_name and card.get("number") == number
+        ]
+
+        if not filtered_cards:
+            return jsonify({"error": "No exact match found"}), 404
+
+        # Return the first matching card after strict filtering
+        card = filtered_cards[0]
         card_name = card["name"]
         card_types = list(card.get("tcgplayer", {}).get("prices", {}).keys())
 
@@ -169,3 +180,4 @@ def get_card_details():
     except requests.RequestException as e:
         print(f"Error fetching card details: {e}", flush=True)
         return jsonify({"error": "Failed to fetch card details"}), 500
+
