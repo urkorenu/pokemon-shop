@@ -5,6 +5,14 @@
 
 <form action="{{ url_for('seller.upload_card') }}" method="POST" enctype="multipart/form-data">
     <div class="mb-3">
+	<label for="language" class="form-label">{{ _("Card Language:") }}</label>
+	<select id="language" name="language" class="form-select" onchange="toggleLanguage()">
+	    <option value="en" selected>{{ _("English") }}</option>
+	    <option value="jp">{{ _("Japanese") }}</option>
+	</select>
+    </div>
+    <!-- Set Name -->
+    <div class="mb-3">
         <label for="set_name" class="form-label">{{ _("Set Name:") }}</label>
         <input class="form-control" list="sets" id="set_name" name="set_name" placeholder="{{ _('Type to search...') }}" required>
         <datalist id="sets">
@@ -14,16 +22,19 @@
         </datalist>
     </div>
 
+    <!-- Card Number -->
     <div class="mb-3">
         <label for="number" class="form-label">{{ _("Card Number:") }}</label>
         <input type="text" id="number" name="number" class="form-control" placeholder="{{ _('Enter card number') }}" required>
     </div>
 
+    <!-- Card Name -->
     <div class="mb-3">
         <label for="name" class="form-label">{{ _("Card Name:") }}</label>
         <input type="text" id="name" name="name" class="form-control" placeholder="{{ _('Card name will be auto-filled') }}" readonly required>
     </div>
 
+    <!-- Card Type -->
     <div class="mb-3">
         <label for="card_type" class="form-label">{{ _("Card Type:") }}</label>
         <select id="card_type" name="card_type" class="form-select" required>
@@ -31,6 +42,7 @@
         </select>
     </div>
 
+    <!-- Price or Follow TCGPlayer -->
     <div class="mb-3">
         <label for="price" class="form-label">{{ _("Price:") }}</label>
         <div class="input-group">
@@ -43,6 +55,7 @@
         </div>
     </div>
 
+    <!-- Condition -->
     <div class="mb-3">
         <label for="condition" class="form-label">{{ _("Condition:") }}</label>
         <select id="condition" name="condition" class="form-select" required>
@@ -57,11 +70,12 @@
         </small>
     </div>
 
+    <!-- Is Graded -->
     <div class="form-check mb-3">
         <input type="checkbox" id="is_graded" name="is_graded" class="form-check-input">
         <label for="is_graded" class="form-check-label">{{ _("Is Graded?") }}</label>
     </div>
-
+    <!-- Grade -->
     <div id="graded_fields" class="mb-3" style="display: none;">
         <label for="grade" class="form-label">{{ _("Grade (1-10):") }}</label>
         <input type="number" id="grade" name="grade" step="0.5" min="1" max="10" class="form-control" placeholder="{{ _('Enter grade') }}">
@@ -73,13 +87,178 @@
         </select>
     </div>
 
+    <!-- File Upload -->
     <div class="mb-3">
         <label for="image" class="form-label">{{ _("Card Image:") }}</label>
         <input type="file" id="image" name="image" class="form-control" accept="image/*" required>
     </div>
 
+    <!-- Submit -->
     <div class="mt-4">
         <button type="submit" class="btn btn-primary">{{ _("Upload") }}</button>
     </div>
 </form>
+<script>
+    const priceInput = document.getElementById("price");
+    const followTcgCheckbox = document.getElementById("follow_tcg");
+    const conditionSelect = document.getElementById("condition");
+    const tcgWarning = document.getElementById("tcg_warning");
+    const cardTypeDropdown = document.getElementById("card_type");
+    const languageDropdown = document.getElementById("language");
+    const setNameInput = document.getElementById("set_name");
+    const setsDataList = document.getElementById("sets");
+    const cardNameInput = document.getElementById("name");
+
+    // Enforce condition logic for Follow TCG checkbox
+    function enforceConditionLogic() {
+	if (followTcgCheckbox.checked) {
+	    conditionSelect.value = "NM";
+	    conditionSelect.disabled = true;
+	    priceInput.value = '';
+	    priceInput.disabled = true;
+	    tcgWarning.style.display = 'block';
+	} else {
+	    conditionSelect.disabled = false;
+	    priceInput.disabled = false;
+	    tcgWarning.style.display = 'none';
+	}
+    }
+
+    // Fetch sets based on language
+    async function fetchSets() {
+	const language = languageDropdown.value;
+	try {
+	    const url = language === "jp" ? "/seller/jp-sets" : "/seller/en-sets";
+	    const response = await fetch(url);
+	    if (!response.ok) throw new Error("Failed to fetch sets");
+
+	    const sets = await response.json();
+	    setsDataList.innerHTML = "";
+	    sets.forEach(set => {
+		const option = document.createElement("option");
+		option.value = set.name;
+		setsDataList.appendChild(option);
+	    });
+	} catch (error) {
+	    console.error("Error fetching sets:", error);
+	    alert("Failed to fetch sets.");
+	}
+    }
+
+    // Fetch card details and handle name and types
+    async function fetchCardDetails() {
+	const setName = setNameInput.value.trim();
+	const cardNumber = document.getElementById("number").value.trim();
+	const language = languageDropdown.value;
+
+	cardNameInput.value = "";
+	cardTypeDropdown.innerHTML = '<option value="">Select Card Type</option>';
+
+	if (!setName || !cardNumber) return;
+
+	try {
+	    const apiUrl = `/seller/card-details?language=${language}&set_name=${encodeURIComponent(setName)}&number=${encodeURIComponent(cardNumber)}`;
+	    const response = await fetch(apiUrl);
+
+	    if (!response.ok) throw new Error("Failed to fetch card details");
+
+	    const data = await response.json();
+	    if (data.error) {
+		console.warn("No card details found:", data.error);
+		return;
+	    }
+
+	    cardNameInput.value = data.name;
+
+	    if (language === "jp") {
+		["Normal", "Holofoil", "Reverseholofoil", "1steditionholofoil", "1stedition"].forEach(type => {
+		    const option = document.createElement("option");
+		    option.value = type.toLowerCase();
+		    option.textContent = type;
+		    cardTypeDropdown.appendChild(option);
+		});
+		followTcgCheckbox.checked = false;
+		followTcgCheckbox.disabled = true;
+		enforceConditionLogic();
+	    } else {
+		data.types.forEach(type => {
+		    const option = document.createElement("option");
+		    option.value = type;
+		    option.textContent = type.replace("_", " ").toUpperCase();
+		    cardTypeDropdown.appendChild(option);
+		});
+		followTcgCheckbox.disabled = false;
+	    }
+	} catch (error) {
+	    console.error("Error fetching card details:", error);
+	}
+    }
+
+    // Fetch TCG Price for English Cards
+    async function fetchTCGPrice() {
+	const setName = setNameInput.value.trim();
+	const cardNumber = document.getElementById("number").value.trim();
+	const cardType = cardTypeDropdown.value.trim();
+
+	if (!setName || !cardNumber || !cardType) {
+	    alert("Please fill Set Name, Card Number, and select Card Type to fetch the price.");
+	    followTcgCheckbox.checked = false;
+	    enforceConditionLogic();
+	    return;
+	}
+
+	try {
+	    const apiUrl = `/seller/card-details?language=en&set_name=${encodeURIComponent(setName)}&number=${encodeURIComponent(cardNumber)}`;
+	    const response = await fetch(apiUrl);
+
+	    if (!response.ok) throw new Error("Failed to fetch TCG price.");
+
+	    const data = await response.json();
+	    const normalizedCardType = cardType.toLowerCase();
+	    const availablePrices = data.prices || {};
+
+	    let tcgPriceUSD = 0.0;
+
+	    for (const key of Object.keys(availablePrices)) {
+		if (key.toLowerCase() === normalizedCardType) {
+		    tcgPriceUSD = parseFloat(availablePrices[key]?.market || 0.0);
+		    break;
+		}
+	    }
+
+	    if (tcgPriceUSD > 0) {
+		const conversionRate = 3.56;
+		const tcgPriceILS = Math.round(tcgPriceUSD * conversionRate);
+		priceInput.value = tcgPriceILS;
+	    } else {
+		throw new Error("No TCG price found for this card type.");
+	    }
+	} catch (error) {
+	    console.error("Error fetching TCG price:", error);
+	    alert("Failed to fetch TCGPlayer price. Please try again.");
+	    followTcgCheckbox.checked = false;
+	    enforceConditionLogic();
+	}
+    }
+
+    // Event Listeners
+    followTcgCheckbox.addEventListener("change", async () => {
+	enforceConditionLogic();
+	if (followTcgCheckbox.checked && languageDropdown.value === "en") {
+	    await fetchTCGPrice();
+	}
+    });
+
+
+    languageDropdown.addEventListener("change", fetchSets);
+    setNameInput.addEventListener("input", fetchCardDetails);
+    document.getElementById("number").addEventListener("input", fetchCardDetails);
+    document.getElementById("is_graded").addEventListener("change", function () {
+	const gradedFields = document.getElementById("graded_fields");
+	gradedFields.style.display = this.checked ? "block" : "none";
+    });
+
+    // Initial load: Fetch English sets
+    window.onload = fetchSets;
+</script>
 {% endblock %}
