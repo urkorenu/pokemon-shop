@@ -97,6 +97,17 @@ def create_app():
                     buyer_id=user_id, status="Confirmed", feedback=None
                 ).count()
             )
+            users_want_uploader_role = 0
+            if current_user.role == "admin":
+                users_want_uploader_role = (
+                    cache.get("users_want_uploader_role")
+                    or User.query.filter_by(request_status="pending").count()
+                )
+                cache.set(
+                    f"users_want_uploader_role",
+                    users_want_uploader_role,
+                    timeout=60,
+                )
             cache.set(f"cart_count_{user_id}", cart_items_count, timeout=60)
             cache.set(f"pending_orders_{user_id}", pending_orders, timeout=60)
             cache.set(
@@ -104,14 +115,18 @@ def create_app():
                 orders_without_feedback,
                 timeout=60,
             )
+
         else:
-            cart_items_count = pending_orders = orders_without_feedback = 0
+            cart_items_count = pending_orders = orders_without_feedback = users_want_uploader_role =0
 
         return {
             "cart_items_count": cart_items_count,
             "pending_orders": pending_orders,
             "orders_without_feedback": orders_without_feedback,
+            "users_want_uploader_role": users_want_uploader_role,
         }
+
+
 
     # Register the dict_without filter
     @app.template_filter("dict_without")

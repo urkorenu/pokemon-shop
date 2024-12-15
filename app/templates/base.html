@@ -114,11 +114,14 @@
                         </ul>
                     </li>
                     {% endif %}
-                    {% if current_user.role in ["admin"] %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('admin.manage_users') }}">{{ _('Manage Users') }}</a>
-                    </li>
-                    {% endif %}
+		    {% if current_user.is_authenticated and current_user.role == "admin" %}
+		    <li class="nav-item">
+			<a class="nav-link" href="{{ url_for('admin.manage_users') }}">
+			    {{ _('Manage Users') }}
+			    <span class="badge bg-warning text-dark rounded-pill">{{ users_want_uploader_role }}</span>
+			</a>
+		    </li>
+		    {% endif %}
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     {% if current_user.is_authenticated %}
