@@ -86,8 +86,8 @@ def create_app():
             # Fetch counts or get from cache
             cart_items_count = cache.get(f"cart_count_{user_id}")
             if cart_items_count is None:
-                cart_items_count = Cart.query.filter_by(user_id=user_id).count()
-                cache.set(f"cart_count_{user_id}", cart_items_count, timeout=60)
+                cart_items_count = Cart.query.with_entities(func.count()).filter_by(user_id=user_id).scalar()
+                cache.set(f"cart_count_{user_id}", int(cart_items_count), timeout=60)
 
             pending_orders = cache.get(f"pending_orders_{user_id}")
             if pending_orders is None:
@@ -118,7 +118,6 @@ def create_app():
             "orders_without_feedback": orders_without_feedback,
             "users_want_uploader_role": users_want_uploader_role,
         }
-
 
 
     # Register the dict_without filter

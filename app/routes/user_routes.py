@@ -15,6 +15,51 @@ from app import cache
 # Create a Blueprint for user routes
 user_bp = Blueprint("user", __name__)
 
+class Pagination:
+    def __init__(self, items, page, per_page, total):
+        self.items = items
+        self.page = page
+        self.per_page = per_page
+        self.total = total
+        self.pages = (total + per_page - 1) // per_page  # Calculate total pages
+
+    def has_prev(self):
+        return self.page > 1
+
+    def has_next(self):
+        return self.page < self.pages
+
+    def prev_num(self):
+        return self.page - 1
+
+    def next_num(self):
+        return self.page + 1
+
+    def iter_pages(self, left_edge=2, left_current=2, right_current=5, right_edge=2):
+        """
+        Generate page numbers for pagination, similar to Flask-SQLAlchemy's Pagination.
+
+        Args:
+            left_edge: Number of pages to display at the start.
+            left_current: Pages to display before the current page.
+            right_current: Pages to display after the current page.
+            right_edge: Pages to display at the end.
+
+        Returns:
+            An iterator for page numbers with `None` for gaps.
+        """
+        last = 0
+        for num in range(1, self.pages + 1):
+            if (
+                num <= left_edge
+                or (num > self.page - left_current and num < self.page + right_current)
+                or num > self.pages - right_edge
+            ):
+                if last + 1 != num:
+                    yield None  # None represents a gap
+                yield num
+                last = num
+
 
 @user_bp.route("/")
 def view_cards():
@@ -25,13 +70,28 @@ def view_cards():
         Rendered template for the cards page with paginated card data.
     """
     page = request.args.get("page", 1, type=int)
-    paginated_cards, unique_set_names, stats = filter_cards(page=page)
+    filtered_data = filter_cards(page=page)
+    
+    # Unpack the returned dictionary
+    cards_list = filtered_data["cards"]
+    unique_set_names = filtered_data["unique_set_names"]
+    stats = filtered_data["stats"]
+    
+    # Rebuild pagination for template compatibility
+    pagination = Pagination(
+        items=cards_list,
+        page=page,
+        per_page=12,
+        total=stats["total_cards"]
+    )
+
+    # Render the template
     return render_template(
         "cards.html",
-        cards=paginated_cards.items,
-        unique_set_names=unique_set_names,
-        pagination=paginated_cards,
-        cities=CITIES_IN_ISRAEL,
+        cards=cards_list,  # List of cards
+        unique_set_names=unique_set_names,  # Set names
+        pagination=pagination,  # Pagination helper
+        cities=CITIES_IN_ISRAEL,  # Cities data
         total_cards=stats["total_cards"],
         total_sets=stats["total_sets"],
         total_graded=stats["total_graded"],
@@ -98,11 +158,25 @@ def profile(user_id):
     Returns:
         Rendered template for the user's profile page with their cards and feedback.
     """
-    user = User.query.get_or_404(user_id)
-    show_sold = request.args.get("show_sold") == "on"
+
     page = request.args.get("page", 1, type=int)
-    paginated_cards, unique_set_names, stats = filter_cards(
+    show_sold = request.args.get("show_sold") == "on"
+    user = User.query.get_or_404(user_id)
+    filtered_data = filter_cards(
         user_id=user_id, show_sold=show_sold, page=page
+        )
+    
+    # Unpack the returned dictionary
+    cards_list = filtered_data["cards"]
+    unique_set_names = filtered_data["unique_set_names"]
+    stats = filtered_data["stats"]
+    
+    # Rebuild pagination for template compatibility
+    pagination = Pagination(
+        items=cards_list,
+        page=page,
+        per_page=12,
+        total=stats["total_cards"]
     )
     completed_orders = (
         db.session.query(User.username, Order.feedback, Order.rating)
@@ -113,10 +187,10 @@ def profile(user_id):
     return render_template(
         "profile.html",
         user=user,
-        cards=paginated_cards.items,
+        cards=cards_list,
         feedback=completed_orders,
         unique_set_names=unique_set_names,
-        pagination=paginated_cards,
+        pagination=pagination,
         total_cards=stats["total_cards"],
         total_sets=stats["total_sets"],
         total_graded=stats["total_graded"],
@@ -410,29 +484,37 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
     ).order_by(None).first()
 
     stats_dict = {
-        "total_cards": stats.total_cards,
-        "total_sets": stats.total_sets,
-        "total_graded": stats.total_graded,
+        "total_cards": int(stats.total_cards),
+        "total_sets": int(stats.total_sets),
+        "total_graded": int(stats.total_graded),
     }
 
-    # Convert query results to serializable data
-    cards = query.paginate(page=page, per_page=per_page, error_out=False)
+    # Paginate results and extract serializable data
     paginated_cards = query.paginate(page=page, per_page=per_page, error_out=False)
-    cards_data = [
-        {
-            "id": card.id,
-            "name": card.name,
-            "price": card.price,
-            "set_name": card.set_name,
-            "uploader": card.uploader.username if card.uploader else "Unknown",
-        }
-        for card in paginated_cards.items
-    ]
-    stats_dict = {
-        "total_cards": stats.total_cards,
-        "total_sets": stats.total_sets,
-        "total_graded": stats.total_graded,
+    cards_list = [
+    {
+        "id": card.id,
+        "name": card.name,
+        "set_name": card.set_name,
+        "price": float(card.price),
+        "amount": card.amount,
+        "is_graded": card.is_graded,
+        "image_url": card.image_url,  # Include image_url
+        "card_type": card.card_type,  # Include card_type
+        "condition": card.condition,  # Include condition
+        "uploaded_at": card.uploaded_at,  # Include upload date
+        "tcg_price": card.tcg_price,  # Optional: Include TCG price
+        "grading_company": card.grading_company,  # Include if applicable
+        "grade": card.grade,  # Include grading value if available
+        "uploader": {
+            "id": card.uploader.id,
+            "username": card.uploader.username,
+            "location": card.uploader.location,
+        } if card.uploader else None,
     }
-    unique_set_names = sorted({card.set_name for card in paginated_cards.items})
+    for card in paginated_cards.items
+]
+    unique_set_names = sorted({card["set_name"] for card in cards_list})
 
-    return cards_data, unique_set_names, stats_dict
+    return {"cards": cards_list, "unique_set_names": unique_set_names, "stats": stats_dict}
+
