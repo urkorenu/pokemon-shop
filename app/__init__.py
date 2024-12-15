@@ -7,6 +7,7 @@ from flask_babel import Babel
 from flask_session import Session
 from redis import Redis
 from sqlalchemy import cast, String
+from sqlalchemy.sql import func
 import os
 
 # Initialize extensions
@@ -83,11 +84,12 @@ def create_app():
         if current_user.is_authenticated:
             user_id = current_user.id
 
-            # Fetch counts or get from cache
-            cart_items_count = cache.get(f"cart_count_{user_id}")
-            if cart_items_count is None:
-                cart_items_count = Cart.query.with_entities(func.count()).filter_by(user_id=user_id).scalar()
-                cache.set(f"cart_count_{user_id}", int(cart_items_count), timeout=60)
+            cart_items_count = (
+                db.session.query(func.count())
+                .select_from(Cart)
+                .filter(Cart.user_id == user_id)
+                .scalar()
+            )
 
             pending_orders = cache.get(f"pending_orders_{user_id}")
             if pending_orders is None:
