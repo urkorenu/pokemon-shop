@@ -1,10 +1,12 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
-from ..models import User, db, Order, Cart
+from ..models import User, db, Order
 from flask_bcrypt import generate_password_hash, check_password_hash
 from ..cities import CITIES_IN_ISRAEL
 from ..mail_service import send_email
 from config import Config
+from app.utils import delete_user_account
+
 
 # Create a Blueprint for authentication routes
 auth_bp = Blueprint("auth", __name__)
@@ -256,16 +258,11 @@ def delete_account():
     """
     Handle account deletion for the current user.
 
-    POST: Process the account deletion based on form data.
+    POST: Deletes the current user's account.
 
     Returns:
         A redirect to the authentication page.
     """
-    Cart.query.filter_by(user_id=current_user.id).delete()
-    user = User.query.get_or_404(current_user.id)
-    db.session.delete(user)
-    db.session.commit()
-
-    logout_user()
-    flash("Your account and all associated data have been deleted.", "success")
+    success, message = delete_user_account(current_user.id)
+    flash(message, "success" if success else "danger")
     return redirect(url_for("auth.auth"))

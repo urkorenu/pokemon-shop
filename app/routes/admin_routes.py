@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from ..models import Card, User, db
-from config import Config
 from app.utils import roles_required
 from ..mail_service import send_email
+from app.utils import delete_user_account
+
 
 # Create a Blueprint for admin routes
 admin_bp = Blueprint("admin", __name__)
@@ -21,6 +22,12 @@ def manage_users():
         users = User.query.all()
 
     if request.method == "POST":
+        delete_user_id = request.form.get("delete_user_id")
+
+        if delete_user_id:
+            success, message = delete_user_account(delete_user_id, is_admin=True)
+            flash(message, "success" if success else "danger")
+            return redirect(url_for("admin.manage_users"))
         user_id = request.form.get("user_id")
         user = User.query.get(user_id)
         if user:
