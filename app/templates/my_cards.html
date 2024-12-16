@@ -4,11 +4,19 @@
 <div class="container">
     <h2 class="text-center mb-4">{{ _('My Uploaded Cards') }}</h2>
 
+    <!-- Search Form -->
+    <form method="GET" action="{{ url_for('user.my_cards') }}" class="mb-4">
+        <div class="input-group">
+            <input type="text" name="search" class="form-control" placeholder="{{ _('Search by name...') }}" value="{{ search_query }}">
+            <button type="submit" class="btn btn-primary">{{ _('Search') }}</button>
+        </div>
+    </form>
+
     <!-- Available Cards -->
     <h4>{{ _('Available Cards') }}</h4>
     <div class="row">
-        {% if available_cards %}
-            {% for card in available_cards %}
+        {% if available_cards.items %}
+            {% for card in available_cards.items %}
                 <div class="col-md-3 mb-4">
                     <div class="card shadow-sm">
                         <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}" style="height: 200px; object-fit: cover;">
@@ -36,13 +44,38 @@
         {% endif %}
     </div>
 
+    <!-- Pagination for Available Cards -->
+    <nav aria-label="Available Cards Pagination">
+        <ul class="pagination justify-content-center">
+            {% if available_cards.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('user.my_cards', search=search_query, page=available_cards.prev_num) }}">{{ _('Previous') }}</a>
+                </li>
+            {% endif %}
+            {% for page_num in available_cards.iter_pages() %}
+                {% if page_num %}
+                    <li class="page-item {% if page_num == available_cards.page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('user.my_cards', search=search_query, page=page_num) }}">{{ page_num }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %}
+            {% endfor %}
+            {% if available_cards.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('user.my_cards', search=search_query, page=available_cards.next_num) }}">{{ _('Next') }}</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+
     <hr>
 
     <!-- Sold Cards -->
     <h4>{{ _('Sold Cards') }}</h4>
     <div class="row">
-        {% if sold_cards %}
-            {% for card in sold_cards %}
+        {% if sold_cards.items %}
+            {% for card in sold_cards.items %}
                 <div class="col-md-3 mb-4">
                     <div class="card shadow-sm border-danger">
                         <img src="{{ card.image_url }}" class="card-img-top" alt="{{ card.name }}" style="height: 200px; object-fit: cover;">
@@ -63,5 +96,31 @@
             </div>
         {% endif %}
     </div>
+
+    <!-- Pagination for Sold Cards -->
+    <nav aria-label="Sold Cards Pagination">
+        <ul class="pagination justify-content-center">
+            {% if sold_cards.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('user.my_cards', search=search_query, page=sold_cards.prev_num) }}">{{ _('Previous') }}</a>
+                </li>
+            {% endif %}
+            {% for page_num in sold_cards.iter_pages() %}
+                {% if page_num %}
+                    <li class="page-item {% if page_num == sold_cards.page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('user.my_cards', search=search_query, page=page_num) }}">{{ page_num }}</a>
+                    </li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %}
+            {% endfor %}
+            {% if sold_cards.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('user.my_cards', search=search_query, page=sold_cards.next_num) }}">{{ _('Next') }}</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
 </div>
 {% endblock %}
+
