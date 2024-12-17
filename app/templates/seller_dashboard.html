@@ -33,99 +33,123 @@
 
     <!-- Search Form -->
     <form method="GET" action="{{ url_for('seller.seller_dashboard') }}" class="mb-4">
-	<div class="row">
-	    <div class="input-group mb-3">
-		<input type="text" name="search" class="form-control"
-		       placeholder="{{ _('Search by Buyer or Card Name') }}"
-		       value="{{ request.args.get('search', '') }}">
-		<button class="btn btn-primary" type="submit">{{ _('Search') }}</button>
-	    </div>
-	    <div class="col-md-3">
-		<a href="{{ url_for('seller.seller_dashboard') }}" class="btn btn-secondary w-100">{{ _('Reset') }}</a>
-	    </div>
-	</div>
+        <div class="row">
+            <div class="input-group mb-3">
+                <input type="text" name="search" class="form-control"
+                       placeholder="{{ _('Search by Buyer or Card Name') }}"
+                       value="{{ request.args.get('search', '') }}">
+                <button class="btn btn-primary" type="submit">{{ _('Search') }}</button>
+            </div>
+            <div class="col-md-3">
+                <a href="{{ url_for('seller.seller_dashboard') }}" class="btn btn-secondary w-100">{{ _('Reset') }}</a>
+            </div>
+        </div>
     </form>
 
-    <!-- Pending Orders Table -->
+    <!-- Pending Orders Section -->
     <h4>{{ _("Pending Orders") }}</h4>
     <div class="table-responsive">
         {% if orders %}
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>{{ _("Order ID") }}</th>
-                        <th>{{ _("Buyer") }}</th>
-                        <th>{{ _("Date") }}</th>
-                        <th>{{ _("Total Price") }}</th>
-                        <th>{{ _("Actions") }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for order in orders %}
-                        <tr>
-                            <td>{{ order.id }}</td>
-                            <td>
-                                <a href="{{ url_for('user.profile', user_id=order.buyer.id) }}" class="text-decoration-none">{{ order.buyer.username }}</a>
-                            </td>
-                            <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                            <td>{{ order.total_price }} ILS</td>
-                            <td>
-                                <form method="POST" action="{{ url_for('order.confirm_order', order_id=order.id) }}" class="d-inline">
-                                    <button type="submit" class="btn btn-success btn-sm">{{ _("Confirm") }}</button>
-                                </form>
-                                <form method="POST" action="{{ url_for('order.reject_order', order_id=order.id) }}" class="d-inline">
-                                    <button type="submit" class="btn btn-danger btn-sm">{{ _("Reject") }}</button>
-                                </form>
-                            </td>
-                        </tr>
+            {% for order in orders %}
+                <!-- Individual Order Container -->
+                <div class="border rounded mb-4 p-3 shadow-sm">
+                    <h5>{{ _("Order ID") }}: {{ order.id }}</h5>
+                    <p>
+                        <strong>{{ _("Buyer:") }}</strong>
+                        <a href="{{ url_for('user.profile', user_id=order.buyer.id) }}" class="text-decoration-none">
+                            {{ order.buyer.username }}
+                        </a>
+                    </p>
+                    <p><strong>{{ _("Date:") }}</strong> {{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                    <p><strong>{{ _("Total Price:") }}</strong> {{ order.total_price }} ILS</p>
 
-                        <!-- Order Details Modal -->
-                        <div class="modal fade" id="orderModal{{ order.id }}" tabindex="-1" aria-labelledby="orderModalLabel{{ order.id }}" aria-hidden="true">
-                            <div class="modal-dialog modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="orderModalLabel{{ order.id }}">{{ _("Order Details") }} - {{ _("Order ID:") }} {{ order.id }}</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <table class="table">
-                                            <thead>
-                                                <tr>
-                                                    <th>{{ _("Card") }}</th>
-                                                    <th>{{ _("Set") }}</th>
-                                                    <th>{{ _("Number") }}</th>
-                                                    <th>{{ _("Grade") }}</th>
-                                                    <th>{{ _("Price") }}</th>
-                                                    <th>{{ _("Actions") }}</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for card in order.cards %}
-                                                    <tr>
-                                                        <td>{{ card.name }}</td>
-                                                        <td>{{ card.set_name }}</td>
-                                                        <td>{{ card.number }}</td>
-                                                        <td>{{ card.is_graded and card.grade or _("N/A") }}</td>
-                                                        <td>{{ card.price }} ILS</td>
-							<td>
-							    <button type="button" class="btn btn-sm btn-primary" onclick="showCardImage('{{ card.image_url }}')">
-								{{ _("View Card") }}
-							    </button>
-							</td>
-                                                    </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
-                                        <p class="text-end"><strong>{{ _("Total Price:") }} {{ order.total_price }} ILS</strong></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    <table class="table table-bordered align-middle mb-3">
+                        <thead class="table-light">
+                            <tr>
+                                <th>{{ _("Card") }}</th>
+                                <th>{{ _("Set") }}</th>
+                                <th>{{ _("Number") }}</th>
+                                <th>{{ _("Grade") }}</th>
+                                <th>{{ _("Price") }}</th>
+                                <th>{{ _("Actions") }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for card in order.cards %}
+                                <tr>
+                                    <td>{{ card.name }}</td>
+                                    <td>{{ card.set_name }}</td>
+                                    <td>{{ card.number }}</td>
+                                    <td>{{ card.is_graded and card.grade or _("N/A") }}</td>
+                                    <td>{{ card.price }} ILS</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-primary" onclick="showCardImage('{{ card.image_url }}')">
+                                            {{ _("View Card") }}
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <!-- Confirm and Reject Buttons -->
+                    <div class="text-end">
+                        <form method="POST" action="{{ url_for('order.confirm_order', order_id=order.id) }}" class="d-inline">
+                            <button type="submit" class="btn btn-success btn-sm">{{ _("Confirm") }}</button>
+                        </form>
+                        <form method="POST" action="{{ url_for('order.reject_order', order_id=order.id) }}" class="d-inline">
+                            <button type="submit" class="btn btn-danger btn-sm">{{ _("Reject") }}</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
         {% else %}
-            <p>{{ _("No pending orders available.") }}</p>
+            <p class="text-center">{{ _("No pending orders available.") }}</p>
+        {% endif %}
+    </div>
+        <!-- Completed Orders Section -->
+    <h4 class="mt-5">{{ _("Completed Orders") }}</h4>
+    <div class="table-responsive">
+        {% if completed_orders %}
+            {% for order in completed_orders %}
+                <div class="border rounded mb-4 p-3 shadow-sm">
+                    <h5>{{ _("Order ID") }}: {{ order.id }}</h5>
+                    <p><strong>{{ _("Buyer:") }}</strong> {{ order.buyer.username }}</p>
+                    <p><strong>{{ _("Date:") }}</strong> {{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                    <p><strong>{{ _("Total Price:") }}</strong> {{ order.total_price }} ILS</p>
+
+                    <table class="table table-bordered align-middle mb-3">
+                        <thead>
+                            <tr>
+                                <th>{{ _("Card") }}</th>
+                                <th>{{ _("Set") }}</th>
+                                <th>{{ _("Card Number") }}</th>
+                                <th>{{ _("Grade") }}</th>
+                                <th>{{ _("Price") }}</th>
+                                <th>{{ _("Actions") }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for card in order.cards %}
+                                <tr>
+                                    <td>{{ card.name }}</td>
+                                    <td>{{ card.set_name }}</td>
+                                    <td>{{ card.number }}</td>
+                                    <td>{{ card.is_graded and card.grade or _("N/A") }}</td>
+                                    <td>{{ card.price }} ILS</td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-primary" onclick="showCardImage('{{ card.image_url }}')">
+                                            {{ _("View Card") }}
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-center">{{ _("No completed orders available.") }}</p>
         {% endif %}
     </div>
 </div>
