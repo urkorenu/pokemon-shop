@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <!-- Dashboard Header -->
+    <h2 class="text-center mb-4">{{ _("Seller Dashboard") }}</h2>
+    <div class="row text-center mb-4">
+        <!-- Summary Statistics -->
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 mb-3">
+                <h5>{{ _("Pending Orders") }}</h5>
+                <p class="fs-4">{{ stats.pending_orders }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 mb-3">
+                <h5>{{ _("Total Cards Uploaded") }}</h5>
+                <p class="fs-4">{{ stats.total_cards }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 mb-3">
+                <h5>{{ _("Sold Cards") }}</h5>
+                <p class="fs-4">{{ stats.sold_cards }}</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm p-3 mb-3">
+                <h5>{{ _("Total Revenue") }}</h5>
+                <p class="fs-4">{{ stats.total_revenue }} ILS</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Form -->
+    <form method="GET" action="{{ url_for('seller.seller_dashboard') }}" class="mb-4">
+	<div class="row">
+	    <div class="input-group mb-3">
+		<input type="text" name="search" class="form-control"
+		       placeholder="{{ _('Search by Buyer or Card Name') }}"
+		       value="{{ request.args.get('search', '') }}">
+		<button class="btn btn-primary" type="submit">{{ _('Search') }}</button>
+	    </div>
+	    <div class="col-md-3">
+		<a href="{{ url_for('seller.seller_dashboard') }}" class="btn btn-secondary w-100">{{ _('Reset') }}</a>
+	    </div>
+	</div>
+    </form>
+
+    <!-- Pending Orders Table -->
+    <h4>{{ _("Pending Orders") }}</h4>
+    <div class="table-responsive">
+        {% if orders %}
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>{{ _("Order ID") }}</th>
+                        <th>{{ _("Buyer") }}</th>
+                        <th>{{ _("Date") }}</th>
+                        <th>{{ _("Total Price") }}</th>
+                        <th>{{ _("Actions") }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                        <tr>
+                            <td>{{ order.id }}</td>
+                            <td>
+                                <a href="{{ url_for('user.profile', user_id=order.buyer.id) }}" class="text-decoration-none">{{ order.buyer.username }}</a>
+                            </td>
+                            <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>{{ order.total_price }} ILS</td>
+                            <td>
+                                <form method="POST" action="{{ url_for('order.confirm_order', order_id=order.id) }}" class="d-inline">
+                                    <button type="submit" class="btn btn-success btn-sm">{{ _("Confirm") }}</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('order.reject_order', order_id=order.id) }}" class="d-inline">
+                                    <button type="submit" class="btn btn-danger btn-sm">{{ _("Reject") }}</button>
+                                </form>
+                            </td>
+                        </tr>
+
+                        <!-- Order Details Modal -->
+                        <div class="modal fade" id="orderModal{{ order.id }}" tabindex="-1" aria-labelledby="orderModalLabel{{ order.id }}" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="orderModalLabel{{ order.id }}">{{ _("Order Details") }} - {{ _("Order ID:") }} {{ order.id }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>{{ _("Card") }}</th>
+                                                    <th>{{ _("Set") }}</th>
+                                                    <th>{{ _("Number") }}</th>
+                                                    <th>{{ _("Grade") }}</th>
+                                                    <th>{{ _("Price") }}</th>
+                                                    <th>{{ _("Actions") }}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for card in order.cards %}
+                                                    <tr>
+                                                        <td>{{ card.name }}</td>
+                                                        <td>{{ card.set_name }}</td>
+                                                        <td>{{ card.number }}</td>
+                                                        <td>{{ card.is_graded and card.grade or _("N/A") }}</td>
+                                                        <td>{{ card.price }} ILS</td>
+							<td>
+							    <button type="button" class="btn btn-sm btn-primary" onclick="showCardImage('{{ card.image_url }}')">
+								{{ _("View Card") }}
+							    </button>
+							</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                        <p class="text-end"><strong>{{ _("Total Price:") }} {{ order.total_price }} ILS</strong></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>{{ _("No pending orders available.") }}</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

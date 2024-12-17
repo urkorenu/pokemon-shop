@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
-from ..models import Card, db
-from flask_login import current_user
+from ..models import Card, db, Order, order_cards, User
+from flask_login import current_user, login_required
 import requests
 from app.upload_to_s3 import upload_to_s3
 from config import Config
@@ -85,9 +85,14 @@ def upload_card():
                 filtered_cards = [
                     card
                     for card in card_data
-                    if card.get("set", {}).get("name") == set_name
-                    and card.get("number") == number
+                    if card.get("set", {}).get("name", "").strip().lower() == set_name.strip().lower()
+                    and str(card.get("number", "")).strip().lower() == str(number).strip().lower()
                 ]
+
+                # Handle empty filtered_cards list
+                if not filtered_cards:
+                    return jsonify({"error": "No card matches the given set name and number."}), 404
+
                 card_details = filtered_cards[0]
                 api_card_name = card_details["name"]
 
@@ -228,9 +233,10 @@ def get_card_details():
             filtered_cards = [
                 card
                 for card in card_data
-                if card.get("set", {}).get("name") == set_name
-                and card.get("number") == number
+                if card.get("set", {}).get("name").strip().lower() == set_name.strip().lower()
+                and str(card.get("number", "")).strip().lower() == str(number).strip().lower()
             ]
+
             if not filtered_cards:
                 return jsonify({"error": "No exact match found"}), 404
 
@@ -296,3 +302,51 @@ def get_card_details():
     except requests.RequestException as e:
         print(f"Error fetching card details: {e}", flush=True)
         return jsonify({"error": "Failed to fetch card details"}), 500
+
+
+@seller_bp.route("/seller-dashboard")
+@login_required
+def seller_dashboard():
+    """
+    Seller Dashboard with pending orders, search, and summary statistics.
+    """
+    if current_user.role not in ["uploader", "admin"]:
+        flash("You do not have permission to access this page.", "danger")
+        return redirect(url_for("user.view_cards"))
+
+    search_query = request.args.get("search", "").strip()
+    query = Order.query.filter_by(seller_id=current_user.id, status="Pending")
+
+    if search_query:
+        query = query.join(Order.buyer).filter(
+            User.username.ilike(f"%{search_query}%")
+            | Order.cards.any(Card.name.ilike(f"%{search_query}%"))
+        )
+
+    pending_orders = query.all()
+    orders_with_details = []
+    for order in pending_orders:
+        cards = (
+            db.session.query(Card)
+            .join(order_cards, Card.id == order_cards.c.card_id)
+            .filter(order_cards.c.order_id == order.id)
+            .all()
+        )
+        total_price = sum(card.price for card in cards)
+        orders_with_details.append({
+            "id": order.id,
+            "buyer": order.buyer,
+            "created_at": order.created_at,
+            "cards": cards,
+            "total_price": total_price,
+        })
+
+    stats = {
+        "pending_orders": len(pending_orders),
+        "total_cards": Card.query.filter_by(uploader_id=current_user.id).count(),
+        "sold_cards": Order.query.filter_by(seller_id=current_user.id, status="Completed").count(),
+        "total_revenue": sum(o.total_price for o in Order.query.filter_by(seller_id=current_user.id, status="Completed")),
+    }
+
+    return render_template("seller_dashboard.html", orders=orders_with_details, stats=stats)
+

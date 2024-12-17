@@ -204,8 +204,8 @@
                             </li>
                             {% if current_user.role in ["uploader", "admin"] %}
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('order.pending_orders') }}">
-                                    {{ _('Pending Orders') }}
+                                <a class="dropdown-item" href="{{ url_for('seller.seller_dashboard') }}">
+                                    {{ _('Seller Dashboard') }}
                                     <span class="badge bg-danger rounded-pill">{{ pending_orders }}</span>
                                 </a>
                             </li>
