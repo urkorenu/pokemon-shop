@@ -562,6 +562,7 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
         {
             "id": card.id,
             "name": card.name,
+            "number": card.number,
             "set_name": card.set_name,
             "price": float(card.price),
             "amount": card.amount,
