@@ -341,12 +341,30 @@ def seller_dashboard():
             "total_price": total_price,
         })
 
+    # Completed Orders with recalculated total_price
+    completed_orders_query = Order.query.filter_by(seller_id=current_user.id, status="Confirmed")
+    completed_orders = []
+    for order in completed_orders_query:
+        cards = db.session.query(Card).join(order_cards).filter(order_cards.c.order_id == order.id).all()
+        total_price = sum(card.price for card in cards)
+        completed_orders.append({
+            "id": order.id,
+            "buyer": order.buyer,
+            "created_at": order.created_at,
+            "cards": cards,
+            "total_price": total_price,
+        })
+
     stats = {
         "pending_orders": len(pending_orders),
         "total_cards": Card.query.filter_by(uploader_id=current_user.id).count(),
-        "sold_cards": Order.query.filter_by(seller_id=current_user.id, status="Completed").count(),
-        "total_revenue": sum(o.total_price for o in Order.query.filter_by(seller_id=current_user.id, status="Completed")),
+        "sold_cards": Card.query.filter(Card.uploader_id == current_user.id, Card.amount == 0).count(),
+        "total_revenue": sum(order["total_price"] for order in completed_orders),
     }
 
-    return render_template("seller_dashboard.html", orders=orders_with_details, stats=stats)
-
+    return render_template(
+        "seller_dashboard.html",
+        orders=orders_with_details,
+        completed_orders=completed_orders,
+        stats=stats
+    )
