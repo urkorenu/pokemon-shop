@@ -45,6 +45,12 @@ jobs:
     steps:
       # Checkout the repository
       - uses: actions/checkout@v3
+      
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
       # Setup PostgreSQL locally
       - name: Start PostgreSQL Container
         uses: ankane/setup-postgres@v1
@@ -60,9 +66,9 @@ jobs:
           redis-version: "6"
 
       # Run the tests locally
-      - name: Run Tests
+      - name: Run Docker Compose
         run: |
-          docker-compose up -d
+          docker compose up -d
           export DB_USERNAME=testuser
           export DB_PASSWORD=testpassword
           export DB_HOST=localhost
