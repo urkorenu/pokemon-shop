@@ -45,69 +45,29 @@ jobs:
     steps:
       # Checkout the repository
       - uses: actions/checkout@v3
-      # Configure AWS credentials
-      - uses: aws-actions/configure-aws-credentials@v2
+      # Setup PostgreSQL locally
+      - name: Start PostgreSQL Container
+        uses: ankane/setup-postgres@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-north-1
-      # Launch an EC2 instance
-      - id: launch-ec2
-        run: |
-          INSTANCE_ID=$(aws ec2 run-instances \
-            --image-id ami-0fcbdd3ee4f67a0a0 \
-            --instance-type t3.micro \
-            --key-name kafka \
-            --security-group-ids sg-06329037012f56824 \
-            --subnet-id subnet-0f682fcb7d40627db \
-            --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=Test-Agent}]' \
-            --query 'Instances[0].InstanceId' \
-            --output text)
-          echo "INSTANCE_ID=${INSTANCE_ID}" >> $GITHUB_ENV
-      # Wait for the EC2 instance to be running
-      - run: aws ec2 wait instance-running --instance-ids ${{ env.INSTANCE_ID }}
-      # Get the public IP of the EC2 instance
-      - run: |
-          PUBLIC_IP=$(aws ec2 describe-instances \
-            --instance-ids ${{ env.INSTANCE_ID }} \
-            --query 'Reservations[0].Instances[0].PublicIpAddress' \
-            --output text)
-          echo "PUBLIC_IP=${PUBLIC_IP}" >> $GITHUB_ENV
-      # SSH into the EC2 instance and run tests
-      - uses: appleboy/ssh-action@v0.1.10
+          username: testuser
+          password: testpassword
+          database: testdb
+
+      # Start Redis
+      - name: Start Redis Container
+        uses: supercharge/redis-github-action@1.7.0
         with:
-          host: ${{ env.PUBLIC_IP }}
-          username: ec2-user
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          script: |
-            set -e
-            mkdir -p /home/ec2-user/git
-            cd /home/ec2-user/git
-            if [ -d "pokemon-shop" ]; then
-              rm -rf pokemon-shop
-            fi
-            BRANCH_NAME=${{ github.head_ref || github.ref_name }}
-            git clone --branch $BRANCH_NAME https://github.com/urkorenu/pokemon-shop.git
-            cd pokemon-shop
-            export $(cat <<EOF
-              DB_USERNAME=${{ secrets.DB_USERNAME }}
-              DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-              DB_HOST=${{ secrets.DB_HOST }}
-              DB_NAME=${{ secrets.DB_NAME }}
-              AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-              AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-              AWS_REGION=${{ secrets.AWS_REGION }}
-              S3_BUCKET=${{ secrets.S3_BUCKET }}
-              API_KEY=${{ secrets.API_KEY }}
-              ADMIN_MAIL=${{ secrets.ADMIN_MAIL }}
-            EOF
-            )
-            docker-compose --env-file <(printenv) up --build test
-      # Terminate the EC2 instance after tests
-      - if: always()
+          redis-version: "6"
+
+      # Run the tests locally
+      - name: Run Tests
         run: |
-          aws ec2 terminate-instances --instance-ids ${{ env.INSTANCE_ID }}
-          aws ec2 wait instance-terminated --instance-ids ${{ env.INSTANCE_ID }}
+          docker-compose up -d
+          export DB_USERNAME=testuser
+          export DB_PASSWORD=testpassword
+          export DB_HOST=localhost
+          export DB_NAME=testdb
+          pytest --junitxml=results.xml
 
   build:
     runs-on: ubuntu-latest
