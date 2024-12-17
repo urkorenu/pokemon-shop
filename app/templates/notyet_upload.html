@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <!-- Uploader Role Request -->
+    <div class="mt-4">
+    {% if current_user.request_status %}
+        <h4>{{ _("Uploader Role Request") }}</h4>
+        <p class="text-{{ 'info' if current_user.request_status == 'Pending' else 'success' if current_user.request_status == 'Approved' else 'danger' }}">
+            {{ _("Your request to become an uploader is currently {status}.").format(status=_(current_user.request_status)) }}
+        </p>
+    {% else %}
+        <h4>{{ _("Uploader Role Request") }}</h4>
+        <p class="text-muted">{{ _("Before submitting a request, ensure your profile details (email, location, and contact details) are up-to-date and accurate.") }}</p>
+        <form method="POST" action="{{ url_for('auth.request_uploader') }}">
+            <div class="mb-3">
+                <h5>{{ _("Rules for Uploaders") }}</h5>
+                <ul>
+                    <li>{{ _("You must provide accurate contact information.") }}</li>
+                    <li>{{ _("All uploaded cards must adhere to community guidelines.") }}</li>
+                    <li>{{ _("Failure to follow rules may result in account suspension.") }}</li>
+                </ul>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="rules_accepted" name="rules_accepted" required>
+                    <label class="form-check-label" for="rules_accepted">{{ _("I have read and accept the rules for becoming an uploader.") }}</label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-success">{{ _("Request Uploader Role") }}</button>
+        </form>
+    {% endif %}
+    </div>
+{% endblock %} 

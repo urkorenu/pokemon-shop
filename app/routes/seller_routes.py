@@ -15,7 +15,7 @@ BASE_URL = "https://api.pokemontcg.io/v2"
 
 
 @seller_bp.route("/upload", methods=["GET", "POST"])
-@roles_required("admin", "uploader")
+@login_required
 def upload_card():
     """Upload a new card."""
 
@@ -46,6 +46,10 @@ def upload_card():
         except requests.RequestException as e:
             print(f"Error fetching Japanese sets: {e}", flush=True)
             return []
+
+    if current_user.role == "normal":
+        return render_template("notyet_upload.html")
+
 
     sets = get_pokemon_sets() if request.method == "GET" else []
 
