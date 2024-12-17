@@ -597,3 +597,27 @@ msgstr "סה״כ סטים"
 msgid "Total Cards"
 msgstr "סה״כ קלפים"
 
+msgid "Reset"
+msgstr "איפוס"
+
+msgid "Total Revenue"
+msgstr "סה״כ מכירות"
+
+msgid "Total Cards Uploaded"
+msgstr "סה״כ קלפים שהועלו"
+
+msgid "Search by Buyer or Card Name"
+msgstr "חיפוש על פי קונה או שם קלף"
+
+msgid "Completed Orders"
+msgstr "הזמנות שהסתיימו"
+
+msgid "Card Language:"
+msgstr "שפת הקלף"
+
+msgid "Japanese"
+msgstr "יפני"
+
+msgid "Enter card number"
+msgstr "הזן מספר קלף"
+
