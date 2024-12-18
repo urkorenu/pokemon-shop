@@ -51,29 +51,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
-      # Setup PostgreSQL locally
-      - name: Start PostgreSQL Container
-        uses: ankane/setup-postgres@v1
-        with:
-          username: testuser
-          password: testpassword
-          database: testdb
-
-      # Start Redis
-      - name: Start Redis Container
-        uses: supercharge/redis-github-action@1.7.0
-        with:
-          redis-version: "6"
 
       # Run the tests locally
       - name: Run Docker Compose
         run: |
-          docker compose up -d
-          export DB_USERNAME=testuser
-          export DB_PASSWORD=testpassword
-          export DB_HOST=localhost
-          export DB_NAME=testdb
-          pytest --junitxml=results.xml
+          docker compose up test -d 
 
   build:
     runs-on: ubuntu-latest
