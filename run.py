@@ -1,4 +1,4 @@
-from app import create_app
+from app import create_app, socketio
 
 # Create the Flask application instance
 app = create_app()
@@ -20,5 +20,5 @@ def dict_without(d, key):
 
 
 if __name__ == "__main__":
-    # Run the Flask application
-    app.run(host="0.0.0.0", port=5000)
+    socketio.run(app, debug=True, host="0.0.0.0", port=5000)
+

@@ -17,4 +17,5 @@ Pillow
 Flask-Babel
 Flask-Session
 redis
+flask_socketio
 

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat with {{ receiver.username }}</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+<body>
+    <h2>Chat with {{ receiver.username }}</h2>
+    <div id="chat-box" style="border:1px solid #ccc; height:400px; overflow-y:scroll; padding:10px;">
+        {% for msg in messages %}
+            {% if msg.sender_id == current_user.id %}
+                <p><strong>You:</strong> {{ msg.message }} <em>{{ msg.timestamp }}</em></p>
+            {% else %}
+                <p><strong>{{ receiver.username }}:</strong> {{ msg.message }} <em>{{ msg.timestamp }}</em></p>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <input type="text" id="message-input" placeholder="Type your message..." />
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        const socket = io();
+        const receiverId = "{{ receiver.id }}";
+
+        // Join the room
+        socket.emit("join_room");
+
+        // Listen for incoming messages
+        socket.on("receive_message", (data) => {
+            const chatBox = document.getElementById("chat-box");
+            chatBox.innerHTML += `<p><strong>${data.sender_id == "{{ current_user.id }}" ? "You" : "{{ receiver.username }}" }:</strong> ${data.message} <em>${data.timestamp}</em></p>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+
+        // Send a message
+        function sendMessage() {
+            const message = document.getElementById("message-input").value;
+            socket.emit("send_message", {
+                receiver_id: receiverId,
+                message: message
+            });
+            document.getElementById("message-input").value = "";
+        }
+    </script>
+</body>
+</html>
