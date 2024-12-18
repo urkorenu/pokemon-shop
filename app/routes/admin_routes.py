@@ -52,7 +52,11 @@ def manage_users():
             user.location = request.form.get(f"location_{user_id}")
             user.contact_preference = request.form.get(f"contact_preference_{user_id}")
             user.contact_details = request.form.get(f"contact_details_{user_id}")
-            user.rating = float(request.form.get(f"rating_{user_id}", 0))
+            user.rating = (
+                float(request.form.get(f"rating_{user_id}"))
+                if request.form.get(f"rating_{user_id}")
+                else None
+            )
             user.feedback_count = int(request.form.get(f"feedback_count_{user_id}", 0))
             user.request_status = request.form.get(
                 f"request_status_{user_id}", ""

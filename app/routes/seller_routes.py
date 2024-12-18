@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
-from ..models import Card, db
-from flask_login import current_user
+from ..models import Card, db, Order, order_cards, User
+from flask_login import current_user, login_required
 import requests
 from app.upload_to_s3 import upload_to_s3
 from config import Config
@@ -15,7 +15,7 @@ BASE_URL = "https://api.pokemontcg.io/v2"
 
 
 @seller_bp.route("/upload", methods=["GET", "POST"])
-@roles_required("admin", "uploader")
+@login_required
 def upload_card():
     """Upload a new card."""
 
@@ -46,6 +46,10 @@ def upload_card():
         except requests.RequestException as e:
             print(f"Error fetching Japanese sets: {e}", flush=True)
             return []
+
+    if current_user.role == "normal":
+        return render_template("notyet_upload.html")
+
 
     sets = get_pokemon_sets() if request.method == "GET" else []
 
@@ -85,9 +89,14 @@ def upload_card():
                 filtered_cards = [
                     card
                     for card in card_data
-                    if card.get("set", {}).get("name") == set_name
-                    and card.get("number") == number
+                    if card.get("set", {}).get("name", "").strip().lower() == set_name.strip().lower()
+                    and str(card.get("number", "")).strip().lower() == str(number).strip().lower()
                 ]
+
+                # Handle empty filtered_cards list
+                if not filtered_cards:
+                    return jsonify({"error": "No card matches the given set name and number."}), 404
+
                 card_details = filtered_cards[0]
                 api_card_name = card_details["name"]
 
@@ -228,9 +237,10 @@ def get_card_details():
             filtered_cards = [
                 card
                 for card in card_data
-                if card.get("set", {}).get("name") == set_name
-                and card.get("number") == number
+                if card.get("set", {}).get("name").strip().lower() == set_name.strip().lower()
+                and str(card.get("number", "")).strip().lower() == str(number).strip().lower()
             ]
+
             if not filtered_cards:
                 return jsonify({"error": "No exact match found"}), 404
 
@@ -296,3 +306,69 @@ def get_card_details():
     except requests.RequestException as e:
         print(f"Error fetching card details: {e}", flush=True)
         return jsonify({"error": "Failed to fetch card details"}), 500
+
+
+@seller_bp.route("/seller-dashboard")
+@login_required
+def seller_dashboard():
+    """
+    Seller Dashboard with pending orders, search, and summary statistics.
+    """
+    if current_user.role not in ["uploader", "admin"]:
+        flash("You do not have permission to access this page.", "danger")
+        return redirect(url_for("user.view_cards"))
+
+    search_query = request.args.get("search", "").strip()
+    query = Order.query.filter_by(seller_id=current_user.id, status="Pending")
+
+    if search_query:
+        query = query.join(Order.buyer).filter(
+            User.username.ilike(f"%{search_query}%")
+            | Order.cards.any(Card.name.ilike(f"%{search_query}%"))
+        )
+
+    pending_orders = query.all()
+    orders_with_details = []
+    for order in pending_orders:
+        cards = (
+            db.session.query(Card)
+            .join(order_cards, Card.id == order_cards.c.card_id)
+            .filter(order_cards.c.order_id == order.id)
+            .all()
+        )
+        total_price = sum(card.price for card in cards)
+        orders_with_details.append({
+            "id": order.id,
+            "buyer": order.buyer,
+            "created_at": order.created_at,
+            "cards": cards,
+            "total_price": total_price,
+        })
+
+    # Completed Orders with recalculated total_price
+    completed_orders_query = Order.query.filter_by(seller_id=current_user.id, status="Confirmed")
+    completed_orders = []
+    for order in completed_orders_query:
+        cards = db.session.query(Card).join(order_cards).filter(order_cards.c.order_id == order.id).all()
+        total_price = sum(card.price for card in cards)
+        completed_orders.append({
+            "id": order.id,
+            "buyer": order.buyer,
+            "created_at": order.created_at,
+            "cards": cards,
+            "total_price": total_price,
+        })
+
+    stats = {
+        "pending_orders": len(pending_orders),
+        "total_cards": Card.query.filter_by(uploader_id=current_user.id).count(),
+        "sold_cards": Card.query.filter(Card.uploader_id == current_user.id, Card.amount == 0).count(),
+        "total_revenue": sum(order["total_price"] for order in completed_orders),
+    }
+
+    return render_template(
+        "seller_dashboard.html",
+        orders=orders_with_details,
+        completed_orders=completed_orders,
+        stats=stats
+    )

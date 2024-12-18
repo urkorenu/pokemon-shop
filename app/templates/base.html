@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -42,7 +42,7 @@
         }
         .navbar-nav .nav-link, .dropdown-menu .dropdown-item {
             {% if session.get('lang', 'he') == 'he' %}
-            text-align: right;
+            text-align: center;
             margin-right: 10px;
             {% endif %}
         }
@@ -147,9 +147,7 @@
             }
         }
         .dropdown-menu {
-            {% if session.get('lang', 'en') == 'he' %}
-            text-align: right;
-            {% endif %}
+	    text-align: center;
         }
         .flash-container {
             z-index: 1050;
@@ -169,8 +167,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ url_for('user.view_cards') }}">
-                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="width: 40px;">
-                Pika-Card
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="width: 60px;">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -180,6 +177,25 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/">{{ _('Home') }}</a>
                     </li>
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('order.my_orders') }}">
+			{{ _('My Orders') }}
+                        <span class="badge bg-warning text-dark rounded-pill">{{ orders_without_feedback }}</span>
+			</a>
+                    </li>
+		    <li class="nav-item">
+			<a class="nav-link" href="{{ url_for('seller.upload_card') }}">{{ _('Upload') }}</a>
+		    </li>
+                    {% if current_user.role in ["uploader", "admin"] %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('seller.seller_dashboard') }}">
+                            {{ _('Seller Dashboard') }}
+                            <span class="badge bg-danger rounded-pill">{{ pending_orders }}</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% endif %}
                     {% if current_user.is_authenticated %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarUserMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -196,24 +212,9 @@
                                     {{ _('My Account') }}
                                 </a>
                             </li>
-                            <li>
-                                <a class="dropdown-item" href="{{ url_for('order.my_orders') }}">
-                                    {{ _('My Orders') }}
-                                    <span class="badge bg-warning text-dark rounded-pill">{{ orders_without_feedback }}</span>
-                                </a>
-                            </li>
                             {% if current_user.role in ["uploader", "admin"] %}
                             <li>
-                                <a class="dropdown-item" href="{{ url_for('order.pending_orders') }}">
-                                    {{ _('Pending Orders') }}
-                                    <span class="badge bg-danger rounded-pill">{{ pending_orders }}</span>
-                                </a>
-                            </li>
-                            <li>
                                 <a class="dropdown-item" href="{{ url_for('user.my_cards') }}">{{ _('My Cards') }}</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="{{ url_for('seller.upload_card') }}">{{ _('Upload') }}</a>
                             </li>
                             {% endif %}
                         </ul>
@@ -255,8 +256,8 @@
                     {% if session.get('lang', 'en') == 'he' %}
                         🇮🇱 עברית
                     {% else %}
-                    {% endif %}
                         🇺🇸 English
+                    {% endif %}
                 </button>
             </div>
         </div>

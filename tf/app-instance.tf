@@ -38,7 +38,7 @@ resource "aws_network_interface" "app_interface" {
 # Define the EC2 instance for the application
 resource "aws_instance" "app_instance" {
   ami                    = "ami-0fcbdd3ee4f67a0a0"
-  instance_type          = "t3.medium"
+  instance_type          = "t3.micro"
   iam_instance_profile   = aws_iam_instance_profile.app_profile.name
   key_name               = "kafka"
 

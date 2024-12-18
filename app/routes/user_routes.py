@@ -217,7 +217,7 @@ def profile(user_id):
 @login_required
 def my_cards():
     """
-    Route to view the current user's cards.
+    Route to view the current user's cards with search and pagination.
 
     Methods:
         GET: Renders the page with the user's available and sold cards.
@@ -228,14 +228,30 @@ def my_cards():
     if current_user.role == "normal":
         flash("You do not have permission to access this page.", "danger")
         return redirect(url_for("user.view_cards"))
-    available_cards = (
-        Card.query.filter_by(uploader_id=current_user.id).filter(Card.amount > 0).all()
-    )
-    sold_cards = (
-        Card.query.filter_by(uploader_id=current_user.id).filter(Card.amount == 0).all()
-    )
+
+    # Get search query and pagination details
+    search_query = request.args.get("search", "").strip()
+    page = request.args.get("page", 1, type=int)
+    per_page = 8  # Cards per page
+
+    # Base query for available and sold cards
+    available_query = Card.query.filter(Card.uploader_id == current_user.id, Card.amount > 0)
+    sold_query = Card.query.filter_by(uploader_id=current_user.id, amount=0)
+
+    # Apply search filter
+    if search_query:
+        available_query = available_query.filter(Card.name.ilike(f"%{search_query}%"))
+        sold_query = sold_query.filter(Card.name.ilike(f"%{search_query}%"))
+
+    # Paginate queries
+    available_cards = available_query.paginate(page=page, per_page=per_page, error_out=False)
+    sold_cards = sold_query.paginate(page=page, per_page=per_page, error_out=False)
+
     return render_template(
-        "my_cards.html", available_cards=available_cards, sold_cards=sold_cards
+        "my_cards.html",
+        available_cards=available_cards,
+        sold_cards=sold_cards,
+        search_query=search_query,
     )
 
 
@@ -267,9 +283,14 @@ def edit_card(card_id):
         card.set_name = request.form.get("set_name", card.set_name)
         card.number = request.form.get("number", card.number)
         card.card_type = request.form.get("card_type", card.card_type)
-        card.is_graded = request.form.get("is_graded") == "yes"
-        card.grading_company = request.form.get("grading_company", card.grading_company)
-        card.grade = request.form.get("grade", card.grade)
+
+        is_graded_value = request.form.get("is_graded", "").lower()
+        grade = request.form.get("grade")
+        grading_company = request.form.get("grading_company")
+
+        card.is_graded = is_graded_value == "yes"
+        card.grade = grade if grade not in (None, "", "None") else None
+        card.grading_company = grading_company if grading_company not in (None, "", "None") else None
         db.session.commit()
         flash("Card updated successfully!", "success")
         return redirect(url_for("user.my_cards"))
@@ -541,6 +562,7 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
         {
             "id": card.id,
             "name": card.name,
+            "number": card.number,
             "set_name": card.set_name,
             "price": float(card.price),
             "amount": card.amount,

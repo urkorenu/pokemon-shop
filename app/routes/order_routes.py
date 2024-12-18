@@ -36,15 +36,31 @@ def place_order(card_id):
     seller = User.query.get(seller_id)
     send_email(
         recipient=seller.email,
-        subject="New Order Received",
+        subject=f"New Order Received :) ID: {order.id}",
         body=f"You have received a new order for your card '{card.name}'.\n"
         f"Buyer Details:\n"
         f"Name: {current_user.username}\n"
         f"Contact: {current_user.contact_details} ({current_user.contact_preference})\n"
-        f"Please confirm the order in your dashboard.",
+        f"Please confirm or reject the order in your dashboard."
+
     )
 
-    flash("Order placed successfully! The seller will contact you soon.", "success")
+    # Notify the buyer with a summary
+    send_email(
+        recipient=current_user.email,
+        subject="Order Placed Successfully",
+        body=f"Your order for the card '{card.name}' has been placed successfully!\n"
+             f"The seller will contact you soon to finalize the details.\n\n"
+             f"Order Summary:\n"
+             f"Card Name: {card.name}\n"
+             f"Price: {card.price} ILS\n"
+             f"Set: {card.set_name}\n"
+             f"Order Status: Pending\n\n"
+             f"Thank you for using our platform!"
+    )
+
+    flash("Order placed successfully! A summary has been sent to your email.", "success")
+
     return redirect(url_for("user.view_cards"))
 
 
@@ -74,15 +90,18 @@ def confirm_order(order_id):
     db.session.commit()
 
     buyer = User.query.get(order.buyer_id)
+
+    # Notify the buyer
     send_email(
         recipient=buyer.email,
         subject="Order Confirmed",
-        body=f"Your order for cards has been confirmed by the seller.\n"
-        f"The seller will contact you soon.\n\nOrder ID: {order.id}",
+        body=f"Your order (ID: {order.id}) has been confirmed by the seller.\n"
+             f"You can now rate the seller from your dashboard.\n\n"
+             f"Thank you for using our platform!"
     )
 
-    flash("Order confirmed, cards marked as sold, and buyer notified.", "success")
-    return redirect(url_for("order.pending_orders"))
+    flash("Order confirmed, and the buyer has been notified.", "success")
+    return redirect(url_for("seller.seller_dashboard"))
 
 
 @order_bp.route("/reject-order/<int:order_id>", methods=["POST"])
@@ -100,18 +119,23 @@ def reject_order(order_id):
     order = Order.query.get_or_404(order_id)
     if order.seller_id != current_user.id:
         flash("You are not authorized to reject this order.", "danger")
-        return redirect(url_for("order.pending_orders"))
+        return redirect(url_for("seller.seller_dashboard"))
 
     order.status = "Rejected"
     db.session.commit()
 
+    # Notify the buyer
     send_email(
         recipient=order.buyer.email,
         subject="Order Rejected",
-        body=f"Your order with ID {order.id} has been rejected by the seller.",
+        body=f"Your order (ID: {order.id}) has been rejected by the seller.\n"
+             f"You can browse for other cards or contact the seller if needed.\n\n"
+             f"Thank you for using our platform!"
     )
-    flash("Order rejected successfully.", "success")
-    return redirect(url_for("order.pending_orders"))
+
+    flash("Order rejected successfully, and the buyer has been notified.", "success")
+
+    return redirect(url_for("seller.seller_dashboard"))
 
 
 @order_bp.route("/submit-feedback/<int:order_id>", methods=["POST"])
@@ -190,45 +214,3 @@ def my_orders():
         )
 
     return render_template("my_orders.html", orders=orders_with_details)
-
-
-@order_bp.route("/pending-orders")
-@login_required
-def pending_orders():
-    """
-    View the current user's pending orders.
-
-    Retrieves all pending orders for the current user if they are an uploader or admin, including details about the cards and buyers.
-
-    Returns:
-        Rendered template for the pending orders view.
-    """
-    if current_user.role not in ["uploader", "admin"]:
-        flash("You do not have permission to access this page.", "danger")
-        return redirect(url_for("user.view_cards"))
-
-    pending_orders = Order.query.filter_by(
-        seller_id=current_user.id, status="Pending"
-    ).all()
-    orders_with_details = []
-
-    for order in pending_orders:
-        cards = (
-            db.session.query(Card)
-            .join(order_cards, Card.id == order_cards.c.card_id)
-            .filter(order_cards.c.order_id == order.id)
-            .all()
-        )
-        total_price = sum(card.price for card in cards)
-
-        orders_with_details.append(
-            {
-                "id": order.id,
-                "buyer": order.buyer,
-                "created_at": order.created_at,
-                "cards": cards,
-                "total_price": total_price,
-            }
-        )
-
-    return render_template("pending_orders.html", orders=orders_with_details)

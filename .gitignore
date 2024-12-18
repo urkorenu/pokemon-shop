@@ -1,33 +1,32 @@
 # Python-related files and directories to ignore
-__pycache__/  # Cache files created by Python
-*.py[cod]     # Compiled Python files
-env/          # Environment directory
-.venv/        # Virtual environment directory
-*.idea        # IDE configuration files
-*.DS_Store    # macOS directory attribute files
+__pycache__/
+*.py[cod]
+env/
+.venv/
+*.idea
+*.DS_Store
 
 # Docker-related files to ignore
-*.log         # Log files
-*.pid         # Process ID files
-*.seed        # Seed files
-*.pid.lock    # Lock files for process IDs
-*.swp         # Swap files
-.env          # Environment variable files
+*.log
+*.pid
+*.seed
+*.pid.lock
+*.swp
+.env
 
 # SQLite database files to ignore
-*.sqlite3     # SQLite database files
+*.sqlite3
 
 # Database instance directory to ignore
-instance/     # Database instance directory
+instance/
 
 # Terraform files to ignore
-tf/.terraform/          # Ignore Terraform internal files
-tf/*.tfvars             # Ignore Terraform variable files
-tf/.terraform.lock.hcl  # Ignore Terraform lock file
-tf/*.tfstate            # Ignore Terraform state files
-tf/*.tfstate.*          # Ignore Terraform state backups
-tf/providers/           # Ignore providers directory
-
+tf/.terraform/
+tf/*.tfvars
+tf/.terraform.lock.hcl
+tf/*.tfstate
+tf/*.tfstate.*
+tf/providers/
 
 # Ignore .DS_Store files and .idea directory recursively
 **/.DS_Store

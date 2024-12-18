@@ -21,4 +21,4 @@ EXPOSE 5000
 RUN pybabel compile -d app/translations
 
 # Use Gunicorn for production with specified parameters
-CMD ["gunicorn", "--worker-class", "sync", "--timeout", "120", "--keep-alive", "30", "-w", "9", "-b", "0.0.0.0:5000", "--access-logfile", "-", "--error-logfile", "-", "run:app"]
+CMD ["gunicorn", "--worker-class", "sync", "--timeout", "120", "--keep-alive", "30", "-w", "4", "-b", "0.0.0.0:5000", "--access-logfile", "-", "--error-logfile", "-", "run:app"]
