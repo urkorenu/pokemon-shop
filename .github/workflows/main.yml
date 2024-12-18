@@ -55,7 +55,7 @@ jobs:
       # Run the tests locally
       - name: Run Docker Compose
         run: |
-          docker compose up test -d 
+          docker compose up test
 
   build:
     runs-on: ubuntu-latest
