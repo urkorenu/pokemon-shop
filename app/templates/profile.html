@@ -1,10 +1,79 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    /* Profile Header Styling */
+    .profile-header {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-header h2 {
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+
+    .profile-header p {
+        margin: 0.3rem 0;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .btn-report {
+        background-color: #dc3545;
+        color: #fff;
+        border-radius: 5px;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        font-weight: bold;
+    }
+
+    .btn-report:hover {
+        background-color: #b02a37;
+    }
+
+    /* Feedback Section */
+    .feedback-card {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        padding: 15px;
+    }
+
+    .feedback-card .feedback-user {
+        font-weight: bold;
+        color: #3B4CCA;
+    }
+
+    .feedback-card p {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    .feedback-rating {
+        color: #ffc107;
+        font-size: 1rem;
+    }
+
+    /* Uploaded Cards Section */
+    .uploaded-cards-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #3B4CCA;
+        margin-top: 40px;
+        margin-bottom: 20px;
+    }
+</style>
+
 <div class="container mt-4">
-    <!-- User Info Section -->
-    <div class="row align-items-center mb-4">
-        <div class="col-md-9">
+    <!-- Profile Header Section -->
+    <div class="profile-header d-flex flex-wrap align-items-center justify-content-between mb-4">
+        <div class="profile-info">
             <h2>{{ user.username }}</h2>
             <p><i class="bi bi-geo-alt-fill"></i> <strong>{{ _('Location:') }}</strong> {{ user.location or _('N/A') }}</p>
             <p><i class="bi bi-star-fill text-warning"></i> <strong>{{ _('Rating:') }}</strong> {{ "%.1f" | format(user.rating) if user.rating else _('No ratings yet') }} ({{ user.feedback_count }} {{ _('feedback') }})</p>
@@ -12,8 +81,8 @@
             <p class="text-danger"><strong>{{ _('Status:') }}</strong> {{ _('Banned') }}</p>
             {% endif %}
         </div>
-        <div class="col-md-3 text-end">
-            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#reportUserModal">
+        <div class="report-user">
+            <button class="btn btn-report" data-bs-toggle="modal" data-bs-target="#reportUserModal">
                 <i class="bi bi-flag"></i> {{ _('Report User') }}
             </button>
         </div>
@@ -45,30 +114,25 @@
     </div>
 
     <!-- Feedback Section -->
-    <div class="card mb-4 shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h3 class="mb-0"><i class="bi bi-chat-dots-fill"></i> {{ _('Feedbacks') }}</h3>
+    <div class="feedback-section">
+        <h3 class="uploaded-cards-title"><i class="bi bi-chat-dots-fill"></i> {{ _('Feedbacks') }}</h3>
+        {% if feedback %}
+        {% for item in feedback %}
+        <div class="feedback-card">
+            <p class="feedback-user">{{ item.username }}</p>
+            <p>{{ item.feedback }}</p>
+            <p class="feedback-rating"><i class="bi bi-star-fill"></i> {{ _('Rating:') }} {{ item.rating }}</p>
         </div>
-        <div class="card-body">
-            {% if feedback %}
-                <ul class="list-group list-group-flush">
-                    {% for item in feedback %}
-                    <li class="list-group-item">
-                        <p class="mb-1"><strong>{{ item.username }}:</strong> {{ item.feedback }}</p>
-                        <p class="mb-0"><i class="bi bi-star-fill text-warning"></i> {{ _('Rating:') }} {{ item.rating }}</p>
-                    </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="text-muted">{{ _('No feedback available yet.') }}</p>
-            {% endif %}
-        </div>
+        {% endfor %}
+        {% else %}
+        <p class="text-muted">{{ _('No feedback available yet.') }}</p>
+        {% endif %}
     </div>
 
-    <!-- Include the Search Form -->
     {% include "_search_form.html" %}
 
-    <h3 class="mt-4">{{ _('Uploaded Cards') }}</h3>
+    <!-- Uploaded Cards Section -->
+    <h3 class="uploaded-cards-title">{{ _('Uploaded Cards') }}</h3>
     <div class="row">
         {% if cards %}
         {% for card in cards %}
@@ -84,3 +148,4 @@
     {% include "_pagination_form.html" %}
 </div>
 {% endblock %}
+

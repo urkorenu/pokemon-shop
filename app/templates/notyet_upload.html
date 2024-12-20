@@ -1,16 +1,74 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <!-- Uploader Role Request -->
-    <div class="mt-4">
+<style>
+    /* General Styling */
+    .uploader-request-container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h4, h5 {
+        color: #3B4CCA;
+        font-weight: bold;
+    }
+
+    p.text-muted {
+        font-size: 0.9rem;
+    }
+
+    .form-check-label {
+        font-size: 0.9rem;
+    }
+
+    ul {
+        padding-left: 20px;
+    }
+
+    ul li {
+        font-size: 0.9rem;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+
+    .alert-info, .alert-success, .alert-danger {
+        padding: 10px;
+        border-radius: 6px;
+    }
+
+    @media (max-width: 768px) {
+        .uploader-request-container {
+            padding: 15px;
+        }
+    }
+</style>
+
+<div class="uploader-request-container mt-4">
     {% if current_user.request_status %}
+        <!-- Request Status Section -->
         <h4>{{ _("Uploader Role Request") }}</h4>
-        <p class="text-{{ 'info' if current_user.request_status == 'Pending' else 'success' if current_user.request_status == 'Approved' else 'danger' }}">
+        <div class="alert alert-{{ 'info' if current_user.request_status == 'Pending' else 'success' if current_user.request_status == 'Approved' else 'danger' }}">
             {{ _("Your request to become an uploader is currently {status}.").format(status=_(current_user.request_status)) }}
-        </p>
+        </div>
     {% else %}
+        <!-- Request Form Section -->
         <h4>{{ _("Uploader Role Request") }}</h4>
-        <p class="text-muted">{{ _("Before submitting a request, ensure your profile details (email, location, and contact details) are up-to-date and accurate.") }}</p>
+        <p class="text-muted">
+            {{ _("Before submitting a request, ensure your profile details (email, location, and contact details) are up-to-date and accurate.") }}
+        </p>
         <form method="POST" action="{{ url_for('auth.request_uploader') }}">
             <div class="mb-3">
                 <h5>{{ _("Rules for Uploaders") }}</h5>
@@ -19,13 +77,16 @@
                     <li>{{ _("All uploaded cards must adhere to community guidelines.") }}</li>
                     <li>{{ _("Failure to follow rules may result in account suspension.") }}</li>
                 </ul>
-                <div class="form-check">
+                <div class="form-check mt-3">
                     <input class="form-check-input" type="checkbox" id="rules_accepted" name="rules_accepted" required>
-                    <label class="form-check-label" for="rules_accepted">{{ _("I have read and accept the rules for becoming an uploader.") }}</label>
+                    <label class="form-check-label" for="rules_accepted">
+                        {{ _("I have read and accept the rules for becoming an uploader.") }}
+                    </label>
                 </div>
             </div>
-            <button type="submit" class="btn btn-success">{{ _("Request Uploader Role") }}</button>
+            <button type="submit" class="btn btn-success w-100">{{ _("Request Uploader Role") }}</button>
         </form>
     {% endif %}
-    </div>
-{% endblock %} 
+</div>
+{% endblock %}
+

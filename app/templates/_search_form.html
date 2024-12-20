@@ -1,53 +1,82 @@
-<!-- Showcase Section -->
-<div class="row mb-4 text-center">
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">{{ _('Total Cards') }}</h5>
-                <p class="card-text fs-3 fw-bold">{{ total_cards }}</p>
-            </div>
+<style>
+    /* Compact Showcase Section */
+    .showcase-card {
+        padding: 10px;
+        margin: 0 auto;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        text-align: center; /* Ensures text alignment is centered */
+    }
+
+    .showcase-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .showcase-icon {
+        font-size: 1.8rem;
+        margin-bottom: 5px;
+    }
+
+    .showcase-title {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-bottom: 2px;
+    }
+
+    .showcase-value {
+        font-size: 1.3rem;
+        font-weight: bold;
+        margin: 0;
+    }
+</style>
+
+<!-- Compact Showcase Section -->
+<div class="row mb-3 justify-content-center text-center">
+    <div class="col-6 col-sm-4 col-md-2">
+        <div class="showcase-card">
+            <i class="bi bi-collection-fill text-primary showcase-icon"></i>
+            <p class="showcase-title">{{ _('Total Cards') }}</p>
+            <p class="showcase-value">{{ total_cards }}</p>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">{{ _('Total Sets') }}</h5>
-                <p class="card-text fs-3 fw-bold">{{ total_sets }}</p>
-            </div>
+    <div class="col-6 col-sm-4 col-md-2">
+        <div class="showcase-card">
+            <i class="bi bi-boxes text-success showcase-icon"></i>
+            <p class="showcase-title">{{ _('Total Sets') }}</p>
+            <p class="showcase-value">{{ total_sets }}</p>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">{{ _('Total Graded Cards') }}</h5>
-                <p class="card-text fs-3 fw-bold">{{ total_graded }}</p>
-            </div>
+    <div class="col-6 col-sm-4 col-md-2">
+        <div class="showcase-card">
+            <i class="bi bi-award-fill text-warning showcase-icon"></i>
+            <p class="showcase-title">{{ _('Total Graded Cards') }}</p>
+            <p class="showcase-value">{{ total_graded }}</p>
         </div>
     </div>
 </div>
-
 <!-- Search Form -->
-<form method="GET" action="{{ request.path }}" class="row g-3 mb-4" id="search-form">
-    <!-- Name Search -->
-    <div class="col-md-3">
-        <input type="text" name="name" class="form-control" placeholder="{{ _('Search by Pokémon Name') }}" value="{{ request.args.get('name', '') }}">
+<form method="GET" action="{{ request.path }}" class="row g-2 align-items-center mb-3">
+    <!-- Pokémon Name Search -->
+    <div class="col-sm-6 col-md-3">
+        <input type="text" name="name" class="form-control" placeholder="{{ _('Search by Pokémon Name') }}"
+               value="{{ request.args.get('name', '') }}">
     </div>
 
     <!-- Set Name with Autocomplete -->
-    <div class="col-md-3">
-	<input class="form-control" list="set_names" id="set_name" name="set_name" 
-	       placeholder="{{ _('Type to search...') }}" 
-	       value="{{ request.args.get('set_name', '') }}">
-	<datalist id="set_names">
-	    {% for set_name in unique_set_names %}
-	    <option value="{{ set_name }}">{{ set_name }}</option>
-	    {% endfor %}
-	</datalist>
+    <div class="col-sm-6 col-md-3">
+        <input class="form-control" list="set_names" id="set_name" name="set_name" placeholder="{{ _('Type to search...') }}"
+               value="{{ request.args.get('set_name', '') }}">
+        <datalist id="set_names">
+            {% for set_name in unique_set_names %}
+            <option value="{{ set_name }}">{{ set_name }}</option>
+            {% endfor %}
+        </datalist>
     </div>
 
-
     <!-- Graded Filter -->
-    <div class="col-md-2">
+    <div class="col-sm-6 col-md-2">
         <select name="is_graded" class="form-select">
             <option value="">{{ _('Graded?') }}</option>
             <option value="yes" {% if request.args.get('is_graded') == 'yes' %}selected{% endif %}>{{ _('Yes') }}</option>
@@ -56,7 +85,7 @@
     </div>
 
     <!-- Location Filter -->
-    <div class="col-md-2">
+    <div class="col-sm-6 col-md-2">
         <select name="location" class="form-select">
             <option value="">{{ _('Filter by Location') }}</option>
             {% for city in cities %}
@@ -66,7 +95,7 @@
     </div>
 
     <!-- Sort Options -->
-    <div class="col-md-2">
+    <div class="col-sm-6 col-md-2">
         <select name="sort" class="form-select">
             <option value="">{{ _('Sort By') }}</option>
             <option value="price_asc" {% if request.args.get('sort') == 'price_asc' %}selected{% endif %}>{{ _('Price: Low to High') }}</option>
@@ -75,18 +104,19 @@
         </select>
     </div>
 
+    <!-- Show Sold Checkbox -->
     {% if show_sold_checkbox %}
-    <div class="col-md-2 form-check d-flex align-items-center">
+    <div class="col-sm-6 col-md-2 form-check d-flex align-items-center">
         <input class="form-check-input me-2" type="checkbox" name="show_sold" id="showSold"
                {% if request.args.get('show_sold') == 'on' %}checked{% endif %} onchange="this.form.submit()">
-        <label class="form-check-label" for="showSold">{{ _('Show Sold Cards') }}</label>
+        <label class="form-check-label small" for="showSold">{{ _('Show Sold Cards') }}</label>
     </div>
     {% endif %}
 
     <!-- Buttons -->
-    <div class="col-md-2 d-flex gap-2">
+    <div class="col-md-3 d-flex gap-2">
         <button type="submit" class="btn btn-primary w-100">{{ _('Search') }}</button>
-        <a href="{{ request.path }}" class="btn btn-secondary w-100">{{ _('Reset') }}</a>
+        <a href="{{ request.path }}" class="btn btn-outline-secondary w-100">{{ _('Reset') }}</a>
     </div>
 </form>
 
@@ -99,8 +129,6 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.5/awesomplete.min.css">
-<script
-    src="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.5/awesomplete.min.js"
-    integrity="sha384-G4zGsz+qCqGRlsONIGGi87FhrrNLtnQ43C6c6dkx3swQY33eaHn3A1rV2Il6szAM"
-    crossorigin="anonymous">
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.5/awesomplete.min.js"></script>
+
+

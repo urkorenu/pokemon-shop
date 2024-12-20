@@ -1,86 +1,140 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    /* General Section Styling */
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #3B4CCA;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-title i {
+        font-size: 1.3rem;
+    }
+
+    hr {
+        border-top: 1px solid #ddd;
+    }
+
+    /* Form Styling */
+    .form-control:focus, .form-select:focus {
+        border-color: #3B4CCA;
+        box-shadow: 0 0 5px rgba(59, 76, 202, 0.5);
+    }
+
+    .btn-primary, .btn-danger {
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #2a3698;
+    }
+
+    .btn-danger:hover {
+        background-color: #b02a37;
+    }
+
+    /* Disabled Section */
+    .disabled-section {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    /* Order History Accordion */
+    .accordion-button {
+        font-weight: bold;
+        color: #3B4CCA;
+    }
+
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: #3B4CCA;
+    }
+</style>
+
 <div class="container mt-4">
-    <h2>{{ _("My Account") }}</h2>
-    <hr>
-
     <!-- Profile Details -->
-    <h4>{{ _("Profile") }}</h4>
-    <form method="POST" action="{{ url_for('auth.account') }}">
+    <h2 class="text-center mb-4">{{ _("My Account") }}</h2>
+
+    <!-- Profile Form -->
+    <h4 class="section-title"><i class="bi bi-person-circle"></i> {{ _("Profile") }}</h4>
+    <form method="POST" action="{{ url_for('auth.account') }}" class="mb-5">
         <input type="hidden" name="action" value="update_profile">
-        <div class="mb-3">
-            <label for="username" class="form-label">{{ _("Username") }}</label>
-            <input type="text" class="form-control" id="username" name="username" value="{{ current_user.username }}" required>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label for="username" class="form-label">{{ _("Username") }}</label>
+                <input type="text" class="form-control" id="username" name="username" value="{{ current_user.username }}" required>
+            </div>
+            <div class="col-md-6">
+                <label for="email" class="form-label">{{ _("Email") }}</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ current_user.email }}" required>
+            </div>
+            <div class="col-md-6">
+                <label for="location" class="form-label">{{ _("Location") }}</label>
+                <select class="form-select" id="location" name="location" required>
+                    <option value="" disabled>{{ _("Select Your Location") }}</option>
+                    {% for city in cities %}
+                        <option value="{{ city }}" {% if current_user.location == city %}selected{% endif %}>{{ city }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="contact_preference" class="form-label">{{ _("Contact Preference") }}</label>
+                <select class="form-select" id="contact_preference" name="contact_preference" required>
+                    <option value="email" {% if current_user.contact_preference == 'email' %}selected{% endif %}>{{ _("Email") }}</option>
+                    <option value="phone" {% if current_user.contact_preference == 'phone' %}selected{% endif %}>{{ _("Phone") }}</option>
+                </select>
+            </div>
+            <div class="col-md-12">
+                <label for="contact_details" class="form-label">{{ _("Contact Details") }}</label>
+                <input type="text" class="form-control" id="contact_details" name="contact_details" value="{{ current_user.contact_details }}" required>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="email" class="form-label">{{ _("Email") }}</label>
-            <input type="email" class="form-control" id="email" name="email" value="{{ current_user.email }}" required>
+        <div class="text-end mt-3">
+            <button type="submit" class="btn btn-primary">{{ _("Update Profile") }}</button>
         </div>
-        <div class="mb-3">
-            <label for="location" class="form-label">{{ _("Location") }}</label>
-            <select class="form-select" id="location" name="location" required>
-                <option value="" disabled selected>{{ _("Select Your Location") }}</option>
-                {% for city in cities %}
-                    <option value="{{ city }}" {% if current_user.location == city %}selected{% endif %}>{{ city }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="contact_preference" class="form-label">{{ _("Contact Preference") }}</label>
-            <select class="form-select" id="contact_preference" name="contact_preference" required>
-                <option value="email" {% if current_user.contact_preference == 'email' %}selected{% endif %}>{{ _("Email") }}</option>
-                <option value="phone" {% if current_user.contact_preference == 'phone' %}selected{% endif %}>{{ _("Phone") }}</option>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label for="contact_details" class="form-label">{{ _("Contact Details") }}</label>
-            <input type="text" class="form-control" id="contact_details" name="contact_details" value="{{ current_user.contact_details }}" required>
-        </div>
-        <button type="submit" class="btn btn-primary">{{ _("Update Profile") }}</button>
     </form>
 
-    <!-- Change Password - Disabled Temporarily -->
-    <h4 class="mt-5">{{ _("Change Password") }}</h4>
-    <div class="alert alert-info" role="alert">{{ _("This feature is temporarily disabled. We are working on improvements. Please check back later!") }}</div>
-    <form method="POST" action="{{ url_for('auth.account') }}" onsubmit="return false;" style="pointer-events: none; opacity: 0.6;">
-        <input type="hidden" name="action" value="change_password">
-        <div class="mb-3">
-            <label for="old_password" class="form-label">{{ _("Old Password") }}</label>
-            <input type="password" class="form-control" id="old_password" name="old_password" disabled>
-        </div>
-        <div class="mb-3">
-            <label for="new_password" class="form-label">{{ _("New Password") }}</label>
-            <input type="password" class="form-control" id="new_password" name="new_password" disabled>
-        </div>
-        <button type="submit" class="btn btn-warning" disabled>{{ _("Change Password") }}</button>
-    </form>
+    <!-- Change Password Section -->
+    <h4 class="section-title"><i class="bi bi-lock-fill"></i> {{ _("Change Password") }}</h4>
+    <div class="alert alert-info">{{ _("This feature is temporarily disabled. Please check back later!") }}</div>
+    <div class="disabled-section">
+        <form method="POST" action="{{ url_for('auth.account') }}">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="old_password" class="form-label">{{ _("Old Password") }}</label>
+                    <input type="password" class="form-control" id="old_password" disabled>
+                </div>
+                <div class="col-md-6">
+                    <label for="new_password" class="form-label">{{ _("New Password") }}</label>
+                    <input type="password" class="form-control" id="new_password" disabled>
+                </div>
+            </div>
+            <div class="text-end mt-3">
+                <button type="submit" class="btn btn-warning" disabled>{{ _("Change Password") }}</button>
+            </div>
+        </form>
+    </div>
 
-    <!-- Delete Account -->
-    <h4 class="mt-5">{{ _("Delete Account") }}</h4>
+    <hr class="my-5">
+
+
+    <!-- Delete Account Section -->
+    <h4 class="section-title text-danger"><i class="bi bi-trash"></i> {{ _("Delete Account") }}</h4>
     <form method="POST" action="{{ url_for('auth.account') }}">
         <input type="hidden" name="action" value="delete_account">
         <p class="text-danger">{{ _("Deleting your account is permanent and cannot be undone.") }}</p>
-        <button type="submit" class="btn btn-danger" onclick="return confirm('{{ _("Are you sure you want to delete your account?") }}')">{{ _("Delete Account") }}</button>
+        <div class="text-end">
+            <button type="submit" class="btn btn-danger" onclick="return confirm('{{ _("Are you sure you want to delete your account?") }}')">
+                {{ _("Delete Account") }}
+            </button>
+        </div>
     </form>
-
-    <hr>
-
-    <!-- Order History -->
-    <h4>{{ _("Order History") }}</h4>
-    {% if orders %}
-    <ul class="list-group">
-        {% for order in orders %}
-        <li class="list-group-item">
-            <strong>{{ _("Order ID") }}:</strong> {{ order.id }} |
-            <strong>{{ _("Status") }}:</strong> {{ _(order.status) }} |
-            <strong>{{ _("Total") }}:</strong> {{ order.cards | sum(attribute='price') }} {{ _("ILS") }} |
-            <strong>{{ _("Date") }}:</strong> {{ order.created_at.strftime('%Y-%m-%d') }}
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <p>{{ _("No orders found.") }}</p>
-    {% endif %}
 </div>
 {% endblock %}
+
