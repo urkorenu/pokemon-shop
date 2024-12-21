@@ -5,6 +5,7 @@ resource "aws_lb" "app_lb" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.elb_sg.id]
   subnets            = [aws_subnet.public_zone1.id, aws_subnet.public_zone2.id]
+  idle_timeout = 60
 
   # Add tags to the ALB
   tags = {
@@ -29,7 +30,7 @@ resource "aws_lb_target_group" "app_target_group" {
   # Configure health check settings for the target group
   health_check {
     enabled             = true
-    path                = "/"
+    path                = "/health"
     port                = "traffic-port"
     protocol            = "HTTP"
     matcher             = "200"

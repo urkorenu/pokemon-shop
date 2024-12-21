@@ -1,60 +1,144 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    /* Table Styling */
+    table {
+        border-collapse: separate;
+        border-spacing: 0 10px;
+    }
+
+    .table thead th {
+        background-color: #3B4CCA;
+        color: white;
+        text-align: center;
+    }
+
+    .table tbody tr {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .table tbody tr td {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    .table tbody tr:hover {
+        background-color: #eef2ff;
+    }
+
+    /* Responsive Table for Mobile */
+    @media (max-width: 768px) {
+        .table thead {
+            display: none; /* Hide the table headers on small screens */
+        }
+
+        .table,
+        .table tbody,
+        .table tr,
+        .table td {
+            display: block;
+            width: 100%;
+        }
+
+        .table tr {
+            margin-bottom: 15px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .table td {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .table td:last-child {
+            border-bottom: none;
+        }
+
+        .table td::before {
+            content: attr(data-label);
+            font-weight: bold;
+            color: #3B4CCA;
+        }
+    }
+</style>
+
 <div class="container mt-4">
-    <h2>{{ _('My Cart') }}</h2>
-    <hr>
+    <h2 class="text-center mb-4">{{ _('My Cart') }}</h2>
+
     {% if grouped_cart %}
         {% for seller_id, items in grouped_cart.items() %}
-            <h4>
-                {{ _('Seller:') }}
-                <a href="{{ url_for('user.profile', user_id=seller_id) }}" class="text-decoration-none">
-                    {{ items[0].card.uploader.username }}
-                </a>
-            </h4>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>{{ _('Card') }}</th>
-                        <th>{{ _('Set') }}</th>
-                        <th>{{ _('Card Number') }}</th>
-                        <th>{{ _('Grade') }}</th>
-                        <th>{{ _('Price') }}</th>
-                        <th>{{ _('Actions') }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in items %}
-                    <tr>
-                        <td>{{ item.card.name }}</td>
-                        <td>{{ item.card.set_name }}</td>
-                        <td>{{ item.card.number }}</td>
-                        <td>{{ item.card.is_graded and item.card.grade or _('N/A') }}</td>
-                        <td>{{ item.card.price }} {{ _('ILS') }}</td>
-                        <td>
-                            <form method="POST" action="{{ url_for('cart.remove_from_cart', cart_id=item.id) }}" class="d-inline">
-                                <button type="submit" class="btn btn-sm btn-danger">{{ _('Remove') }}</button>
-                            </form>
-                            <button
-                                type="button"
-                                class="btn btn-sm btn-primary"
-                                onclick="showCardImage('{{ item.card.image_url }}', '{{ item.card.name }}')">
-                                {{ _('View Card') }}
-                            </button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <div class="mb-4">
+                <h4 class="text-primary">
+                    {{ _('Seller:') }}
+                    <a href="{{ url_for('user.profile', user_id=seller_id) }}" class="text-decoration-none">
+                        {{ items[0].card.uploader.username }}
+                    </a>
+                </h4>
+
+                <!-- Responsive Cart Table -->
+                <div class="table-responsive">
+                    <table class="table table-borderless">
+                        <thead>
+                            <tr>
+                                <th>{{ _('Card') }}</th>
+                                <th>{{ _('Set') }}</th>
+                                <th>{{ _('Card Number') }}</th>
+                                <th>{{ _('Grade') }}</th>
+                                <th>{{ _('Price') }}</th>
+                                <th>{{ _('Actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in items %}
+                            <tr>
+                                <td data-label="{{ _('Card') }}">
+                                    <strong>{{ item.card.name }}</strong>
+                                </td>
+                                <td data-label="{{ _('Set') }}">{{ item.card.set_name }}</td>
+                                <td data-label="{{ _('Card Number') }}">{{ item.card.number }}</td>
+                                <td data-label="{{ _('Grade') }}">
+                                    {{ item.card.is_graded and item.card.grade or _('N/A') }}
+                                </td>
+                                <td data-label="{{ _('Price') }}">{{ item.card.price }} {{ _('ILS') }}</td>
+                                <td data-label="{{ _('Actions') }}">
+                                    <form method="POST" action="{{ url_for('cart.remove_from_cart', cart_id=item.id) }}" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-danger">{{ _('Remove') }}</button>
+                                    </form>
+                                    <button
+                                        type="button"
+                                        class="btn btn-sm btn-outline-primary"
+                                        onclick="showCardImage('{{ item.card.image_url }}', '{{ item.card.name }}')">
+                                        {{ _('View Card') }}
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         {% endfor %}
-        <div class="text-end">
-            <h5>{{ _('Total Price:') }} {{ total_price }} {{ _('ILS') }}</h5>
+
+        <!-- Total Price Section -->
+        <div class="total-container mt-4 d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">{{ _('Total Price:') }} <strong>{{ total_price }} {{ _('ILS') }}</strong></h4>
             <form method="POST" action="{{ url_for('cart.checkout') }}">
-                <button type="submit" class="btn btn-success">{{ _('Checkout') }}</button>
+                <button type="submit" class="btn btn-success px-4">{{ _('Checkout') }}</button>
             </form>
         </div>
     {% else %}
-        <p>{{ _('Your cart is empty.') }} <a href="/">{{ _('Start shopping!') }}</a></p>
+        <div class="text-center">
+            <p class="lead">{{ _('Your cart is empty.') }}</p>
+            <a href="/" class="btn btn-primary">{{ _('Start Shopping!') }}</a>
+        </div>
     {% endif %}
 </div>
 {% endblock %}
+

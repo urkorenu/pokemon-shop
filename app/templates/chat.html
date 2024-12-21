@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    /* General Styling */
+    .chat-container {
+        height: 90vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Sidebar */
+    .sidebar {
+        border-right: 1px solid #ddd;
+        background: #f8f9fa;
+        height: 100%;
+        overflow-y: auto;
+    }
+
+    .sidebar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background: #3b4cca;
+        color: white;
+    }
+
+    .user-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        transition: all 0.2s;
+    }
+
+    .user-item:hover {
+        background: #f0f0f0;
+        cursor: pointer;
+    }
+
+    .user-item.active {
+        background: #e0e7ff;
+        font-weight: bold;
+    }
+
+    .unread-badge {
+        background-color: #dc3545;
+        color: white;
+        font-size: 0.75rem;
+        padding: 2px 6px;
+        border-radius: 12px;
+    }
+
+    .recent-message {
+        font-size: 0.85rem;
+        color: #6c757d;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        max-width: 150px;
+    }
+
+    /* Chat Area */
+    .chat-header {
+        background-color: #3b4cca;
+        color: white;
+        padding: 10px;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .chat-box {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-top: none;
+    }
+
+    .message {
+        margin: 5px 0;
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+    }
+
+    .message.sent {
+        justify-content: flex-end;
+    }
+
+    .message.received {
+        justify-content: flex-start;
+    }
+
+    .message-bubble {
+        max-width: 70%;
+        padding: 10px;
+        border-radius: 15px;
+        position: relative;
+    }
+
+    .message.sent .message-bubble {
+        background-color: #3b4cca;
+        color: white;
+    }
+
+    .message.received .message-bubble {
+        background-color: #f1f1f1;
+        color: #333;
+    }
+
+    .timestamp {
+        font-size: 0.75rem;
+        margin-top: 2px;
+        text-align: right;
+        color: #6c757d;
+    }
+
+    /* Input Section */
+    .input-section {
+        display: flex;
+        align-items: center;
+        border-top: 1px solid #ddd;
+        padding: 10px;
+        background: #f8f9fa;
+    }
+
+    .input-section input {
+        flex: 1;
+        margin-right: 10px;
+        border-radius: 15px;
+        padding: 10px;
+    }
+
+    .input-section button {
+        background-color: #3b4cca;
+        color: white;
+        border-radius: 15px;
+        padding: 10px 15px;
+    }
+
+    .input-section button:hover {
+        background-color: #2a3698;
+    }
+
+    /* Mobile Sidebar Popup */
+    #sidebar-popup {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: white;
+        z-index: 1050;
+        overflow-y: auto;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    #sidebar-popup.active {
+        display: block;
+    }
+
+    /* Floating Button */
+    .floating-button {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #3b4cca;
+        color: white;
+        font-size: 1.5rem;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        z-index: 1060;
+        border: none;
+    }
+
+    .floating-button:hover {
+        background-color: #2a3698;
+    }
+</style>
+
+<div class="container mt-4 chat-container">
+    <div class="row h-100">
+        <!-- Sidebar: User List -->
+        <div class="col-md-4 sidebar d-none d-md-block">
+            <div class="sidebar-header">
+                <h5>{{ _('Chats') }}</h5>
+            </div>
+            <div class="user-list">
+                <ul id="user-list" class="list-group">
+                    {% for user in other_users %}
+                    <li class="user-item list-group-item {{ 'active' if user.id == receiver.id else '' }}" onclick="selectUser({{ user.id }})">
+                        <div>
+                            <strong>{{ user.username }}</strong>
+                            <p class="recent-message">{{ user.recent_message or _('No recent messages') }}</p>
+                        </div>
+                        {% if user.unread_messages %}
+                        <span class="unread-badge">{{ user.unread_messages }}</span>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Chat Window -->
+        <div class="col-md-8 chat-window">
+            {% if receiver %}
+            <div class="chat-header">
+                <h5 class="mb-0">{{ _('Chat with') }} {{ receiver.username }}</h5>
+            </div>
+            <div id="chat-box" class="chat-box">
+                {% for msg in messages %}
+                <div class="message {{ 'sent' if msg.sender_id == current_user.id else 'received' }}">
+                    <div class="message-bubble">
+                        <strong>{{ msg.sender_username }}</strong>: {{ msg.message }}
+                        <div class="timestamp">{{ msg.timestamp }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="input-section">
+                <input type="text" id="message-input" class="form-control" placeholder="{{ _('Type your message...') }}" onkeypress="handleEnter(event)">
+                <button class="btn btn-primary" onclick="sendMessage()">{{ _('Send') }}</button>
+            </div>
+            {% else %}
+            <div class="text-center mt-5">
+                <p>{{ _('Select a user to start chatting.') }}</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Sidebar Popup -->
+<div id="sidebar-popup" class="d-md-none">
+    <div class="sidebar-header">
+        <h5>{{ _('Chats') }}</h5>
+        <button onclick="toggleSidebar()">&times;</button>
+    </div>
+    <div class="user-list">
+        <ul id="user-list-mobile" class="list-group">
+            {% for user in other_users %}
+            <li class="user-item list-group-item {{ 'active' if user.id == receiver.id else '' }}" onclick="selectUser({{ user.id }})">
+                <div>
+                    <strong>{{ user.username }}</strong>
+                    <p class="recent-message">{{ user.recent_message or _('No recent messages') }}</p>
+                </div>
+                {% if user.unread_messages %}
+                <span class="unread-badge">{{ user.unread_messages }}</span>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<!-- Floating Button for Mobile -->
+<button class="floating-button d-md-none" onclick="toggleSidebar()">☰</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script>
+    const socket = io("https://www.pika-card.store", { transports: ["websocket", "polling"] });
+    const room = "{{ receiver.id }}";
+
+    socket.emit("join_room", { receiver_id: room });
+
+    socket.on("load_messages", (data) => {
+        const chatBox = document.getElementById("chat-box");
+        chatBox.innerHTML = ""; 
+        data.messages.forEach((msg) => {
+            const div = document.createElement("div");
+            div.className = `message ${msg.sender_id === {{ current_user.id }} ? 'sent' : 'received'}`;
+            div.innerHTML = `<div class="message-bubble"><strong>${msg.username}</strong>: ${msg.message}<div class="timestamp">${msg.timestamp}</div></div>`;
+            chatBox.appendChild(div);
+        });
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+
+    socket.on("receive_message", (data) => {
+        const chatBox = document.getElementById("chat-box");
+        const div = document.createElement("div");
+        div.className = `message ${data.sender_id === {{ current_user.id }} ? 'sent' : 'received'}`;
+        div.innerHTML = `<div class="message-bubble"><strong>${data.username}</strong>: ${data.message}<div class="timestamp">${data.timestamp}</div></div>`;
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+
+    function sendMessage() {
+        const messageInput = document.getElementById("message-input");
+        const message = messageInput.value.trim();
+        if (message) {
+            socket.emit("send_message", { receiver_id: room, message });
+            messageInput.value = "";
+        }
+    }
+
+    function handleEnter(event) {
+        if (event.key === "Enter") {
+            sendMessage();
+        }
+    }
+
+    function selectUser(userId) {
+        window.location.href = `?new_user=${userId}`;
+    }
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById("sidebar-popup");
+        sidebar.classList.toggle("active");
+    }
+</script>
+{% endblock %}
+

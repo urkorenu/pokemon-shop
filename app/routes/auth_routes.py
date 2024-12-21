@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
-from ..models import User, db, Order
+from ..models import User, db
 from flask_bcrypt import generate_password_hash, check_password_hash
 from ..cities import CITIES_IN_ISRAEL
 from ..mail_service import send_email
@@ -160,8 +160,7 @@ def account():
 
         return redirect(url_for("auth.account"))
 
-    orders = Order.query.filter_by(buyer_id=current_user.id).all()
-    return render_template("account.html", orders=orders, cities=CITIES_IN_ISRAEL)
+    return render_template("account.html", cities=CITIES_IN_ISRAEL)
 
 
 @auth_bp.route("/request_uploader", methods=["POST"])

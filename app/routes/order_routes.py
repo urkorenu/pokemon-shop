@@ -41,8 +41,7 @@ def place_order(card_id):
         f"Buyer Details:\n"
         f"Name: {current_user.username}\n"
         f"Contact: {current_user.contact_details} ({current_user.contact_preference})\n"
-        f"Please confirm or reject the order in your dashboard."
-
+        f"Please confirm or reject the order in your dashboard.",
     )
 
     # Notify the buyer with a summary
@@ -50,16 +49,18 @@ def place_order(card_id):
         recipient=current_user.email,
         subject="Order Placed Successfully",
         body=f"Your order for the card '{card.name}' has been placed successfully!\n"
-             f"The seller will contact you soon to finalize the details.\n\n"
-             f"Order Summary:\n"
-             f"Card Name: {card.name}\n"
-             f"Price: {card.price} ILS\n"
-             f"Set: {card.set_name}\n"
-             f"Order Status: Pending\n\n"
-             f"Thank you for using our platform!"
+        f"The seller will contact you soon to finalize the details.\n\n"
+        f"Order Summary:\n"
+        f"Card Name: {card.name}\n"
+        f"Price: {card.price} ILS\n"
+        f"Set: {card.set_name}\n"
+        f"Order Status: Pending\n\n"
+        f"Thank you for using our platform!",
     )
 
-    flash("Order placed successfully! A summary has been sent to your email.", "success")
+    flash(
+        "Order placed successfully! A summary has been sent to your email.", "success"
+    )
 
     return redirect(url_for("user.view_cards"))
 
@@ -96,8 +97,8 @@ def confirm_order(order_id):
         recipient=buyer.email,
         subject="Order Confirmed",
         body=f"Your order (ID: {order.id}) has been confirmed by the seller.\n"
-             f"You can now rate the seller from your dashboard.\n\n"
-             f"Thank you for using our platform!"
+        f"You can now rate the seller from your dashboard.\n\n"
+        f"Thank you for using our platform!",
     )
 
     flash("Order confirmed, and the buyer has been notified.", "success")
@@ -129,8 +130,8 @@ def reject_order(order_id):
         recipient=order.buyer.email,
         subject="Order Rejected",
         body=f"Your order (ID: {order.id}) has been rejected by the seller.\n"
-             f"You can browse for other cards or contact the seller if needed.\n\n"
-             f"Thank you for using our platform!"
+        f"You can browse for other cards or contact the seller if needed.\n\n"
+        f"Thank you for using our platform!",
     )
 
     flash("Order rejected successfully, and the buyer has been notified.", "success")

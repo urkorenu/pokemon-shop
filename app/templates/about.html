@@ -1,49 +1,109 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <h1 class="text-center mb-4">{{ _("About Us") }}</h1>
-            <p class="lead text-center">
-                {{ _("Welcome to") }} <strong>{{ _("Pika-Card") }}</strong>,
-                {{ _("your ultimate destination for Pokémon card enthusiasts!") }}
+<style>
+    /* Hero Section */
+    .hero-section {
+        background: url("{{ url_for('static', filename='images/mission.jpg') }}") center/cover no-repeat;
+        color: #fff;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        padding: 80px 20px;
+        border-radius: 10px;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .hero-section h1 {
+        font-size: 2.5rem;
+        font-weight: bold;
+    }
+
+    .hero-section p {
+        font-size: 1.2rem;
+    }
+
+    /* Section Styling */
+    .section-title {
+        color: #3B4CCA;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .why-choose-us li {
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+        list-style: none;
+    }
+
+    .why-choose-us li::before {
+        content: "\f058";
+        font-family: "bootstrap-icons";
+        color: #3B4CCA;
+        margin-right: 10px;
+    }
+
+    .btn-primary {
+        background-color: #3B4CCA;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #2a3698;
+        color: #fff;
+    }
+
+    /* Image Styling */
+    .rounded-image {
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+<!-- Hero Section -->
+<div class="hero-section">
+    <h1>{{ _("About Us") }}</h1>
+</div>
+
+<!-- Main Content -->
+<div class="container mb-5">
+    <!-- Our Mission -->
+    <div class="row align-items-center mb-5">
+        <div class="col-md-6">
+            <h3 class="section-title">{{ _("Our Mission") }}</h3>
+            <p>
+                {{ _("At Pika-Card, we aim to provide the best platform for buying, selling, and showcasing Pokémon cards. "
+                    "Our team is passionate about the Pokémon universe and dedicated to building a vibrant community "
+                    "of collectors and players.") }}
             </p>
-
-            <div class="row mt-4">
-                <div class="col-md-6 mb-4">
-                    <h3>{{ _("Our Mission") }}</h3>
-                    <p>
-                        {{ _("At Pika-Card, we aim to provide the best platform for buying, selling, and showcasing Pokémon cards. "
-                            "Our team is passionate about the Pokémon universe and dedicated to building a vibrant community "
-                            "of collectors and players.") }}
-                    </p>
-                </div>
-                <div class="col-md-6 mb-4">
-                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="{{ _('About Us') }}" class="img-fluid rounded">
-                </div>
-            </div>
-
-            <div class="row mt-4">
-                <div class="col-md-6 mb-4">
-                    <img src="{{ url_for('static', filename='images/mission.jpg') }}" alt="{{ _('Our Mission') }}" class="img-fluid rounded">
-                </div>
-                <div class="col-md-6 mb-4">
-                    <h3>{{ _("Why Choose Us?") }}</h3>
-                    <ul>
-                        <li>{{ _("Made in Israel") }}</li>
-                        <li>{{ _("Wide selection of Pokémon cards") }}</li>
-                        <li>{{ _("Seamless user experience") }}</li>
-                        <li>{{ _("Secure transactions and trusted sellers") }}</li>
-                        <li>{{ _("Community-driven platform") }}</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="text-center mt-4">
-                <a href="{{ url_for('user.contact_us') }}" class="btn btn-primary">{{ _("Contact Us") }}</a>
-            </div>
         </div>
+        <div class="col-md-6">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="{{ _('Our Mission') }}" class="img-fluid rounded-image">
+        </div>
+    </div>
+
+    <!-- Why Choose Us -->
+    <div class="row align-items-center mb-5">
+        <div class="col-md-6 order-md-2">
+            <h3 class="section-title">{{ _("Why Choose Us?") }}</h3>
+            <ul class="why-choose-us">
+                <li>{{ _("Made in Israel") }}</li>
+                <li>{{ _("Wide selection of Pokémon cards") }}</li>
+                <li>{{ _("Seamless user experience") }}</li>
+                <li>{{ _("Secure transactions and trusted sellers") }}</li>
+                <li>{{ _("Community-driven platform") }}</li>
+            </ul>
+        </div>
+        <div class="col-md-6 order-md-1">
+            <img src="{{ url_for('static', filename='images/mission.jpg') }}" alt="{{ _('Why Choose Us?') }}" class="img-fluid rounded-image">
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="text-center">
+        <a href="{{ url_for('user.contact_us') }}" class="btn btn-primary btn-lg shadow">
+            <i class="bi bi-envelope"></i> {{ _("Contact Us") }}
+        </a>
     </div>
 </div>
 {% endblock %}
+

@@ -50,7 +50,6 @@ def upload_card():
     if current_user.role == "normal":
         return render_template("notyet_upload.html")
 
-
     sets = get_pokemon_sets() if request.method == "GET" else []
 
     if request.method == "POST":
@@ -89,13 +88,20 @@ def upload_card():
                 filtered_cards = [
                     card
                     for card in card_data
-                    if card.get("set", {}).get("name", "").strip().lower() == set_name.strip().lower()
-                    and str(card.get("number", "")).strip().lower() == str(number).strip().lower()
+                    if card.get("set", {}).get("name", "").strip().lower()
+                    == set_name.strip().lower()
+                    and str(card.get("number", "")).strip().lower()
+                    == str(number).strip().lower()
                 ]
 
                 # Handle empty filtered_cards list
                 if not filtered_cards:
-                    return jsonify({"error": "No card matches the given set name and number."}), 404
+                    return (
+                        jsonify(
+                            {"error": "No card matches the given set name and number."}
+                        ),
+                        404,
+                    )
 
                 card_details = filtered_cards[0]
                 api_card_name = card_details["name"]
@@ -237,8 +243,10 @@ def get_card_details():
             filtered_cards = [
                 card
                 for card in card_data
-                if card.get("set", {}).get("name").strip().lower() == set_name.strip().lower()
-                and str(card.get("number", "")).strip().lower() == str(number).strip().lower()
+                if card.get("set", {}).get("name").strip().lower()
+                == set_name.strip().lower()
+                and str(card.get("number", "")).strip().lower()
+                == str(number).strip().lower()
             ]
 
             if not filtered_cards:
@@ -337,32 +345,45 @@ def seller_dashboard():
             .all()
         )
         total_price = sum(card.price for card in cards)
-        orders_with_details.append({
-            "id": order.id,
-            "buyer": order.buyer,
-            "created_at": order.created_at,
-            "cards": cards,
-            "total_price": total_price,
-        })
+        orders_with_details.append(
+            {
+                "id": order.id,
+                "buyer": order.buyer,
+                "created_at": order.created_at,
+                "cards": cards,
+                "total_price": total_price,
+            }
+        )
 
     # Completed Orders with recalculated total_price
-    completed_orders_query = Order.query.filter_by(seller_id=current_user.id, status="Confirmed")
+    completed_orders_query = Order.query.filter_by(
+        seller_id=current_user.id, status="Confirmed"
+    )
     completed_orders = []
     for order in completed_orders_query:
-        cards = db.session.query(Card).join(order_cards).filter(order_cards.c.order_id == order.id).all()
+        cards = (
+            db.session.query(Card)
+            .join(order_cards)
+            .filter(order_cards.c.order_id == order.id)
+            .all()
+        )
         total_price = sum(card.price for card in cards)
-        completed_orders.append({
-            "id": order.id,
-            "buyer": order.buyer,
-            "created_at": order.created_at,
-            "cards": cards,
-            "total_price": total_price,
-        })
+        completed_orders.append(
+            {
+                "id": order.id,
+                "buyer": order.buyer,
+                "created_at": order.created_at,
+                "cards": cards,
+                "total_price": total_price,
+            }
+        )
 
     stats = {
         "pending_orders": len(pending_orders),
         "total_cards": Card.query.filter_by(uploader_id=current_user.id).count(),
-        "sold_cards": Card.query.filter(Card.uploader_id == current_user.id, Card.amount == 0).count(),
+        "sold_cards": Card.query.filter(
+            Card.uploader_id == current_user.id, Card.amount == 0
+        ).count(),
         "total_revenue": sum(order["total_price"] for order in completed_orders),
     }
 
@@ -370,5 +391,5 @@ def seller_dashboard():
         "seller_dashboard.html",
         orders=orders_with_details,
         completed_orders=completed_orders,
-        stats=stats
+        stats=stats,
     )

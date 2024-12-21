@@ -19,7 +19,6 @@ from ..models import Card, Cart, db, User, Order
 from ..cities import CITIES_IN_ISRAEL
 from ..mail_service import send_email
 from app import cache
-from app.utils import roles_required
 
 # Create a Blueprint for user routes
 user_bp = Blueprint("user", __name__)
@@ -235,7 +234,9 @@ def my_cards():
     per_page = 8  # Cards per page
 
     # Base query for available and sold cards
-    available_query = Card.query.filter(Card.uploader_id == current_user.id, Card.amount > 0)
+    available_query = Card.query.filter(
+        Card.uploader_id == current_user.id, Card.amount > 0
+    )
     sold_query = Card.query.filter_by(uploader_id=current_user.id, amount=0)
 
     # Apply search filter
@@ -244,7 +245,9 @@ def my_cards():
         sold_query = sold_query.filter(Card.name.ilike(f"%{search_query}%"))
 
     # Paginate queries
-    available_cards = available_query.paginate(page=page, per_page=per_page, error_out=False)
+    available_cards = available_query.paginate(
+        page=page, per_page=per_page, error_out=False
+    )
     sold_cards = sold_query.paginate(page=page, per_page=per_page, error_out=False)
 
     return render_template(
@@ -290,7 +293,9 @@ def edit_card(card_id):
 
         card.is_graded = is_graded_value == "yes"
         card.grade = grade if grade not in (None, "", "None") else None
-        card.grading_company = grading_company if grading_company not in (None, "", "None") else None
+        card.grading_company = (
+            grading_company if grading_company not in (None, "", "None") else None
+        )
         db.session.commit()
         flash("Card updated successfully!", "success")
         return redirect(url_for("user.my_cards"))
@@ -476,6 +481,15 @@ def about_us():
         Rendered template for the about us page.
     """
     return render_template("about.html")
+
+
+@user_bp.route("/health", methods=["GET"])
+def health_check():
+    """
+    Health check endpoint for AWS ALB.
+    Returns a 200 status with a JSON response indicating the app is healthy.
+    """
+    return jsonify({"status": "healthy"}), 200
 
 
 @user_bp.route("/templates/css/styles.css.jinja")
