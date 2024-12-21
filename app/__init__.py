@@ -20,7 +20,7 @@ socketio = SocketIO(
     logger=True,
     engineio_logger=True,
     manage_session=True,
-    message_queue="redis://redis:6379/0"
+    message_queue="redis://redis:6379/0",
 )
 
 
@@ -170,4 +170,3 @@ def create_app():
     app.register_blueprint(chat_bp, url_prefix="/chat")
 
     return app
-

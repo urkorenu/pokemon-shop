@@ -13,11 +13,13 @@ chat_bp = Blueprint("chat", __name__)
 # Redis client
 redis_client = redis.StrictRedis(host="redis", port=6379, decode_responses=True)
 
+
 def get_chat_room(user1, user2):
     """Return a normalized room key for the two users."""
     user1 = int(user1)  # Convert to integer
     user2 = int(user2)  # Convert to integer
     return f"chat:{min(user1, user2)}:{max(user1, user2)}"
+
 
 @chat_bp.route("/chat")
 @login_required
@@ -33,7 +35,10 @@ def chat():
         room = get_chat_room(current_user.id, new_user_id)
         serialized_messages = redis_client.lrange(room, 0, -1)
         messages = [
-            {**json.loads(msg), "timestamp": redis_client.hget(f"{room}:timestamps", idx)}
+            {
+                **json.loads(msg),
+                "timestamp": redis_client.hget(f"{room}:timestamps", idx),
+            }
             for idx, msg in enumerate(serialized_messages)
         ]
 
@@ -49,14 +54,18 @@ def chat():
         if recent_message:
             recent_message = json.loads(recent_message)["message"]
 
-        other_users.append({
-            "id": user.id,
-            "username": user.username,
-            "unread_count": unread_count,
-            "recent_message": recent_message or _("No recent messages"),
-        })
+        other_users.append(
+            {
+                "id": user.id,
+                "username": user.username,
+                "unread_count": unread_count,
+                "recent_message": recent_message or _("No recent messages"),
+            }
+        )
 
-    return render_template("chat.html", other_users=other_users, messages=messages, receiver=receiver)
+    return render_template(
+        "chat.html", other_users=other_users, messages=messages, receiver=receiver
+    )
 
 
 @socketio.on("connect")
@@ -66,6 +75,7 @@ def handle_connect():
         print(f"Unauthorized connection attempt by {request.sid}")
         return False
     print(f"User connected: {current_user.username} (ID: {current_user.id})")
+
 
 @socketio.on("send_message")
 @login_required
@@ -84,11 +94,14 @@ def send_message(data):
     # Save serialized message to Redis
     serialized_message = json.dumps(message)
     redis_client.rpush(room, serialized_message)
-    redis_client.hset(f"{room}:timestamps", redis_client.llen(room) - 1, message["timestamp"])
+    redis_client.hset(
+        f"{room}:timestamps", redis_client.llen(room) - 1, message["timestamp"]
+    )
     redis_client.incr(f"{room}:unread")  # Increment unread count
 
     # Emit message
     emit("receive_message", message, room=room)
+
 
 @socketio.on("join_room")
 @login_required
@@ -108,4 +121,3 @@ def join_room_handler(data):
 
     # Emit the chat history to the client
     emit("load_messages", {"messages": messages})
-
