@@ -477,6 +477,14 @@ def about_us():
     """
     return render_template("about.html")
 
+@user_bp.route("/health", methods=["GET"])
+def health_check():
+    """
+    Health check endpoint for AWS ALB.
+    Returns a 200 status with a JSON response indicating the app is healthy.
+    """
+    return jsonify({"status": "healthy"}), 200
+
 
 @user_bp.route("/templates/css/styles.css.jinja")
 def styles():
