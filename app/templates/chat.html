@@ -23,15 +23,11 @@
             <h4 class="text-center mb-3">{{ _('Chat with') }} {{ receiver.username }}</h4>
             <div id="chat-box" class="border rounded p-3 mb-3" style="height: 400px; overflow-y: scroll;">
                 {% for msg in messages %}
-                    {% if msg.sender_id == current_user.id %}
-                        <div class="text-end mb-2">
-                            <span class="badge bg-primary">{{ _('You') }}: {{ msg.message }}</span>
-                        </div>
-                    {% else %}
-                        <div class="text-start mb-2">
-                            <span class="badge bg-secondary">{{ receiver.username }}: {{ msg.message }}</span>
-                        </div>
-                    {% endif %}
+                <div class="{{ 'text-end' if msg.sender_id == current_user.id else 'text-start' }} mb-2">
+                    <span class="badge {{ 'bg-primary' if msg.sender_id == current_user.id else 'bg-secondary' }}">
+                        {{ msg.sender_username }}: {{ msg.message }}
+                    </span>
+                </div>
                 {% endfor %}
             </div>
             <div class="input-group">
@@ -47,59 +43,42 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 <script>
-    const socket = io({
-        transports: ['polling', "websocket"],
-	upgrade: true,
-	withCredentials: false
+    const socket = io("https://www.pika-card.store", {
+        transports: ["websocket", "polling"],
     });
-    socket.emit("join_room"); // Join the user's room
 
-    // Handle receiving messages
+    const room = "{{ receiver.id }}";
+
+    // Join the chat room
+    socket.emit("join_room", { receiver_id: room });
+
+    socket.on("load_messages", (data) => {
+	const chatBox = document.getElementById("chat-box");
+	chatBox.innerHTML = "";  // Clear the chat box
+	data.messages.forEach((msg) => {
+	    const div = document.createElement("div");
+	    div.textContent = `${msg.username}: ${msg.message}`;
+	    chatBox.appendChild(div);
+	});
+    });
+
     socket.on("receive_message", (data) => {
-        const chatBox = document.getElementById("chat-box");
-        const alignment = data.sender_id == "{{ current_user.id }}" ? "text-end" : "text-start";
-        const sender = data.sender_id == "{{ current_user.id }}" ? "{{ _('You') }}" : "{{ receiver.username }}";
-        chatBox.innerHTML += `
-            <div class="${alignment} mb-2">
-                <span class="badge bg-${data.sender_id == "{{ current_user.id }}" ? 'primary' : 'secondary'}">
-                    ${sender}: ${data.message}
-                </span>
-            </div>`;
-        chatBox.scrollTop = chatBox.scrollHeight;
+	const chatBox = document.getElementById("chat-box");
+	const div = document.createElement("div");
+	div.textContent = `${data.username}: ${data.message}`;
+	chatBox.appendChild(div);
+	chatBox.scrollTop = chatBox.scrollHeight;  // Auto-scroll to the bottom
     });
 
-    // Send a message
+
     function sendMessage() {
         const messageInput = document.getElementById("message-input");
         const message = messageInput.value.trim();
         if (message) {
-	    console.log("Sending message:", message, "to receiver:", "{{ receiver.id }}");
-            socket.emit("send_message", {
-                message: message,
-                receiver_id: "{{ receiver.id }}"
-            });
+            socket.emit("send_message", { receiver_id: room, message });
             messageInput.value = "";
         }
     }
-
-    // User search functionality
-    document.getElementById("user-search").addEventListener("input", function () {
-        const query = this.value.toLowerCase();
-        document.querySelectorAll("#user-list li").forEach(item => {
-            item.style.display = item.textContent.toLowerCase().includes(query) ? "" : "none";
-        });
-    });
-    socket.on("connect", () => {
-	console.log("Socket.IO connected successfully with ID:", socket.id);
-    });
-
-    socket.on("disconnect", () => {
-	console.log("Socket.IO disconnected");
-    });
-
-    socket.on("connect_error", (error) => {
-	console.error("Connection Error:", error);
-    });
 </script>
 {% endblock %}
 

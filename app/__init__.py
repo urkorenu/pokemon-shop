@@ -6,14 +6,22 @@ from flask_caching import Cache
 from flask_babel import Babel
 from flask_session import Session
 from redis import Redis
+from flask_socketio import SocketIO
 from sqlalchemy import cast, String, func
+from flask_cors import CORS
 import os
 
-# Initialize extensions
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
 cache = Cache()
+socketio = SocketIO(
+    cors_allowed_origins="https://www.pika-card.store",
+    logger=True,
+    engineio_logger=True,
+    manage_session=True,
+    message_queue="redis://redis:6379/0"
+)
 
 
 def create_app():
@@ -35,8 +43,11 @@ def create_app():
         SESSION_COOKIE_SECURE=os.getenv("FLASK_ENV") == "production",
         SESSION_REDIS=Redis(host="redis", port=6379),
     )
-    Session(app)
 
+    # Initialize Flask extensions
+    Session(app)  # Manage sessions using Flask-Session
+    CORS(app, origins=["https://www.pika-card.store"], supports_credentials=True)
+    socketio.init_app(app, manage_session=True)
     # Initialize Babel for internationalization
     babel = Babel(app)
     babel.init_app(
@@ -45,7 +56,6 @@ def create_app():
         or request.accept_languages.best_match(app.config["LANGUAGES"]),
     )
 
-    # Initialize extensions with the app
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
@@ -149,6 +159,7 @@ def create_app():
     from app.routes.cart_routes import cart_bp
     from app.routes.order_routes import order_bp
     from app.routes.seller_routes import seller_bp
+    from app.routes.chat_routes import chat_bp
 
     app.register_blueprint(user_bp, url_prefix="/")
     app.register_blueprint(admin_bp, url_prefix="/admin")
@@ -156,5 +167,7 @@ def create_app():
     app.register_blueprint(cart_bp, url_prefix="/cart")
     app.register_blueprint(order_bp, url_prefix="/order")
     app.register_blueprint(seller_bp, url_prefix="/seller")
+    app.register_blueprint(chat_bp, url_prefix="/chat")
 
     return app
+

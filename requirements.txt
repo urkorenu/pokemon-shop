@@ -18,4 +18,5 @@ Flask-Babel
 Flask-Session
 redis
 flask_socketio
-
+eventlet
+flask_cors

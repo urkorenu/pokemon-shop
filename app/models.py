@@ -172,3 +172,4 @@ class Message(db.Model):
 
     sender = db.relationship("User", foreign_keys=[sender_id])
     receiver = db.relationship("User", foreign_keys=[receiver_id])
+    is_read = db.Column(db.Boolean, default=False)
