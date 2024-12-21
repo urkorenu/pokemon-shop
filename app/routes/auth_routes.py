@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
-from ..models import User, db, Order
+from ..models import User, db
 from flask_bcrypt import generate_password_hash, check_password_hash
 from ..cities import CITIES_IN_ISRAEL
 from ..mail_service import send_email

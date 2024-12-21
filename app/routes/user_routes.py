@@ -19,7 +19,6 @@ from ..models import Card, Cart, db, User, Order
 from ..cities import CITIES_IN_ISRAEL
 from ..mail_service import send_email
 from app import cache
-from app.utils import roles_required
 
 # Create a Blueprint for user routes
 user_bp = Blueprint("user", __name__)
