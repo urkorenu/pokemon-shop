@@ -160,8 +160,7 @@ def account():
 
         return redirect(url_for("auth.account"))
 
-    orders = Order.query.filter_by(buyer_id=current_user.id).all()
-    return render_template("account.html", orders=orders, cities=CITIES_IN_ISRAEL)
+    return render_template("account.html", cities=CITIES_IN_ISRAEL)
 
 
 @auth_bp.route("/request_uploader", methods=["POST"])
