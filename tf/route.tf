@@ -3,7 +3,6 @@ resource "aws_route53_record" "app_dns" {
   zone_id = "Z0057660LWNAO0YHSRYG"  # The ID of the hosted zone
   name    = "pika-card.store"       # The domain name
   type    = "A"                     # The record type
-  ttl     = 300                     # Time-to-live in seconds
 
 
   alias {
@@ -18,7 +17,6 @@ resource "aws_route53_record" "app_www_dns" {
   zone_id = "Z0057660LWNAO0YHSRYG"  # The ID of the hosted zone
   name    = "www.pika-card.store"   # The subdomain name
   type    = "A"                     # The record type
-  ttl     = 300                     # Time-to-live in seconds
 
 
   alias {
