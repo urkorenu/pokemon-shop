@@ -621,3 +621,32 @@ msgstr "יפני"
 msgid "Enter card number"
 msgstr "הזן מספר קלף"
 
+msgid "Chats"
+msgstr "שיחות"
+
+msgid "No recent messages"
+msgstr "אין הודעות אחרונות"
+
+msgid "Chat with"
+msgstr "שיחה עם"
+
+msgid "Select a user to start chatting."
+msgstr "בחר משתמש כדי להתחיל לשוחח."
+
+msgid "Type your message..."
+msgstr "הקלד את ההודעה שלך..."
+
+msgid "Send"
+msgstr "שלח"
+
+msgid "Start Shopping!"
+msgstr "התחל לקנות!"
+
+msgid "Enter your full name"
+msgstr "הזן את שמך המלא"
+
+msgid "Enter your full name"
+msgstr "הזן את שמך המלא"
+
+msgid "Write your message here..."
+msgstr "כתוב את ההודעה שלך כאן..."
