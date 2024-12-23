@@ -25,6 +25,12 @@
         color: white;
     }
 
+    .sidebar-header h5 {
+	margin: 0;
+	font-size: 1.25rem;
+	text-align: center;
+    }
+
     .user-item {
         display: flex;
         justify-content: space-between;
@@ -76,6 +82,7 @@
         border-top: none;
     }
 
+    /* General chat alignment */
     .message {
         margin: 5px 0;
         display: flex;
@@ -83,38 +90,40 @@
         font-size: 0.9rem;
     }
 
+    /* Default styling: English (ltr) */
     .message.sent {
-        justify-content: flex-end;
+	justify-content: flex-start;
     }
 
     .message.received {
-        justify-content: flex-start;
+	justify-content: flex-end;
     }
 
     /* Styling for Hebrew (rtl) */
     html[dir="rtl"] .message.sent {
-        justify-content: flex-start;
+	justify-content: flex-end;
     }
 
     html[dir="rtl"] .message.received {
-        justify-content: flex-end;
+	justify-content: flex-start;
     }
 
+    /* General styling for the message bubble */
     .message-bubble {
-        max-width: 70%;
-        padding: 10px;
-        border-radius: 15px;
-        position: relative;
+	max-width: 70%;
+	padding: 10px;
+	border-radius: 15px;
+	position: relative;
     }
 
     .message.sent .message-bubble {
-        background-color: #3b4cca;
-        color: white;
+	background-color: #3b4cca;
+	color: white;
     }
 
     .message.received .message-bubble {
-        background-color: #f1f1f1;
-        color: #333;
+	background-color: #f1f1f1;
+	color: #333;
     }
 
     .timestamp {
@@ -194,6 +203,9 @@
     }
 </style>
 
+<audio id="send-sound" src="{{ url_for('static', filename='sounds/send.wav') }}"></audio>
+<audio id="receive-sound" src="{{ url_for('static', filename='sounds/receive.wav') }}"></audio>
+
 <div class="container mt-4 chat-container">
     <div class="row h-100">
         <!-- Sidebar: User List -->
@@ -209,9 +221,9 @@
                             <strong>{{ user.username }}</strong>
                             <p class="recent-message">{{ user.recent_message or _('No recent messages') }}</p>
                         </div>
-                        {% if user.unread_messages %}
-                        <span class="unread-badge">{{ user.unread_messages }}</span>
-                        {% endif %}
+			{% if user.unread_count|int > 0 %}
+			<span class="unread-badge">{{ user.unread_count }}</span>
+			{% endif %}
                     </li>
                     {% endfor %}
                 </ul>
@@ -224,10 +236,10 @@
             <div class="chat-header">
                 <h5 class="mb-0">{{ _('Chat with') }} {{ receiver.username }}</h5>
             </div>
-            <div id="chat-box" class="chat-box">
+	    <div id="chat-box" class="chat-box">
                 {% for msg in messages %}
                 <div class="message {{ 'sent' if msg.sender_id == current_user.id else 'received' }}">
-                    <div class="message-bubble">
+                    <div class="message-bubble" dir="{{ 'rtl' if session.get('lang', 'en') == 'he' else 'ltr' }}">
                         <strong>{{ msg.sender_username }}</strong>: {{ msg.message }}
                         <div class="timestamp">{{ msg.timestamp }}</div>
                     </div>
@@ -282,23 +294,35 @@
 
     socket.on("load_messages", (data) => {
         const chatBox = document.getElementById("chat-box");
-        chatBox.innerHTML = ""; 
+        chatBox.innerHTML = "";
         data.messages.forEach((msg) => {
             const div = document.createElement("div");
+            const direction = document.documentElement.getAttribute('dir');
             div.className = `message ${msg.sender_id === {{ current_user.id }} ? 'sent' : 'received'}`;
-            div.innerHTML = `<div class="message-bubble"><strong>${msg.username}</strong>: ${msg.message}<div class="timestamp">${msg.timestamp}</div></div>`;
+            div.innerHTML = `
+                <div class="message-bubble" dir="${direction}">
+                    <strong>${msg.username}</strong>: ${msg.message}
+                    <div class="timestamp">${msg.timestamp}</div>
+                </div>`;
             chatBox.appendChild(div);
         });
         chatBox.scrollTop = chatBox.scrollHeight;
     });
 
     socket.on("receive_message", (data) => {
-        const chatBox = document.getElementById("chat-box");
-        const div = document.createElement("div");
-        div.className = `message ${data.sender_id === {{ current_user.id }} ? 'sent' : 'received'}`;
-        div.innerHTML = `<div class="message-bubble"><strong>${data.username}</strong>: ${data.message}<div class="timestamp">${data.timestamp}</div></div>`;
-        chatBox.appendChild(div);
-        chatBox.scrollTop = chatBox.scrollHeight;
+	const chatBox = document.getElementById("chat-box");
+	const direction = document.documentElement.getAttribute('dir'); // Get the global direction (ltr or rtl)
+
+	const div = document.createElement("div");
+	div.className = `message ${data.sender_id === {{ current_user.id }} ? 'sent' : 'received'}`;
+	div.innerHTML = `
+	    <div class="message-bubble" dir="${direction}">
+		<strong>${data.username}</strong>: ${data.message}
+		<div class="timestamp">${data.timestamp}</div>
+	    </div>`;
+	chatBox.appendChild(div);
+	chatBox.scrollTop = chatBox.scrollHeight;
+	document.getElementById("receive-sound").play(); // Play receive sound
     });
 
     function sendMessage() {
@@ -307,6 +331,7 @@
         if (message) {
             socket.emit("send_message", { receiver_id: room, message });
             messageInput.value = "";
+	    document.getElementById("send-sound").play(); // Play send sound
         }
     }
 
