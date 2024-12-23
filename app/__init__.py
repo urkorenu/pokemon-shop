@@ -45,10 +45,9 @@ def create_app():
     )
 
     # Initialize Flask extensions
-    Session(app)  # Manage sessions using Flask-Session
+    Session(app)
     CORS(app, origins=["https://www.pika-card.store"], supports_credentials=True)
     socketio.init_app(app, manage_session=True)
-    # Initialize Babel for internationalization
     babel = Babel(app)
     babel.init_app(
         app,
@@ -69,18 +68,10 @@ def create_app():
     )
 
     from app.models import Cart, Order, User
+    from app.routes.chat_routes import get_chat_room
 
     @login_manager.user_loader
     def load_user(user_id):
-        """
-        Load a user by their user ID.
-
-        Args:
-            user_id (int): The user ID.
-
-        Returns:
-            User: The user object.
-        """
         return User.query.get(int(user_id))
 
     login_manager.login_view = "auth.auth"
@@ -88,12 +79,6 @@ def create_app():
 
     @app.context_processor
     def inject_counts():
-        """
-        Inject counts of cart items, pending orders, orders without feedback, and users who requested uploader role into the template context.
-
-        Returns:
-            dict: A dictionary with counts of various user-related items.
-        """
         if current_user.is_authenticated:
             user_id = current_user.id
             cart_items_count = (
@@ -126,30 +111,32 @@ def create_app():
                 ).count()
             )
             cache.set("users_want_uploader_role", users_want_uploader_role, timeout=60)
+
+            unread_message_count = 0
+            for user in User.query.filter(User.id != current_user.id).all():
+                room = get_chat_room(current_user.id, user.id)
+                redis_key = f"{room}:unread"
+
+                redis_value = app.config["SESSION_REDIS"].get(redis_key)
+
+                unread_count = int(redis_value or 0)
+                unread_message_count += unread_count
+
         else:
             cart_items_count = pending_orders = orders_without_feedback = (
                 users_want_uploader_role
-            ) = 0
+            ) = unread_message_count = 0
 
         return {
             "cart_items_count": cart_items_count,
             "pending_orders": pending_orders,
             "orders_without_feedback": orders_without_feedback,
             "users_want_uploader_role": users_want_uploader_role,
+            "unread_message_count": unread_message_count,
         }
 
     @app.template_filter("dict_without")
     def dict_without(d, key):
-        """
-        Remove a key from a dictionary.
-
-        Args:
-            d (dict): The dictionary.
-            key: The key to remove.
-
-        Returns:
-            dict: The dictionary without the specified key.
-        """
         return {k: v for k, v in d.items() if k != key}
 
     # Register blueprints for different routes
@@ -170,3 +157,4 @@ def create_app():
     app.register_blueprint(chat_bp, url_prefix="/chat")
 
     return app
+

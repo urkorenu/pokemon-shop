@@ -146,7 +146,9 @@
 			<a class="nav-link" href="{{ url_for('seller.upload_card') }}">{{ _('Upload') }}</a>
 		    </li>
 		    <li class="nav-item">
-			<a class="nav-link" href="{{ url_for('chat.chat') }}">{{ _('Chat') }}</a>
+			<a class="nav-link" href="{{ url_for('chat.chat') }}">{{ _('Chat') }}
+        		<span class="badge bg-danger text-light rounded-pill">{{ unread_message_count }}</span>
+			</a>
 		    </li>
                     {% if current_user.role in ["uploader", "admin"] %}
                     <li class="nav-item">
