@@ -134,3 +134,29 @@ resource "aws_security_group" "app_db_sg" {
     Name = "${local.env}-app-db-sg"  # Tag name
   }
 }
+
+
+resource "aws_security_group" "cache_sg" {
+  vpc_id = aws_vpc.main.id
+  name   = "${local.env}-cache-sg"
+
+  ingress {
+    description = "Allow Redis traffic from App SG"
+    from_port   = 6379
+    to_port     = 6379
+    protocol    = "tcp"
+    security_groups = [aws_security_group.app_sg.id]  # Allow from App SG
+  }
+
+  egress {
+    description = "Allow all outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${local.env}-cache-sg"
+  }
+}
