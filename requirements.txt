@@ -20,3 +20,4 @@ redis
 flask_socketio
 eventlet
 flask_cors
+kombu
