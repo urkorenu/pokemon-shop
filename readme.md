@@ -63,7 +63,7 @@ A modern web application for managing and showcasing Pokémon cards with advance
 - **Reset Cards**: Removes all cards from the database and deletes images from S3.
 
 ## Infrastructure Diagram
-![Infrastructure Diagram](pokemon-app.drawio)
+![Infrastructure Diagram](infrastructure.png)
 
 *This diagram was generated using Draw.io and provides an overview of the application's cloud-based architecture.*
 
