@@ -7,11 +7,16 @@ import redis
 import json
 from datetime import datetime
 from ..models import User
+from config import Config
 
 chat_bp = Blueprint("chat", __name__)
 
-# Redis client
-redis_client = redis.StrictRedis(host="redis", port=6379, decode_responses=True)
+
+redis_client = redis.StrictRedis(
+    host=Config.ELASTIC_CACHE or "localhost",  # Use ELASTIC_CACHE or default to localhost
+    port=6379,
+    decode_responses=True,
+)
 
 
 def get_chat_room(user1, user2):

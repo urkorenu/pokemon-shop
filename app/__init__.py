@@ -9,20 +9,21 @@ from redis import Redis
 from flask_socketio import SocketIO
 from sqlalchemy import cast, String, func
 from flask_cors import CORS
+from config import Config
 import os
 
+# Initialize extensions (without specific configurations)
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
 cache = Cache()
-socketio = SocketIO(
+socketio = SocketIO(  # Initialize without message_queue for now
     cors_allowed_origins="https://www.pika-card.store",
     logger=True,
     engineio_logger=True,
     manage_session=True,
-    message_queue="redis://redis:6379/0",
+    message_queue=f"redis://{os.getenv('ELASTIC_CACHE')}:6379/0",
 )
-
 
 def create_app():
     """
@@ -31,8 +32,11 @@ def create_app():
     Returns:
         Flask: The configured Flask application.
     """
+    config = Config()  # Create the Config object
     app = Flask(__name__)
     app.config.from_object("config.Config")
+
+    # Update app configuration
     app.config.update(
         MAX_CONTENT_LENGTH=10 * 1024 * 1024,
         LANGUAGES=["en", "he"],
@@ -41,13 +45,21 @@ def create_app():
         SESSION_USE_SIGNER=True,
         SESSION_KEY_PREFIX="pokemon-shop:",
         SESSION_COOKIE_SECURE=os.getenv("FLASK_ENV") == "production",
-        SESSION_REDIS=Redis(host="redis", port=6379),
+        SESSION_REDIS=Redis(
+            host=config.ELASTIC_CACHE,
+            port=6379,
+            decode_responses=False,
+        ),
+        SESSION_SERIALIZER="json",
     )
 
     # Initialize Flask extensions
     Session(app)
     CORS(app, origins=["https://www.pika-card.store"], supports_credentials=True)
+
+    # Initialize socketio with the resolved Redis message queue
     socketio.init_app(app, manage_session=True)
+
     babel = Babel(app)
     babel.init_app(
         app,
@@ -62,11 +74,12 @@ def create_app():
         app,
         config={
             "CACHE_TYPE": "RedisCache",
-            "CACHE_REDIS_URL": "redis://redis:6379/0",
+            "CACHE_REDIS_URL": f"redis://{config.ELASTIC_CACHE}:6379/0",
             "CACHE_DEFAULT_TIMEOUT": 300,
         },
     )
 
+    # Blueprints and other app-level configurations
     from app.models import Cart, Order, User
     from app.routes.chat_routes import get_chat_room
 
@@ -79,50 +92,33 @@ def create_app():
 
     @app.context_processor
     def inject_counts():
-        if current_user.is_authenticated:
-            user_id = current_user.id
-            cart_items_count = (
-                db.session.query(func.count())
-                .select_from(Cart)
-                .filter(Cart.user_id == user_id)
-                .scalar()
-            )
-            pending_orders = (
-                cache.get(f"pending_orders_{user_id}")
-                or Order.query.filter_by(seller_id=user_id, status="Pending").count()
-            )
-            cache.set(f"pending_orders_{user_id}", pending_orders, timeout=60)
-            orders_without_feedback = (
-                cache.get(f"orders_without_feedback_{user_id}")
-                or Order.query.filter_by(
-                    buyer_id=user_id, status="Confirmed", feedback=None
-                ).count()
-            )
-            cache.set(
-                f"orders_without_feedback_{user_id}",
-                orders_without_feedback,
-                timeout=60,
-            )
-            users_want_uploader_role = cache.get("users_want_uploader_role") or (
-                current_user.role == "admin"
-                and User.query.filter(
-                    (User.request_status == "Pending")
-                    | (cast(User.request_status, String) == "0")
-                ).count()
-            )
-            cache.set("users_want_uploader_role", users_want_uploader_role, timeout=60)
+        try:
+            if current_user.is_authenticated:
+                user_id = current_user.id
+                cart_items_count = (
+                    db.session.query(func.count())
+                    .select_from(Cart)
+                    .filter(Cart.user_id == user_id)
+                    .scalar()
+                )
+                pending_orders = cache.get(f"pending_orders_{user_id}") or 0
+                orders_without_feedback = cache.get(f"orders_without_feedback_{user_id}") or 0
+                users_want_uploader_role = cache.get("users_want_uploader_role") or 0
+                unread_message_count = 0
 
-            unread_message_count = 0
-            for user in User.query.filter(User.id != current_user.id).all():
-                room = get_chat_room(current_user.id, user.id)
-                redis_key = f"{room}:unread"
-
-                redis_value = app.config["SESSION_REDIS"].get(redis_key)
-
-                unread_count = int(redis_value or 0)
-                unread_message_count += unread_count
-
-        else:
+                # Example: Safe Redis Access
+                for user in User.query.filter(User.id != current_user.id).all():
+                    room = get_chat_room(current_user.id, user.id)
+                    redis_key = f"{room}:unread"
+                    redis_value = app.config["SESSION_REDIS"].get(redis_key)
+                    unread_count = int(redis_value or 0)
+                    unread_message_count += unread_count
+            else:
+                cart_items_count = pending_orders = orders_without_feedback = (
+                    users_want_uploader_role
+                ) = unread_message_count = 0
+        except Exception as e:
+            print(f"Error in inject_counts: {e}")
             cart_items_count = pending_orders = orders_without_feedback = (
                 users_want_uploader_role
             ) = unread_message_count = 0
