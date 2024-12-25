@@ -81,6 +81,13 @@
             <p class="text-danger"><strong>{{ _('Status:') }}</strong> {{ _('Banned') }}</p>
             {% endif %}
         </div>
+        {% if user.id != current_user.id %}
+	<div class="chat-button mb-2">
+            <a href="{{ url_for('chat.chat', new_user=user.id) }}" class="btn btn-primary">
+                <i class="bi bi-chat-dots"></i> {{ _('Chat with User') }}
+            </a>
+        </div>
+        {% endif %}
         <div class="report-user">
             <button class="btn btn-report" data-bs-toggle="modal" data-bs-target="#reportUserModal">
                 <i class="bi bi-flag"></i> {{ _('Report User') }}

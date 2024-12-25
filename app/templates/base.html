@@ -62,6 +62,63 @@
             90% { opacity: 1; }
             100% { opacity: 0; }
         }
+                @media (max-width: 768px) {
+            .navbar-nav {
+                justify-content: center !important;
+                text-align: center !important;
+            }
+            .dropdown-menu {
+                text-align: center;
+            }
+        }
+
+        /* Style footer buttons */
+        footer a.btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            border: 2px solid #FFCB05;
+            background-color: #FFCB05;
+            color: #3B4CCA;
+            border-radius: 5px;
+            text-transform: uppercase;
+        }
+        footer a.btn:hover {
+            background-color: #3B4CCA;
+            color: #FFFFFF;
+        }
+
+        /* Modern footer design */
+        footer {
+            background: #212529;
+            color: #f8f9fa;
+            padding: 20px 0;
+            border-top: 5px solid #FFCB05;
+        }
+        footer p, footer a {
+            margin: 0;
+            padding: 0;
+        }
+        footer ul {
+            list-style: none;
+            padding: 0;
+        }
+        footer ul li {
+            display: inline;
+            margin-right: 15px;
+        }
+        footer ul li:last-child {
+            margin-right: 0;
+        }
+        footer ul a {
+            color: #FFCB05;
+            text-decoration: none;
+        }
+        footer ul a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -89,7 +146,9 @@
 			<a class="nav-link" href="{{ url_for('seller.upload_card') }}">{{ _('Upload') }}</a>
 		    </li>
 		    <li class="nav-item">
-			<a class="nav-link" href="{{ url_for('chat.chat') }}">{{ _('Chat') }}</a>
+			<a class="nav-link" href="{{ url_for('chat.chat') }}">{{ _('Chat') }}
+        		<span class="badge bg-danger text-light rounded-pill">{{ unread_message_count }}</span>
+			</a>
 		    </li>
                     {% if current_user.role in ["uploader", "admin"] %}
                     <li class="nav-item">
@@ -221,18 +280,18 @@
     {% endif %}
     {% endwith %}
     <!-- Footer -->
-    <footer class="text-center py-4 bg-dark text-light">
+    <footer class="text-center">
         <p>&copy; 2024 Pika-Card. All rights reserved.</p>
-	<div class="col-12">
-	    <ul class="list-inline mb-0">
-		<li class="list-inline-item">
-		    <a class="text-light text-decoration-none" href="{{ url_for('user.about_us') }}">{{ _('About Us') }}</a>
-		</li>
-		<li class="list-inline-item">
-		    <a class="text-light text-decoration-none" href="{{ url_for('user.contact_us') }}">{{ _('Contact Us') }}</a>
-		</li>
-	    </ul>
-	</div>
+        <div class="container">
+            <ul class="list-inline">
+                <li class="list-inline-item">
+                    <a href="{{ url_for('user.about_us') }}" class="btn">{{ _('About Us') }}</a>
+                </li>
+                <li class="list-inline-item">
+                    <a href="{{ url_for('user.contact_us') }}" class="btn">{{ _('Contact Us') }}</a>
+                </li>
+            </ul>
+        </div>
     </footer>
 
     <!-- Scripts -->

@@ -9,18 +9,26 @@ from redis import Redis
 from flask_socketio import SocketIO
 from sqlalchemy import cast, String, func
 from flask_cors import CORS
+from config import Config
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 import os
 
+# Initialize extensions (without specific configurations)
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
 cache = Cache()
-socketio = SocketIO(
+socketio = SocketIO(  # Initialize without message_queue for now
     cors_allowed_origins="https://www.pika-card.store",
     logger=True,
     engineio_logger=True,
     manage_session=True,
-    message_queue="redis://redis:6379/0",
+    message_queue=f"redis://{os.getenv('ELASTIC_CACHE')}:6379/0",
+)
+limiter = Limiter(
+    key_func=get_remote_address,
+    storage_uri=f"redis://{os.getenv('ELASTIC_CACHE')}:6379",
 )
 
 
@@ -31,8 +39,11 @@ def create_app():
     Returns:
         Flask: The configured Flask application.
     """
+    config = Config()  # Create the Config object
     app = Flask(__name__)
     app.config.from_object("config.Config")
+
+    # Update app configuration
     app.config.update(
         MAX_CONTENT_LENGTH=10 * 1024 * 1024,
         LANGUAGES=["en", "he"],
@@ -41,14 +52,21 @@ def create_app():
         SESSION_USE_SIGNER=True,
         SESSION_KEY_PREFIX="pokemon-shop:",
         SESSION_COOKIE_SECURE=os.getenv("FLASK_ENV") == "production",
-        SESSION_REDIS=Redis(host="redis", port=6379),
+        SESSION_REDIS=Redis(
+            host=config.ELASTIC_CACHE,
+            port=6379,
+            decode_responses=False,
+        ),
+        SESSION_SERIALIZER="json",
     )
 
     # Initialize Flask extensions
-    Session(app)  # Manage sessions using Flask-Session
+    Session(app)
     CORS(app, origins=["https://www.pika-card.store"], supports_credentials=True)
+
+    # Initialize socketio with the resolved Redis message queue
     socketio.init_app(app, manage_session=True)
-    # Initialize Babel for internationalization
+
     babel = Babel(app)
     babel.init_app(
         app,
@@ -59,28 +77,22 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
+    limiter.init_app(app)
     cache.init_app(
         app,
         config={
             "CACHE_TYPE": "RedisCache",
-            "CACHE_REDIS_URL": "redis://redis:6379/0",
+            "CACHE_REDIS_URL": f"redis://{config.ELASTIC_CACHE}:6379/0",
             "CACHE_DEFAULT_TIMEOUT": 300,
         },
     )
 
+    # Blueprints and other app-level configurations
     from app.models import Cart, Order, User
+    from app.routes.chat_routes import get_chat_room
 
     @login_manager.user_loader
     def load_user(user_id):
-        """
-        Load a user by their user ID.
-
-        Args:
-            user_id (int): The user ID.
-
-        Returns:
-            User: The user object.
-        """
         return User.query.get(int(user_id))
 
     login_manager.login_view = "auth.auth"
@@ -88,68 +100,97 @@ def create_app():
 
     @app.context_processor
     def inject_counts():
-        """
-        Inject counts of cart items, pending orders, orders without feedback, and users who requested uploader role into the template context.
+        try:
+            if current_user.is_authenticated:
+                user_id = current_user.id
 
-        Returns:
-            dict: A dictionary with counts of various user-related items.
-        """
-        if current_user.is_authenticated:
-            user_id = current_user.id
-            cart_items_count = (
-                db.session.query(func.count())
-                .select_from(Cart)
-                .filter(Cart.user_id == user_id)
-                .scalar()
-            )
-            pending_orders = (
-                cache.get(f"pending_orders_{user_id}")
-                or Order.query.filter_by(seller_id=user_id, status="Pending").count()
-            )
-            cache.set(f"pending_orders_{user_id}", pending_orders, timeout=60)
-            orders_without_feedback = (
-                cache.get(f"orders_without_feedback_{user_id}")
-                or Order.query.filter_by(
-                    buyer_id=user_id, status="Confirmed", feedback=None
-                ).count()
-            )
-            cache.set(
-                f"orders_without_feedback_{user_id}",
-                orders_without_feedback,
-                timeout=60,
-            )
-            users_want_uploader_role = cache.get("users_want_uploader_role") or (
-                current_user.role == "admin"
-                and User.query.filter(
-                    (User.request_status == "Pending")
-                    | (cast(User.request_status, String) == "0")
-                ).count()
-            )
-            cache.set("users_want_uploader_role", users_want_uploader_role, timeout=60)
-        else:
+                # Fetch or calculate pending_orders
+                pending_orders = cache.get(f"pending_orders_{user_id}")
+                if pending_orders is None:
+                    pending_orders = Order.query.filter_by(
+                        seller_id=user_id, status="Pending"
+                    ).count()
+                    cache.set(f"pending_orders_{user_id}", pending_orders, timeout=300)
+
+                # Fetch or calculate orders_without_feedback
+                orders_without_feedback = cache.get(
+                    f"orders_without_feedback_{user_id}"
+                )
+                if orders_without_feedback is None:
+                    orders_without_feedback = Order.query.filter_by(
+                        buyer_id=user_id, status="Confirmed", feedback=None
+                    ).count()
+                    cache.set(
+                        f"orders_without_feedback_{user_id}",
+                        orders_without_feedback,
+                        timeout=300,
+                    )
+
+                # Fetch or calculate users_want_uploader_role
+                users_want_uploader_role = 0
+                if current_user.role == "admin":
+                    users_want_uploader_role = cache.get("users_want_uploader_role")
+                    if (
+                        users_want_uploader_role is None
+                        and current_user.role == "admin"
+                    ):
+                        users_want_uploader_role = User.query.filter(
+                            (User.request_status == "Pending")
+                            | (cast(User.request_status, String) == "0")
+                        ).count()
+                        cache.set(
+                            "users_want_uploader_role",
+                            users_want_uploader_role,
+                            timeout=300,
+                        )
+
+                # Use caching for counts
+                cart_items_count = cache.get(f"cart_items_count_{user_id}")
+                if cart_items_count is None:
+                    cart_items_count = (
+                        db.session.query(func.count(Cart.id))
+                        .filter(Cart.user_id == user_id)
+                        .scalar()
+                    )
+                    cache.set(
+                        f"cart_items_count_{user_id}", cart_items_count, timeout=5
+                    )
+
+                # Aggregate unread counts in Redis efficiently
+                unread_message_count = 0
+                user_ids = [
+                    u.id
+                    for u in db.session.query(User.id).filter(User.id != user_id).all()
+                ]
+
+                # Use pipeline to batch Redis operations
+                pipeline = app.config["SESSION_REDIS"].pipeline()
+                for other_user_id in user_ids:
+                    room = get_chat_room(user_id, other_user_id)
+                    redis_key = f"{room}:unread"
+                    pipeline.get(redis_key)
+                unread_counts = pipeline.execute()
+                unread_message_count = sum(int(count or 0) for count in unread_counts)
+            else:
+                cart_items_count = pending_orders = orders_without_feedback = (
+                    users_want_uploader_role
+                ) = unread_message_count = 0
+        except Exception as e:
+            print(f"Error in inject_counts: {e}")
             cart_items_count = pending_orders = orders_without_feedback = (
                 users_want_uploader_role
-            ) = 0
+            ) = unread_message_count = 0
 
         return {
             "cart_items_count": cart_items_count,
             "pending_orders": pending_orders,
             "orders_without_feedback": orders_without_feedback,
             "users_want_uploader_role": users_want_uploader_role,
+            "unread_message_count": unread_message_count,
         }
 
     @app.template_filter("dict_without")
     def dict_without(d, key):
-        """
-        Remove a key from a dictionary.
-
-        Args:
-            d (dict): The dictionary.
-            key: The key to remove.
-
-        Returns:
-            dict: The dictionary without the specified key.
-        """
         return {k: v for k, v in d.items() if k != key}
 
     # Register blueprints for different routes

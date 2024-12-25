@@ -23,11 +23,12 @@ A modern web application for managing and showcasing Pokémon cards with advance
 ## Technologies
 - **Backend**: Flask, Flask-SQLAlchemy, Flask-Migrate, Flask-Login, Flask-Caching.
 - **Database**: PostgreSQL (via AWS RDS).
-- **Cloud Services**: AWS S3 for image storage, AWS RDS for database.
+- **Cloud Services**: AWS S3 for image storage, AWS RDS for database and Elastic cache.
 - **Frontend**: Bootstrap 5.
-- **DevOps**: Docker, Kubernetes, ArgoCD, AWS EC2.
+- **DevOps**: Docker, Terraform.
 
 ## Setup Instructions
+
 1. **Clone the Repository**:
     ```bash
     git clone <repository-url>
@@ -35,7 +36,18 @@ A modern web application for managing and showcasing Pokémon cards with advance
     ```
 
 2. **Set Up Environment Variables**:
-   Todo
+    Add the required environment variables to a `.env` file or export them manually:
+    ```bash
+    export SECRET_KEY=<your-secret-key>
+    export DB_USERNAME=<your-db-username>
+    export DB_PASSWORD=<your-db-password>
+    export DB_HOST=<your-db-host>
+    export DB_NAME=<your-db-name>
+    export AWS_ACCESS_KEY_ID=<your-aws-access-key>
+    export AWS_SECRET_ACCESS_KEY=<your-aws-secret-key>
+    export AWS_REGION=<your-aws-region>
+    export S3_BUCKET=<your-s3-bucket>
+    ```
 
 3. **Set Up Docker and Run the App**:
     ```bash
@@ -43,13 +55,17 @@ A modern web application for managing and showcasing Pokémon cards with advance
     ```
 
 4. **Access the App**:
-- Local: [http://localhost:5000](http://localhost:5000)
-- Deployed (example): [http://cards-il.duckdns.org](http://cards-il.duckdns.org)
+    - Local: [http://localhost:5000](http://localhost:5000)
 
 ## Admin Operations
 - **Admin Panel**: Accessible at `/admin/users`.
 - **Promote Users**: Change roles from "Normal" to "Uploader".
 - **Reset Cards**: Removes all cards from the database and deletes images from S3.
+
+## Infrastructure Diagram
+![Infrastructure Diagram](infrastructure.png)
+
+*This diagram was generated using Draw.io and provides an overview of the application's cloud-based architecture.*
 
 ## Environment Variables
 - **General**:
@@ -62,7 +78,7 @@ A modern web application for managing and showcasing Pokémon cards with advance
   - `S3_BUCKET`: Name of the S3 bucket.
 
 ## Future Enhancements
-- Implement pagination for large card collections.
 - Add test coverage with unit and integration tests.
-- Extend user roles with additional permissions.
 - Improve logging and monitoring for cloud services.
+- Work on piepline
+

@@ -1,13 +1,6 @@
 services:
-  redis:
-    image: redis:6
-    ports:
-      - "6379:6379"
-
   app:
     image: urkoren/pokemon-shop:latest
-    depends_on:
-      - redis
     ports:
       - "5000:5000"
     environment:
@@ -27,6 +20,7 @@ services:
       S3_BUCKET: "${S3_BUCKET}"
       API_KEY: "${API_KEY}"
       ADMIN_MAIL: "${ADMIN_MAIL}"
+      ELASTIC_CACHE: "${ELASTIC_CACHE}"
       PYTHONPATH: "./"
     volumes:
       - ./migrations:/app/migrations
@@ -45,6 +39,7 @@ services:
       S3_BUCKET: "${S3_BUCKET}"
       API_KEY: "${API_KEY}"
       ADMIN_MAIL: "${ADMIN_MAIL}"
+      ELASTIC_CACHE: "${ELASTIC_CACHE}"
       PYTHONPATH: "./"
     command: pytest --junitxml=/app/test-results/results.xml -q
 

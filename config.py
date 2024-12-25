@@ -32,3 +32,6 @@ class Config:
 
     # Disable SQLAlchemy track modifications to save resources.
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # Elastic cache url
+    ELASTIC_CACHE = os.getenv("ELASTIC_CACHE")

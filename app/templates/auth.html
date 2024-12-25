@@ -67,6 +67,14 @@
         opacity: 1;
         transform: translateY(0);
     }
+
+    html[dir="rtl"] body,
+    html[dir="rtl"] .form-label,
+    html[dir="rtl"] .form-control,
+    html[dir="rtl"] .card-header h3,
+    html[dir="rtl"] .card-footer small {
+        text-align: left !important;
+    }
 </style>
 
 <div class="container mt-5">
@@ -91,6 +99,10 @@
                                 <label for="password-login" class="form-label">{{ _("Password") }}</label>
                                 <input type="password" class="form-control" name="password" placeholder="{{ _('Enter your password') }}" required>
                             </div>
+			    <div class="mb-3 form-check">
+				<input type="checkbox" class="form-check-input" name="remember" id="remember">
+				<label class="form-check-label" for="remember">{{ _("Remember Me") }}</label>
+			    </div>
                             <button type="submit" class="btn btn-primary w-100">{{ _("Login") }}</button>
                         </form>
                     </div>
@@ -110,6 +122,9 @@
                             <div class="mb-3">
                                 <label for="password-register" class="form-label">{{ _("Password") }}</label>
                                 <input type="password" class="form-control" name="password" placeholder="{{ _('Choose a password') }}" required>
+				<small class="text-muted">
+				    {{ _("Password must be at least 8 characters long and include uppercase, lowercase and numbers.") }}
+				</small>
                             </div>
                             <div class="mb-3">
                                 <label for="location" class="form-label">{{ _("Location") }}</label>
@@ -157,23 +172,41 @@
     const toggleText = document.getElementById('toggle-text');
 
     toggleLink.addEventListener('click', (e) => {
-        e.preventDefault();
+	e.preventDefault();
 
-        if (loginForm.classList.contains('form-visible')) {
-            // Show Register Form
-            loginForm.classList.replace('form-visible', 'form-hidden');
-            registerForm.classList.replace('form-hidden', 'form-visible');
-            formTitle.textContent = "{{ _('Register') }}";
-            toggleText.textContent = "{{ _('Already have an account? ') }}";
-            toggleLink.textContent = "{{ _('Login here') }}";
-        } else {
-            // Show Login Form
-            registerForm.classList.replace('form-visible', 'form-hidden');
-            loginForm.classList.replace('form-hidden', 'form-visible');
-            formTitle.textContent = "{{ _('Login') }}";
-            toggleText.textContent = "{{ _('Don\'t have an account? ') }}";
-            toggleLink.textContent = "{{ _('Register here') }}";
-        }
+	if (loginForm.classList.contains('form-visible')) {
+	    // Show Register Form
+	    loginForm.classList.replace('form-visible', 'form-hidden');
+	    registerForm.classList.replace('form-hidden', 'form-visible');
+	    formTitle.textContent = "{{ _('Register') }}";
+	    toggleText.textContent = "{{ _('Already have an account? ') }}";
+	    toggleLink.textContent = "{{ _('Login here') }}";
+
+	    // Add password strength validation for the register form
+	    document.querySelectorAll('#register-form input[name="password"]').forEach(input => {
+		input.addEventListener('input', () => {
+		    const strengthRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).{8,}$/;
+		    if (!strengthRegex.test(input.value)) {
+			input.setCustomValidity("Password must meet the strength requirements.");
+		    } else {
+			input.setCustomValidity("");
+		    }
+		});
+	    });
+	} else {
+	    // Show Login Form
+	    registerForm.classList.replace('form-visible', 'form-hidden');
+	    loginForm.classList.replace('form-hidden', 'form-visible');
+	    formTitle.textContent = "{{ _('Login') }}";
+	    toggleText.textContent = "{{ _('Don\'t have an account? ') }}";
+	    toggleLink.textContent = "{{ _('Register here') }}";
+
+	    // Remove password strength validation for the login form
+	    document.querySelectorAll('#login-form input[name="password"]').forEach(input => {
+		input.setCustomValidity(""); // Reset custom validation
+		input.removeEventListener('input', null); // Remove event listener
+	    });
+	}
     });
 </script>
 {% endblock %}
