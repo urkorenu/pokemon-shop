@@ -21,3 +21,4 @@ flask_socketio
 eventlet
 flask_cors
 kombu
+flask_limiter
