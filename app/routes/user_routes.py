@@ -385,24 +385,28 @@ def add_to_cart():
     """
     card_id = request.form.get("card_id")
     card = Card.query.get_or_404(card_id)
-    cart_item = Cart.query.filter_by(user_id=current_user.id, card_id=card.id).first()
-    if cart_item:
-        if cart_item.quantity < card.amount:
-            cart_item.quantity += 1
-            db.session.commit()
-            flash(f"{card.name} has been added to your cart.", "success")
-        else:
-            flash(
-                f"You cannot add more {card.name} cards. Only {card.amount} available.",
-                "danger",
-            )
+    if card.uploader_id == current_user.id:
+        flash(f"You cant buy your own cards :)", "danger")
+
     else:
-        if card.amount > 0:
-            db.session.add(Cart(user_id=current_user.id, card_id=card.id, quantity=1))
-            db.session.commit()
-            flash(f"{card.name} has been added to your cart.", "success")
+        cart_item = Cart.query.filter_by(user_id=current_user.id, card_id=card.id).first()
+        if cart_item:
+            if cart_item.quantity < card.amount:
+                cart_item.quantity += 1
+                db.session.commit()
+                flash(f"{card.name} has been added to your cart.", "success")
+            else:
+                flash(
+                    f"You cannot add more {card.name} cards. Only {card.amount} available.",
+                    "danger",
+                )
         else:
-            flash(f"{card.name} is out of stock.", "danger")
+            if card.amount > 0:
+                db.session.add(Cart(user_id=current_user.id, card_id=card.id, quantity=1))
+                db.session.commit()
+                flash(f"{card.name} has been added to your cart.", "success")
+            else:
+                flash(f"{card.name} is out of stock.", "danger")
     return redirect(url_for("user.view_cards"))
 
 
