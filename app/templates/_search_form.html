@@ -66,7 +66,7 @@
 
     <!-- Set Name with Autocomplete -->
     <div class="col-sm-6 col-md-3">
-        <input class="form-control" list="set_names" id="set_name" name="set_name" placeholder="{{ _('Type to search...') }}"
+        <input class="form-control" list="set_names" id="set_name" name="set_name" placeholder="{{ _('Type to search set...') }}"
                value="{{ request.args.get('set_name', '') }}">
         <datalist id="set_names">
             {% for set_name in unique_set_names %}
