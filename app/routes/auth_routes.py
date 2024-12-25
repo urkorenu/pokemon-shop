@@ -6,12 +6,18 @@ from ..cities import CITIES_IN_ISRAEL
 from ..mail_service import send_email
 from config import Config
 from app.utils import delete_user_account
+import re
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+
+limiter = Limiter(key_func=get_remote_address)
 
 # Create a Blueprint for authentication routes
 auth_bp = Blueprint("auth", __name__)
 
 
 @auth_bp.route("/sign-in", methods=["GET", "POST"])
+@limiter.limit("5 per minute")
 def auth():
     """
     Route for user authentication (login and registration).
@@ -35,7 +41,8 @@ def auth():
                     flash("Your account has been banned", "error")
                     return redirect(url_for("auth.auth"))
 
-                login_user(user)
+                remember = bool(request.form.get("remember"))
+                login_user(user, remember=remember)
                 flash("Login successful!", "success")
                 return redirect(url_for("user.view_cards"))
 
@@ -67,6 +74,10 @@ def auth():
 
             if User.query.filter_by(email=email).first():
                 flash("Email already registered. Please log in.", "error")
+                return redirect(url_for("auth.auth"))
+
+            if not is_password_strong(password):
+                flash("Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters.", "error")
                 return redirect(url_for("auth.auth"))
 
             user = User(
@@ -267,3 +278,12 @@ def delete_account():
     success, message = delete_user_account(current_user.id)
     flash(message, "success" if success else "danger")
     return redirect(url_for("auth.auth"))
+
+def is_password_strong(password):
+    """
+    Validate if the password meets the strength requirements:
+    - At least 8 characters
+    - Contains uppercase, lowercase, and a number
+    """
+    return bool(re.match(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{8,}$', password))
+
