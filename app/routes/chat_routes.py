@@ -13,7 +13,8 @@ chat_bp = Blueprint("chat", __name__)
 
 
 redis_client = redis.StrictRedis(
-    host=Config.ELASTIC_CACHE or "localhost",  # Use ELASTIC_CACHE or default to localhost
+    host=Config.ELASTIC_CACHE
+    or "localhost",  # Use ELASTIC_CACHE or default to localhost
     port=6379,
     decode_responses=True,
 )

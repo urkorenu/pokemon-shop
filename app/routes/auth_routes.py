@@ -77,7 +77,10 @@ def auth():
                 return redirect(url_for("auth.auth"))
 
             if not is_password_strong(password):
-                flash("Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters.", "error")
+                flash(
+                    "Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters.",
+                    "error",
+                )
                 return redirect(url_for("auth.auth"))
 
             user = User(
@@ -279,11 +282,11 @@ def delete_account():
     flash(message, "success" if success else "danger")
     return redirect(url_for("auth.auth"))
 
+
 def is_password_strong(password):
     """
     Validate if the password meets the strength requirements:
     - At least 8 characters
     - Contains uppercase, lowercase, and a number
     """
-    return bool(re.match(r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{8,}$', password))
-
+    return bool(re.match(r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{8,}$", password))

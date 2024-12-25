@@ -26,7 +26,10 @@ socketio = SocketIO(  # Initialize without message_queue for now
     manage_session=True,
     message_queue=f"redis://{os.getenv('ELASTIC_CACHE')}:6379/0",
 )
-limiter = Limiter(key_func=get_remote_address, storage_uri=f"redis://{os.getenv('ELASTIC_CACHE')}:6379")
+limiter = Limiter(
+    key_func=get_remote_address,
+    storage_uri=f"redis://{os.getenv('ELASTIC_CACHE')}:6379",
+)
 
 
 def create_app():
@@ -104,28 +107,43 @@ def create_app():
                 # Fetch or calculate pending_orders
                 pending_orders = cache.get(f"pending_orders_{user_id}")
                 if pending_orders is None:
-                    pending_orders = Order.query.filter_by(seller_id=user_id, status="Pending").count()
+                    pending_orders = Order.query.filter_by(
+                        seller_id=user_id, status="Pending"
+                    ).count()
                     cache.set(f"pending_orders_{user_id}", pending_orders, timeout=300)
 
                 # Fetch or calculate orders_without_feedback
-                orders_without_feedback = cache.get(f"orders_without_feedback_{user_id}")
+                orders_without_feedback = cache.get(
+                    f"orders_without_feedback_{user_id}"
+                )
                 if orders_without_feedback is None:
                     orders_without_feedback = Order.query.filter_by(
                         buyer_id=user_id, status="Confirmed", feedback=None
                     ).count()
-                    cache.set(f"orders_without_feedback_{user_id}", orders_without_feedback, timeout=300)
+                    cache.set(
+                        f"orders_without_feedback_{user_id}",
+                        orders_without_feedback,
+                        timeout=300,
+                    )
 
                 # Fetch or calculate users_want_uploader_role
                 users_want_uploader_role = 0
                 if current_user.role == "admin":
                     users_want_uploader_role = cache.get("users_want_uploader_role")
-                    if users_want_uploader_role is None and current_user.role == "admin":
+                    if (
+                        users_want_uploader_role is None
+                        and current_user.role == "admin"
+                    ):
                         users_want_uploader_role = User.query.filter(
                             (User.request_status == "Pending")
                             | (cast(User.request_status, String) == "0")
                         ).count()
-                        cache.set("users_want_uploader_role", users_want_uploader_role, timeout=300)
-                
+                        cache.set(
+                            "users_want_uploader_role",
+                            users_want_uploader_role,
+                            timeout=300,
+                        )
+
                 # Use caching for counts
                 cart_items_count = cache.get(f"cart_items_count_{user_id}")
                 if cart_items_count is None:
@@ -134,13 +152,17 @@ def create_app():
                         .filter(Cart.user_id == user_id)
                         .scalar()
                     )
-                    cache.set(f"cart_items_count_{user_id}", cart_items_count, timeout=5)
+                    cache.set(
+                        f"cart_items_count_{user_id}", cart_items_count, timeout=5
+                    )
 
-                
                 # Aggregate unread counts in Redis efficiently
                 unread_message_count = 0
-                user_ids = [u.id for u in db.session.query(User.id).filter(User.id != user_id).all()]
-                
+                user_ids = [
+                    u.id
+                    for u in db.session.query(User.id).filter(User.id != user_id).all()
+                ]
+
                 # Use pipeline to batch Redis operations
                 pipeline = app.config["SESSION_REDIS"].pipeline()
                 for other_user_id in user_ids:
@@ -167,7 +189,6 @@ def create_app():
             "unread_message_count": unread_message_count,
         }
 
-
     @app.template_filter("dict_without")
     def dict_without(d, key):
         return {k: v for k, v in d.items() if k != key}
@@ -190,4 +211,3 @@ def create_app():
     app.register_blueprint(chat_bp, url_prefix="/chat")
 
     return app
-

@@ -389,7 +389,9 @@ def add_to_cart():
         flash(f"You cant buy your own cards :)", "danger")
 
     else:
-        cart_item = Cart.query.filter_by(user_id=current_user.id, card_id=card.id).first()
+        cart_item = Cart.query.filter_by(
+            user_id=current_user.id, card_id=card.id
+        ).first()
         if cart_item:
             if cart_item.quantity < card.amount:
                 cart_item.quantity += 1
@@ -402,7 +404,9 @@ def add_to_cart():
                 )
         else:
             if card.amount > 0:
-                db.session.add(Cart(user_id=current_user.id, card_id=card.id, quantity=1))
+                db.session.add(
+                    Cart(user_id=current_user.id, card_id=card.id, quantity=1)
+                )
                 db.session.commit()
                 flash(f"{card.name} has been added to your cart.", "success")
             else:

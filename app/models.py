@@ -161,5 +161,3 @@ class Cart(db.Model):
 
     user = db.relationship("User", backref="cart_items")
     card = db.relationship("Card", backref="cart_entries")
-
-
