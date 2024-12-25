@@ -166,7 +166,7 @@ msgid "Card Number"
 msgstr "מספר קלף"
 
 msgid "Show Sold Cards"
-msgstr "הצג קליפם שנמכרו"
+msgstr "הצג קלפים שנמכרו"
 
 msgid "Search"
 msgstr "חפש"
@@ -419,6 +419,9 @@ msgstr "שם סט:"
 
 msgid "Type to search..."
 msgstr "הקלד כדי לחפש..."
+
+msgid "Type to search set..."
+msgstr "הקלד כדי לחפש סט..."
 
 msgid "Select Card Type"
 msgstr "בחר סוג קלף"
