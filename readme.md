@@ -1,5 +1,7 @@
 # Pokémon Card Store Web App
 
+[![GLWTSPL](https://img.shields.io/badge/GLWTS-Public_License-red.svg)](LICENSE)
+
 A modern web application for managing and showcasing Pokémon cards with advanced search, user roles, and cloud deployment.
 
 ## Features
