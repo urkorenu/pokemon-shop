@@ -133,3 +133,28 @@ resource "aws_security_group" "cache_sg" {
 
   tags = var.tags
 }
+
+
+# Redis Security Group
+resource "aws_security_group" "dynamic_testing" {
+  vpc_id = var.vpc_id
+  name   = "${var.env}-dynamic_testing-sg"
+
+  ingress {
+    description     = "Allow ssh traffic"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    description = "Allow all outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = var.tags
+}
