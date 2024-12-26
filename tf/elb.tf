@@ -60,10 +60,3 @@ resource "aws_lb_listener" "https_listener" {
     target_group_arn = aws_lb_target_group.app_target_group.arn
   }
 }
-
-# Attach an instance to the target group
-resource "aws_lb_target_group_attachment" "app_attachment" {
-  target_group_arn = aws_lb_target_group.app_target_group.arn
-  target_id        = aws_instance.app_instance.id
-  port             = 5000
-}
