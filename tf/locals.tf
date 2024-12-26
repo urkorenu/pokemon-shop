@@ -1,6 +1,6 @@
 locals {
   aws_access_key_id     = "your-access-key-id"
-  aws_secret_access_key = "your-secret-access"
+  aws_secret_access_key = "your-secret-access-key"
   aws_region            = "il-central-1"
   api_key               = "your-api-key"
   admin_mail            = "your-email"

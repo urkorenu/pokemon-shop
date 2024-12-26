@@ -4,7 +4,7 @@ variable "user_data" {
   default     = ""
 }
 
-resource "aws_instance" "ec2_instance" {
+resource "aws_instance" "nat_instance" {
   ami                    = var.ami_id
   instance_type          = var.instance_type
   key_name               = var.key_name
@@ -42,14 +42,45 @@ resource "aws_instance" "ec2_instance" {
   }
 }
 
+# Fetch the existing route table
+data "aws_route_table" "private_route_table" {
+  route_table_id = var.private_route_table_id
+}
+
+# Check if a route for 0.0.0.0/0 already exists
+locals {
+  route_exists = length([
+    for route in data.aws_route_table.private_route_table.routes : route
+    if route.cidr_block == "0.0.0.0/0"
+  ]) > 0
+}
+
+# Define a route for the NAT instance only if it doesn't already exist
+resource "aws_route" "nat_route" {
+  count                = local.route_exists ? 0 : 1
+  route_table_id       = var.private_route_table_id
+  destination_cidr_block = "0.0.0.0/0"
+  network_interface_id = aws_instance.nat_instance.primary_network_interface_id
+
+  lifecycle {
+    ignore_changes = [destination_cidr_block]
+    create_before_destroy = true
+    prevent_destroy       = false
+  }
+
+  depends_on = [aws_instance.nat_instance]
+}
+
+
+
 
 # Output for instance ID
 output "ec2_instance_id" {
-  value = aws_instance.ec2_instance.id
+  value = aws_instance.nat_instance.id
 }
 
 output "nat_instance_network_interface_id" {
-  value = aws_instance.ec2_instance.primary_network_interface_id  # Correct attribute
+  value = aws_instance.nat_instance.primary_network_interface_id  # Correct attribute
 }
 
 
