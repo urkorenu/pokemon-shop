@@ -9,6 +9,8 @@ ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 # Start Docker service
 systemctl start docker
 systemctl enable docker
+sudo usermod -aG docker ec2-user
+
 
 # Set environment variables
 cat <<EOF > /etc/environment
