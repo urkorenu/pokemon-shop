@@ -1,5 +1,5 @@
 output "cache_endpoint" {
-  value = "endpoint=${aws_elasticache_cluster.cluster.cache_nodes[0].address}:${aws_elasticache_cluster.cluster.cache_nodes[0].port}"
+  value = aws_elasticache_cluster.cluster.cache_nodes[0].address
 }
 
 output "subnet_group_name" {
