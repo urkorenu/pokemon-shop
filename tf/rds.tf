@@ -27,6 +27,7 @@ resource "aws_db_instance" "app_rds" {
   vpc_security_group_ids  = [aws_security_group.app_db_sg.id]  # List of VPC security group IDs
   skip_final_snapshot     = true               # Skip final snapshot before deletion
   deletion_protection     = true               # Enable deletion protection
+  snapshot_identifier     = "init"             # Snapshot identifier
 
   lifecycle {
     ignore_changes = [
@@ -39,4 +40,12 @@ resource "aws_db_instance" "app_rds" {
     Environment = "production"  # Environment tag
     Critical    = "true"        # Critical tag
   }
+}
+
+output "rds_endpoint" {
+  value = "rds://${aws_db_instance.app_rds.address}:${aws_db_instance.app_rds.port}/${aws_db_instance.app_rds.db_name}"
+}
+
+output "db_name" {
+  value = "rds://${aws_db_instance.app_rds.db_name}"
 }
