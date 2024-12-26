@@ -81,6 +81,8 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             set -e
+            sudo usermod -aG docker ec2-user
+            newgrp docker
             mkdir -p /home/ec2-user/git
             cd /home/ec2-user/git
             if [ -d "pokemon-shop" ]; then
