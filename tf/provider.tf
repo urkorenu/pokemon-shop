@@ -1,9 +1,9 @@
 # Configure the Terraform backend to use an S3 bucket for storing the state file
 terraform {
   backend "s3" {
-    bucket         = "pokemon-production-tf-state"  # S3 bucket name
+    bucket         = "pokemon-production-tf-state-unique-id"  # S3 bucket name
     key            = "terraform/state.tfstate"      # Path to the state file within the bucket
-    region         = "eu-north-1"                   # AWS region of the S3 bucket
+    region         = "il-central-1"                 # AWS region of the S3 bucket
     encrypt        = true                           # Enable encryption for the state file
   }
 
@@ -11,7 +11,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"  # Source of the AWS provider
-      version = "~> 4.0"         # Version constraint for the AWS provider
+      version = "~> 5.12"         # Version constraint for the AWS provider
     }
   }
 }

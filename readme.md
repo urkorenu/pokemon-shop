@@ -66,6 +66,8 @@ A modern web application for managing and showcasing Pokémon cards with advance
 
 ## Infrastructure Diagram
 ![Infrastructure Diagram](infrastructure.png)
+## Terraform Graph
+![Terraform Graph](tf/graph.png)
 
 *This diagram was generated using Draw.io and provides an overview of the application's cloud-based architecture.*
 

@@ -34,3 +34,8 @@ variable "vpc_id" {
   description = "The VPC ID where the security group is created"
   type        = string
 }
+
+variable "private_route_table_id" {
+    description = "The route table ID for the private subnet"
+    type        = string
+}
