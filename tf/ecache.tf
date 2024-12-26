@@ -21,3 +21,7 @@ resource "aws_elasticache_cluster" "pokemon_cache" {
   }
 }
 
+
+output "cache_endpoint" {
+  value = "endpoint=${aws_elasticache_cluster.pokemon_cache.cache_nodes.0.address}:${aws_elasticache_cluster.pokemon_cache.cache_nodes.0.port}"
+}
