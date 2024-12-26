@@ -55,7 +55,7 @@ jobs:
       - id: launch-ec2
         run: |
           INSTANCE_ID=$(aws ec2 run-instances \
-            --image-id ami-0d494ad1f8b4fb282 \
+            --image-id ami-03d7ce6feba3797b6 \
             --instance-type t3.micro \
             --key-name pokemon-app \
             --security-group-ids sg-00846fdd7be685d85 \
@@ -109,6 +109,12 @@ jobs:
 
             # Build and run Docker Compose with the environment file
             docker-compose --env-file .env up --build test
+
+      # Terminate the EC2 instance after tests
+      - if: always()
+        run: |
+          aws ec2 terminate-instances --instance-ids ${{ env.INSTANCE_ID }}
+          aws ec2 wait instance-terminated --instance-ids ${{ env.INSTANCE_ID }}
 
   build:
     runs-on: ubuntu-latest
