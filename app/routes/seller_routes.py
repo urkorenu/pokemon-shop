@@ -135,7 +135,7 @@ def upload_card():
             name=name, price=price, follow_tcg=follow_tcg, tcg_price=selected_price if language == "en" else 0,
             condition=condition, amount=1, set_name=set_name, number=number, image_url=image_url,
             is_graded=is_graded, grade=grade, grading_company=grading_company, card_type=card_type, uploader_id=current_user.id,
-            back_image_url=back_image_url,  # Add this field
+            back_image_url=back_image_url,  
 
         )
         db.session.add(card)
