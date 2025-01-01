@@ -71,8 +71,9 @@ def update_tcg_prices():
     try:
         print("Starting TCG price update process...")
 
-        # Query all cards with follow_tcg=True
-        cards = session.query(Card).filter(Card.follow_tcg == True).all()
+        # Query all cards with follow_tcg=True and amount == 1
+        cards = session.query(Card).filter(Card.follow_tcg == True, Card.amount == 1).all()
+
 
         if not cards:
             print("No cards found with follow_tcg=True.")
