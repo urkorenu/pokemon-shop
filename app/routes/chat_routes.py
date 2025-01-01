@@ -19,6 +19,7 @@ redis_client = redis.StrictRedis(
     decode_responses=True,
 )
 
+
 def get_chat_room(user1, user2):
     """
     Return a normalized room key for the two users.
@@ -31,6 +32,7 @@ def get_chat_room(user1, user2):
         str: Normalized room key.
     """
     return f"chat:{min(int(user1), int(user2))}:{max(int(user1), int(user2))}"
+
 
 @chat_bp.route("/chat")
 @login_required
@@ -49,7 +51,10 @@ def chat():
         room = get_chat_room(current_user.id, new_user_id)
         serialized_messages = redis_client.lrange(room, 0, -1)
         messages = [
-            {**json.loads(msg), "timestamp": redis_client.hget(f"{room}:timestamps", idx)}
+            {
+                **json.loads(msg),
+                "timestamp": redis_client.hget(f"{room}:timestamps", idx),
+            }
             for idx, msg in enumerate(serialized_messages)
         ]
         redis_client.delete(f"{room}:unread")
@@ -58,14 +63,25 @@ def chat():
         {
             "id": user.id,
             "username": user.username,
-            "unread_count": redis_client.get(f"{get_chat_room(current_user.id, user.id)}:unread") or 0,
-            "recent_message": json.loads(redis_client.lindex(get_chat_room(current_user.id, user.id), -1))["message"]
-            if redis_client.lindex(get_chat_room(current_user.id, user.id), -1) else _("No recent messages"),
+            "unread_count": redis_client.get(
+                f"{get_chat_room(current_user.id, user.id)}:unread"
+            )
+            or 0,
+            "recent_message": (
+                json.loads(
+                    redis_client.lindex(get_chat_room(current_user.id, user.id), -1)
+                )["message"]
+                if redis_client.lindex(get_chat_room(current_user.id, user.id), -1)
+                else _("No recent messages")
+            ),
         }
         for user in User.query.filter(User.id != current_user.id).all()
     ]
 
-    return render_template("chat.html", other_users=other_users, messages=messages, receiver=receiver)
+    return render_template(
+        "chat.html", other_users=other_users, messages=messages, receiver=receiver
+    )
+
 
 @socketio.on("connect")
 def handle_connect():
@@ -79,6 +95,7 @@ def handle_connect():
         print(f"Unauthorized connection attempt by {request.sid}")
         return False
     print(f"User connected: {current_user.username} (ID: {current_user.id})")
+
 
 @socketio.on("send_message")
 @login_required
@@ -97,9 +114,12 @@ def send_message(data):
         "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     }
     redis_client.rpush(room, json.dumps(message))
-    redis_client.hset(f"{room}:timestamps", redis_client.llen(room) - 1, message["timestamp"])
+    redis_client.hset(
+        f"{room}:timestamps", redis_client.llen(room) - 1, message["timestamp"]
+    )
     redis_client.incr(f"{room}:unread")
     emit("receive_message", message, room=room)
+
 
 @socketio.on("join_room")
 @login_required

@@ -14,11 +14,11 @@ BASE_URL = "https://api.pokemontcg.io/v2"
 API_KEY = Config.API_KEY
 
 
-
 # Create a database engine
 engine = create_engine(DATABASE_URI)
 Session = sessionmaker(bind=engine)
 session = Session()
+
 
 def fetch_tcg_price(card_name, set_name, number, card_type):
     """Fetch the latest price for a card from TCGPlayer."""
@@ -41,9 +41,12 @@ def fetch_tcg_price(card_name, set_name, number, card_type):
 
         # Filter for an exact match
         filtered_cards = [
-            card for card in card_data
-            if card.get("set", {}).get("name", "").strip().lower() == set_name.strip().lower() and
-               str(card.get("number", "")).strip().lower() == str(number).strip().lower()
+            card
+            for card in card_data
+            if card.get("set", {}).get("name", "").strip().lower()
+            == set_name.strip().lower()
+            and str(card.get("number", "")).strip().lower()
+            == str(number).strip().lower()
         ]
 
         if not filtered_cards:
@@ -58,7 +61,9 @@ def fetch_tcg_price(card_name, set_name, number, card_type):
         market_price = tcg_price_data.get(card_type.lower(), {}).get("market")
 
         if market_price is None:
-            print(f"No market price found for card '{card_name}' with type '{card_type}'. Full API Response: {response.json()}")
+            print(
+                f"No market price found for card '{card_name}' with type '{card_type}'. Full API Response: {response.json()}"
+            )
 
         print(f"Fetched price for card '{card_name}' ({card_type}): {market_price}")
         return market_price
@@ -72,8 +77,9 @@ def update_tcg_prices():
         print("Starting TCG price update process...")
 
         # Query all cards with follow_tcg=True and amount == 1
-        cards = session.query(Card).filter(Card.follow_tcg == True, Card.amount == 1).all()
-
+        cards = (
+            session.query(Card).filter(Card.follow_tcg == True, Card.amount == 1).all()
+        )
 
         if not cards:
             print("No cards found with follow_tcg=True.")
@@ -85,7 +91,9 @@ def update_tcg_prices():
             set_name = card.set_name
             number = card.number
 
-            print(f"Fetching TCG price for card: {card_name} (Set: {set_name}, Number: {number})")
+            print(
+                f"Fetching TCG price for card: {card_name} (Set: {set_name}, Number: {number})"
+            )
             # Fetch the updated price
             new_price = fetch_tcg_price(card_name, set_name, number, card.card_type)
             if new_price is not None:
@@ -107,6 +115,6 @@ def update_tcg_prices():
     finally:
         session.close()
 
+
 if __name__ == "__main__":
     update_tcg_prices()
-

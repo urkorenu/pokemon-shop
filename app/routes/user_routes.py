@@ -506,12 +506,14 @@ def privacy_policy():
     """
     return render_template("privacy_policy.html")
 
+
 @user_bp.route("/terms-of-use")
 def terms_of_use():
     """
     Render the Terms of Use page.
     """
     return render_template("terms_of_use.html")
+
 
 @user_bp.route("/health", methods=["GET"])
 def health_check():

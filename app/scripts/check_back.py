@@ -14,6 +14,7 @@ engine = create_engine(DATABASE_URI)
 Session = sessionmaker(bind=engine)
 session = Session()
 
+
 def check_back_images():
     try:
         # Query all cards
@@ -21,7 +22,9 @@ def check_back_images():
 
         # Check for back_image_url presence and print results
         for card in cards:
-            has_back_image = bool(card.back_image_url)  # True if back_image_url is not None or empty
+            has_back_image = bool(
+                card.back_image_url
+            )  # True if back_image_url is not None or empty
             print(f"Card ID {card.id}: {card.name}")
             print(f"  Front Image URL: {card.image_url}")
             if has_back_image:
@@ -35,6 +38,6 @@ def check_back_images():
     finally:
         session.close()
 
+
 if __name__ == "__main__":
     check_back_images()
-
