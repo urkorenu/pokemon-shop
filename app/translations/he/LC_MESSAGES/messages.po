@@ -265,7 +265,7 @@ msgid "Rules for Uploaders"
 msgstr "חוקי מעלה תוכן"
 
 msgid "I have read and accept the rules for becoming an uploader."
-msgstr "קראתי ואני מסכים לחוקי הלאת קלפים."
+msgstr "קראתי ואני מסכים לחוקי העלאת קלפים."
 
 msgid "Order History"
 msgstr "היסטוריית הזמנות"
@@ -365,9 +365,6 @@ msgstr "אין לך הזמנות."
 
 msgid "Start shopping!"
 msgstr "התחל לקנות!"
-
-msgid "Pending Orders"
-msgstr "הזמנות ממתינות"
 
 msgid "Buyer:"
 msgstr "קונה:"
@@ -642,6 +639,27 @@ msgstr "הקלד את ההודעה שלך..."
 msgid "Send"
 msgstr "שלח"
 
+msgid "Privacy Policy"
+msgstr "פרטיות"
+
+msgid "PRIVACY POLICY"
+msgstr "פרטיות"
+
+msgid "Remember Me"
+msgstr "זכור אותי"
+
+msgid "By signing up, you agree to our"
+msgstr "על ידי הרשמה, הנך מסכים ל"
+
+msgid "and"
+msgstr "ו"
+
+msgid "Terms of Use"
+msgstr "תנאי השימוש"
+
+msgid "TERMS OF USE"
+msgstr "תנאי השימוש"
+
 msgid "Start Shopping!"
 msgstr "התחל לקנות!"
 
@@ -653,3 +671,186 @@ msgstr "הזן את שמך המלא"
 
 msgid "Write your message here..."
 msgstr "כתוב את ההודעה שלך כאן..."
+
+msgid "Welcome to Pika-Card! By using our platform, you agree to abide by these Terms of Use. If you do not agree to these terms, please discontinue using our services."
+msgstr "ברוכים הבאים ל-Pika-Card! על ידי שימוש בפלטפורמה שלנו, אתה מסכים לעמוד בתנאי השימוש הללו. אם אינך מסכים לתנאים, אנא הפסק את השימוש בשירותינו."
+
+msgid "1. Nature of the Service"
+msgstr "1. מהות השירות"
+
+msgid "Pika-Card is a free platform designed to connect sellers and buyers for trading collectible cards and related items. We do not manage payments, transactions, or guarantee the fulfillment of agreements between users."
+msgstr "Pika-Card היא פלטפורמה חינמית המיועדת לחבר בין מוכרים וקונים למטרת מסחר בקלפי אספנות ופריטים קשורים. אנחנו לא מנהלים תשלומים, עסקאות או מבטיחים את קיום ההסכמים בין המשתמשים."
+
+msgid "2. User Responsibilities"
+msgstr "2. אחריות המשתמשים"
+
+msgid "Users must provide accurate and up-to-date information during registration."
+msgstr "משתמשים נדרשים לספק מידע מדויק ומעודכן בעת ההרשמה."
+
+msgid "Sellers are responsible for the accuracy of item listings, including descriptions, conditions, and images."
+msgstr "מוכרים אחראים לדיוק של רישומי המוצרים, כולל תיאורים, מצבים ותמונות."
+
+msgid "Users must be 18+ years old."
+msgstr "משתמשים נדרים להיות מעל גיל 18."
+
+msgid "Buyers and sellers are solely responsible for arranging payment, delivery, and other transaction details."
+msgstr "קונים ומוכרים אחראים בלעדית לסידור התשלום, המשלוח ופרטי העסקה האחרים."
+
+msgid "You agree not to engage in fraudulent, harmful, or illegal activities while using the platform."
+msgstr "אתה מסכים שלא לעסוק בפעילויות מרמה, מזיקות או בלתי חוקיות בעת השימוש בפלטפורמה."
+
+msgid "3. Content Guidelines"
+msgstr "3. הנחיות לתוכן"
+
+msgid "Users may upload content, such as item listings and images, subject to the following conditions:"
+msgstr "משתמשים יכולים להעלות תוכן, כמו רישומי פריטים ותמונות, בכפוף לתנאים הבאים:"
+
+msgid "Content must not infringe on intellectual property rights."
+msgstr "תוכן לא יכול להפר זכויות קניין רוחני."
+
+msgid "Content must not be offensive, misleading, or harmful."
+msgstr "תוכן לא יכול להיות פוגע, מטעה או מזיק."
+
+msgid "We reserve the right to remove content that violates these guidelines."
+msgstr "אנו שומרים את הזכות להסיר תוכן שמפר הנחיות אלו."
+
+msgid "4. Limitation of Liability"
+msgstr "4. הגבלת אחריות"
+
+msgid "Pika-Card is not liable for disputes, losses, or damages arising from interactions between users. We provide the platform 'as is' and make no warranties regarding the reliability or accuracy of user-generated content."
+msgstr "Pika-Card אינה אחראית למחלוקות, הפסדים או נזקים הנובעים מאינטראקציות בין משתמשים. אנו מספקים את הפלטפורמה כפי שהיא ולא מבטיחים אמינות או דיוק של תוכן שנוצר על ידי המשתמשים."
+
+msgid "5. Termination"
+msgstr "5. השעיה"
+
+msgid "We reserve the right to suspend or terminate your account if you violate these Terms or engage in prohibited activities."
+msgstr "אנו שומרים את הזכות להשעות את חשבונך אם תפר תנאים אלו או תעסוק בפעילויות אסורות."
+
+msgid "6. Changes to These Terms"
+msgstr "6. שינויים בתנאים אלו"
+
+msgid "We may update these Terms of Use at any time. Continued use of the platform constitutes acceptance of any changes."
+msgstr "אנו עשויים לעדכן את תנאי השימוש בכל עת. המשך השימוש בפלטפורמה מהווה הסכמה לשינויים."
+
+msgid "7. Governing Law"
+msgstr "7. החוק החל"
+
+msgid "These terms are governed by the laws of the State of Israel. Any disputes arising out of or in connection with these terms will be resolved exclusively in the competent courts located in Israel."
+msgstr "תנאים אלו כפופים לחוקי מדינת ישראל. כל מחלוקת הנובעת או קשורה לתנאים אלו תיפתר באופן בלעדי בבתי המשפט המוסמכים הממוקמים בישראל."
+
+msgid "8. Contact Us"
+msgstr "8. צור קשר"
+
+msgid "If you have questions about these Terms, please contact us at:"
+msgstr "אם יש לך שאלות לגבי תנאים אלו, אנא צור איתנו קשר:"
+
+msgid "At Pika-Card, we respect your privacy and are committed to protecting your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our services. By accessing our platform, you agree to the terms outlined in this policy."
+msgstr "ב-Pika-Card אנו מכבדים את פרטיותך ומתחייבים להגן על המידע האישי שלך. מדיניות פרטיות זו מסבירה כיצד אנו אוספים, משתמשים ומגנים על הנתונים שלך בעת השימוש בשירותינו. על ידי גישה לפלטפורמה שלנו, אתה מסכים לתנאים המתוארים במדיניות זו."
+
+msgid "1. Information We Collect"
+msgstr "1. מידע שאנו אוספים"
+
+msgid "Personal Information:"
+msgstr "מידע אישי:"
+
+msgid "When you register, we collect details such as your name, email address, and contact preferences."
+msgstr "בעת ההרשמה, אנו אוספים פרטים כמו שם, כתובת דואר אלקטרוני והעדפות קשר."
+
+msgid "Profile Information:"
+msgstr "מידע פרופיל:"
+
+msgid "Optional details like your location and contact methods (e.g., phone or social media links)."
+msgstr "פרטים אופציונליים כמו המיקום שלך ושיטות יצירת קשר (למשל, טלפון או קישורים לרשתות חברתיות)."
+
+msgid "Usage Data:"
+msgstr "נתוני שימוש:"
+
+msgid "General analytics on platform activity, such as page views and interactions, to improve user experience."
+msgstr "ניתוחים כלליים על פעילות בפלטפורמה, כגון צפיות בדפים ואינטראקציות, לשיפור חווית המשתמש."
+
+msgid "2. How We Use Your Information"
+msgstr "2. כיצד אנו משתמשים במידע שלך"
+
+msgid "To create and manage your account."
+msgstr "כדי ליצור ולנהל את חשבונך."
+
+msgid "To facilitate communication between buyers and sellers."
+msgstr "כדי לאפשר תקשורת בין קונים למוכרים."
+
+msgid "To provide customer support and respond to inquiries."
+msgstr "כדי לספק תמיכה ללקוחות ולהגיב לשאלות."
+
+msgid "To improve our platform through analytics and feedback."
+msgstr "כדי לשפר את הפלטפורמה שלנו באמצעות ניתוחים ומשוב."
+
+msgid "3. Sharing Your Information"
+msgstr "3. שיתוף המידע שלך"
+
+msgid "We do not sell or rent your personal information. However, basic details like your username and contact preferences will be visible to other users to enable communication. We may share your data with legal authorities if required by law."
+msgstr "אנו לא מוכרים או משכירים את המידע האישי שלך. עם זאת, פרטים בסיסיים כמו שם המשתמש שלך והעדפות הקשר שלך יהיו גלויים למשתמשים אחרים כדי לאפשר תקשורת. אנו עשויים לשתף את הנתונים שלך עם רשויות חוק אם יידרש על פי חוק."
+
+msgid "4. Your Rights"
+msgstr "4. הזכויות שלך"
+
+msgid "You can update or delete your profile information at any time."
+msgstr "תוכל לעדכן או למחוק את פרטי הפרופיל שלך בכל עת."
+
+msgid "You may delete your account by doing so in the account section or by contacting our support team."
+msgstr "תוכל למחוק את חשבונך על ידי כך באזור החשבון או על ידי פנייה לצוות התמיכה שלנו."
+
+msgid "You can request a copy of your data or ask for its removal, subject to applicable laws."
+msgstr "תוכל לבקש עותק של הנתונים שלך או לבקש את הסרתם, בכפוף לחוקים החלים."
+
+msgid "5. Data Security"
+msgstr "5. אבטחת מידע"
+
+msgid "We implement reasonable security measures to protect your data. However, no system is completely secure, and we cannot guarantee the absolute safety of your information."
+msgstr "אנו מיישמים אמצעי אבטחה סבירים כדי להגן על המידע שלך. עם זאת, אף מערכת אינה בטוחה לחלוטין, ואיננו יכולים להבטיח את בטיחותו המוחלטת של המידע שלך."
+
+msgid "6. Changes to This Privacy Policy"
+msgstr "6. שינויים במדיניות פרטיות זו"
+
+msgid "We may update this policy from time to time. Any changes will be posted on this page with a revised 'Last Updated' date."
+msgstr "אנו עשויים לעדכן מדיניות זו מעת לעת. כל שינוי יפורסם בעמוד זה עם תאריך עדכון האחרון."
+
+msgid "7. Contact Us"
+msgstr "7. צור קשר"
+
+msgid "If you have any questions or concerns about our Privacy Policy, please reach out to us at:"
+msgstr "אם יש לך שאלות או חששות לגבי מדיניות פרטיות זו, אנא צור קשר איתנו ב:"
+
+msgid "Your request to become an uploader is currently {status}."
+msgstr "הבקשה שלך להפוך למעלה תכנים נמצאת כרגע במצב {status}."
+
+msgid "Pending"
+msgstr "בהמתנה"
+
+msgid "Approved"
+msgstr "מאושרת"
+
+msgid "Rejected"
+msgstr "נדחתה"
+
+msgid "Before submitting a request, ensure your profile details (email, location, and contact details) are up-to-date and accurate."
+msgstr "לפני שליחת הבקשה, וודא שפרטי הפרופיל שלך (דוא\"ל, מיקום ופרטי קשר) מעודכנים ומדויקים."
+
+msgid "Rules for Uploaders"
+msgstr "חוקי מעלה תוכן"
+
+msgid "You must provide accurate contact information."
+msgstr "עליך לספק פרטי קשר מדויקים."
+
+msgid "All uploaded cards must adhere to community guidelines."
+msgstr "כל הקלפים המועלים חייבים לעמוד בקווים המנחים של הקהילה."
+
+msgid "Failure to follow rules may result in account suspension or termination."
+msgstr "אי עמידה בחוקים עשויה להוביל להשעיה או לסגירת החשבון."
+
+msgid "You must review and verify all uploaded information for accuracy."
+msgstr "עליך לבדוק ולאמת את כל המידע שהועלה לצורך דיוק."
+
+msgid "Repeated violations will lead to permanent revocation of uploader privileges."
+msgstr "הפרות חוזרות יובילו לביטול קבוע של זכויות המעלה תכנים."
+
+msgid "Request Uploader Role"
+msgstr "הגשת בקשה"
