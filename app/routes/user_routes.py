@@ -499,6 +499,20 @@ def about_us():
     return render_template("about.html")
 
 
+@user_bp.route("/privacy-policy")
+def privacy_policy():
+    """
+    Render the Privacy Policy page.
+    """
+    return render_template("privacy_policy.html")
+
+@user_bp.route("/terms-of-use")
+def terms_of_use():
+    """
+    Render the Terms of Use page.
+    """
+    return render_template("terms_of_use.html")
+
 @user_bp.route("/health", methods=["GET"])
 def health_check():
     """
@@ -562,7 +576,7 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
     if name_query:
         query = query.filter(Card.name.ilike(f"%{name_query}%"))
     if set_name_query:
-        query = query.filter(Card.set_name == set_name_query)
+        query = query.filter(Card.set_name.ilike(f"%{set_name_query}%"))
     if location_query:
         query = query.filter(uploader_alias.location.ilike(f"%{location_query}%"))
     if is_graded == "yes":
