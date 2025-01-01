@@ -281,7 +281,7 @@
     {% endwith %}
     <!-- Footer -->
     <footer class="text-center">
-        <p>&copy; 2024 Pika-Card. All rights reserved.</p>
+        <p>&copy; 2024 Pika-Card. All rights reserved</p>
         <div class="container">
             <ul class="list-inline">
                 <li class="list-inline-item">
@@ -289,6 +289,12 @@
                 </li>
                 <li class="list-inline-item">
                     <a href="{{ url_for('user.contact_us') }}" class="btn">{{ _('Contact Us') }}</a>
+                </li>
+                <li class="list-inline-item">
+                    <a href="{{ url_for('user.privacy_policy') }}" class="btn">{{ _('Privacy Policy') }}</a>
+                </li>
+                <li class="list-inline-item">
+                    <a href="{{ url_for('user.terms_of_use') }}" class="btn">{{ _('Terms of Use') }}</a>
                 </li>
             </ul>
         </div>
