@@ -9,7 +9,6 @@ from app.utils import roles_required
 
 # Create a Blueprint for the seller routes
 seller_bp = Blueprint("seller", __name__)
-
 API_KEY = Config.API_KEY
 BASE_URL = "https://api.pokemontcg.io/v2"
 
@@ -17,11 +16,21 @@ BASE_URL = "https://api.pokemontcg.io/v2"
 @seller_bp.route("/upload", methods=["GET", "POST"])
 @login_required
 def upload_card():
-    """Upload a new card."""
+    """
+    Upload a new card.
+
+    Returns:
+        Rendered template for the upload page or a redirect to the upload page with a flash message.
+    """
 
     @cache.cached(timeout=86400, key_prefix="pokemon_sets")
     def get_pokemon_sets():
-        """Fetches Pokémon sets from the API and caches the result for 24 hours."""
+        """
+        Fetch Pokémon sets from the API and cache the result.
+
+        Returns:
+            list: List of Pokémon sets with their names and max card numbers.
+        """
         try:
             response = requests.get(
                 f"{BASE_URL}/sets", headers={"X-Api-Key": API_KEY}, timeout=10
@@ -38,7 +47,12 @@ def upload_card():
 
     @cache.cached(timeout=86400, key_prefix="japanese_sets")
     def get_japanese_sets():
-        """Fetches Japanese sets."""
+        """
+        Fetch Japanese sets from the API and cache the result.
+
+        Returns:
+            list: List of Japanese sets.
+        """
         try:
             response = requests.get("https://www.jpn-cards.com/v2/set", timeout=10)
             response.raise_for_status()
@@ -53,19 +67,28 @@ def upload_card():
     sets = get_pokemon_sets() if request.method == "GET" else []
 
     if request.method == "POST":
-        # Collect form data
-        name = request.form.get("name")
-        follow_tcg = request.form.get("follow_tcg") == "on"
-        price = float(request.form.get("price") or 0.0)
-        condition = request.form.get("condition")
-        set_name = request.form.get("set_name")
-        number = request.form.get("number")
-        card_type = request.form.get("card_type")
-        is_graded = request.form.get("is_graded") == "on"
-        grade = request.form.get("grade") if is_graded else None
-        grading_company = request.form.get("grading_company") if is_graded else None
-        language = request.form.get("language")
-        file = request.files.get("image")
+        name, follow_tcg, price = (
+            request.form.get("name"),
+            request.form.get("follow_tcg") == "on",
+            float(request.form.get("price") or 0.0),
+        )
+        condition, set_name, number = (
+            request.form.get("condition"),
+            request.form.get("set_name"),
+            request.form.get("number"),
+        )
+        card_type, is_graded = (
+            request.form.get("card_type"),
+            request.form.get("is_graded") == "on",
+        )
+        grade, grading_company = request.form.get("grade") if is_graded else None, (
+            request.form.get("grading_company") if is_graded else None
+        )
+        language, file, back_file = (
+            request.form.get("language"),
+            request.files.get("image"),
+            request.files.get("back_image"),
+        )
 
         if language == "en":
             try:
@@ -94,7 +117,6 @@ def upload_card():
                     == str(number).strip().lower()
                 ]
 
-                # Handle empty filtered_cards list
                 if not filtered_cards:
                     return (
                         jsonify(
@@ -162,6 +184,10 @@ def upload_card():
             return render_template("upload.html", sets=sets)
 
         image_url = upload_to_s3(file, bucket_name=Config.S3_BUCKET) if file else None
+        back_image_url = (
+            upload_to_s3(back_file, bucket_name=Config.S3_BUCKET) if back_file else None
+        )
+
         card = Card(
             name=name,
             price=price,
@@ -177,6 +203,7 @@ def upload_card():
             grading_company=grading_company,
             card_type=card_type,
             uploader_id=current_user.id,
+            back_image_url=back_image_url,
         )
         db.session.add(card)
         db.session.commit()
@@ -189,7 +216,12 @@ def upload_card():
 @seller_bp.route("/en-sets", methods=["GET"])
 @cache.cached(timeout=86400, key_prefix="english_pokemon_sets")
 def get_english_sets():
-    """Fetch English Pokémon sets."""
+    """
+    Fetch English Pokémon sets.
+
+    Returns:
+        JSON response with the list of English Pokémon sets.
+    """
     try:
         response = requests.get(
             f"{BASE_URL}/sets", headers={"X-Api-Key": API_KEY}, timeout=10
@@ -205,7 +237,12 @@ def get_english_sets():
 @seller_bp.route("/jp-sets", methods=["GET"])
 @cache.cached(timeout=86400, key_prefix="japanese_pokemon_sets")
 def get_japanese_sets():
-    """Fetch Japanese Pokémon sets."""
+    """
+    Fetch Japanese Pokémon sets.
+
+    Returns:
+        JSON response with the list of Japanese Pokémon sets.
+    """
     try:
         response = requests.get("https://www.jpn-cards.com/v2/set", timeout=10)
         response.raise_for_status()
@@ -220,10 +257,17 @@ def get_japanese_sets():
 @roles_required("admin", "uploader")
 @cache.cached(timeout=86400, query_string=True)
 def get_card_details():
-    """Get details of a specific card."""
-    language = request.args.get("language", "en")
-    set_name = request.args.get("set_name")
-    number = request.args.get("number")
+    """
+    Get details of a specific card.
+
+    Returns:
+        JSON response with the card details or an error message.
+    """
+    language, set_name, number = (
+        request.args.get("language", "en"),
+        request.args.get("set_name"),
+        request.args.get("number"),
+    )
 
     if not set_name or not number:
         return jsonify({"error": "Missing required parameters"}), 400
@@ -267,7 +311,16 @@ def get_card_details():
         elif language == "jp":
 
             def get_set_id_by_name(sets_data, set_name):
-                """Extract the set ID by matching the set name."""
+                """
+                Get the set ID by set name.
+
+                Args:
+                    sets_data (list): List of sets data.
+                    set_name (str): Name of the set.
+
+                Returns:
+                    int: Set ID.
+                """
                 for set_entry in sets_data:
                     if set_entry.get("name") == set_name:
                         return set_entry.get("id")
@@ -321,6 +374,9 @@ def get_card_details():
 def seller_dashboard():
     """
     Seller Dashboard with pending orders, search, and summary statistics.
+
+    Returns:
+        Rendered template for the seller dashboard with orders and statistics.
     """
     if current_user.role not in ["uploader", "admin"]:
         flash("You do not have permission to access this page.", "danger")
@@ -355,7 +411,6 @@ def seller_dashboard():
             }
         )
 
-    # Completed Orders with recalculated total_price
     completed_orders_query = Order.query.filter_by(
         seller_id=current_user.id, status="Confirmed"
     )

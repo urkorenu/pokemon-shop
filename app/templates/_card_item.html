@@ -60,9 +60,55 @@
         margin-bottom: 0;
         flex-grow: 1;
     }
-    /* Badge Styling */
+
     .badge {
         font-size: 0.8rem;
+    }
+
+    .badge-top-left {
+        top: 10px;
+        left: 10px;
+    }
+
+    .badge-top-right {
+        top: 10px;
+        right: 10px;
+    }
+
+    .badge-bottom-left {
+        bottom: 10px;
+        left: 10px;
+    }
+
+    .badge-bottom-right {
+        bottom: 10px;
+        right: 10px;
+    }
+
+    .badge-modern {
+        font-size: 0.7rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 4px 8px;
+        border-radius: 12px;
+        background-color: #007bff;
+        color: white;
+        position: absolute;
+        top: 10px; /* Positioned at the top-right corner */
+        right: 10px;
+        z-index: 5;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .badge-modern:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+    }
+
+    .badge-modern i {
+        font-size: 1rem;
     }
 
     /* Modal Styling */
@@ -80,6 +126,7 @@
         background-color: #ffc107;
         color: #000;
     }
+
     /* Footer Button Styling */
     .btn-sold {
         background-color: #dc3545;
@@ -93,11 +140,16 @@
         <span class="badge bg-secondary position-absolute top-0 start-0 m-2">
             {{ _('Uploaded:') }} {{ card.uploaded_at.strftime('%Y-%m-%d') if card.uploaded_at else _('N/A') }}
         </span>
+	{% if card.back_image_url %}
+        <span class="badge-modern badge-top-right">
+       	    🔄 {{ _('Back Image') }}
+        </span>
+	{% endif %}
 
         <!-- Admin Delete Button -->
         {% if current_user.is_authenticated and current_user.role == "admin" %}
         <form method="POST" action="{{ url_for('user.delete_card', card_id=card.id) }}">
-            <button type="submit" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2">
+            <button type="submit" class="btn btn-danger btn-sm position-absolute badge-top-right">
                 <i class="bi bi-trash"></i>
             </button>
         </form>
@@ -113,7 +165,7 @@
             <p class="card-text">
                 <strong>{{ _('Card Type:') }}</strong> {{ card.card_type|capitalize }}<br>
                 <strong>{{ _('Set:') }}</strong> {{ card.set_name }}<br>
-		<strong>{{ _('Card Number:') }}</strong> {{ card.number }}<br>
+                <strong>{{ _('Card Number:') }}</strong> {{ card.number }}<br>
                 <strong>{{ _('Condition:') }}</strong>
                 <span class="badge
                     {% if card.condition == 'NM' %} bg-success
@@ -126,7 +178,7 @@
                     {{ card.condition }}
                 </span><br>
                 <strong>{{ _('Price:') }}</strong> {{ card.price }} {{ _('ILS') }}<br>
-		{% if card.uploader %}
+                {% if card.uploader %}
                 <strong>{{ _('Uploaded By:') }}</strong>
                 <a href="{{ url_for('user.profile', user_id=card.uploader.id) }}">
                     {{ card.uploader.username }}
@@ -155,14 +207,26 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ _('Close') }}"></button>
                 </div>
                 <div class="modal-body text-center">
-                    <img src="{{ card.image_url }}" class="img-fluid rounded" alt="{{ card.name }}">
+                    <!-- Image Element -->
+                    <img id="modalCardImage{{ card.id }}" src="{{ card.image_url }}"
+                         class="img-fluid rounded"
+                         data-front-url="{{ card.image_url }}"
+                         data-back-url="{{ card.back_image_url }}"
+                         alt="{{ _('Front Image') }}">
+                    <!-- Toggle Button -->
                     <div class="mt-3">
+                        <!-- Additional Info -->
+			{% if card.back_image_url %}
+			<button type="button" class="btn btn-primary mt-3" onclick="toggleModalCardImage('{{ card.id }}')">
+		            🔄
+			</button>
+			{% endif %}
                         <p>
-			    <strong>{{ _('Card Number:') }}</strong> {{ card.number }}<br>
-			    <strong>{{ _('Set:') }}</strong> {{ card.set_name }}<br>
-			    <strong>{{ _('Condition:') }}</strong> {{ card.condition }}<br>
-			    <strong>{{ _('Price:') }}</strong> {{ card.price }} {{ _('ILS') }}<br>
-			    <strong>{{ _('Graded:') }}</strong> {{ _('Yes') if card.is_graded else _('No') }}<br>
+                            <strong>{{ _('Card Number:') }}</strong> {{ card.number }}<br>
+                            <strong>{{ _('Set:') }}</strong> {{ card.set_name }}<br>
+                            <strong>{{ _('Condition:') }}</strong> {{ card.condition }}<br>
+                            <strong>{{ _('Price:') }}</strong> {{ card.price }} {{ _('ILS') }}<br>
+                            <strong>{{ _('Graded:') }}</strong> {{ _('Yes') if card.is_graded else _('No') }}<br>
 			    {% if card.is_graded %}
 			    <strong>{{ _('Grading Company:') }}</strong> {{ card.grading_company }}<br>
 			    <strong>{{ _('Grade:') }}</strong> {{ card.grade }}<br>
@@ -177,14 +241,11 @@
 			    <strong>{{ _('TCGPlayer Price (NM):') }}</strong> ${{ card.tcg_price if card.tcg_price else _('N/A') }}
                         </p>
                     </div>
-                    <button type="button" class="btn btn-report w-100 mt-2" data-bs-toggle="modal"
-                            data-bs-target="#reportModal{{ card.id }}">
-                        <i class="bi bi-flag"></i> {{ _('Report') }}
-                    </button>
                 </div>
             </div>
         </div>
     </div>
+
     <!-- Report Modal -->
     <div class="modal fade" id="reportModal{{ card.id }}" tabindex="-1" aria-labelledby="reportModalLabel{{ card.id }}" aria-hidden="true">
         <div class="modal-dialog">
@@ -210,3 +271,31 @@
         </div>
     </div>
 </div>
+<script>
+function toggleModalCardImage(cardId) {
+    const img = document.getElementById(`modalCardImage${cardId}`);
+    const frontImage = img.getAttribute('data-front-url');
+    const backImage = img.getAttribute('data-back-url');
+
+    // Validate URLs
+    if (!frontImage || !backImage) {
+        console.error("Missing Front or Back Image URLs");
+        return;
+    }
+
+    // Normalize URLs
+    const currentImage = img.src;
+    const frontImageURL = new URL(frontImage, window.location.origin).href;
+    const backImageURL = new URL(backImage, window.location.origin).href;
+
+    // Toggle between front and back image
+    if (currentImage === frontImageURL) {
+        img.src = backImageURL;
+        img.alt = "Back Image";
+    } else {
+        img.src = frontImageURL;
+        img.alt = "Front Image";
+    }
+}
+</script>
+

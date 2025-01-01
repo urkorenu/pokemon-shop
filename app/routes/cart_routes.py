@@ -13,11 +13,8 @@ def view_cart():
     """
     View the current user's cart.
 
-    Retrieves all items in the current user's cart, groups them by the uploader,
-    calculates the total price, and renders the cart template.
-
     Returns:
-        Rendered template for the cart view.
+        Rendered template for the cart page with grouped cart items and total price.
     """
     cart_items = Cart.query.filter_by(user_id=current_user.id).all()
     grouped_cart = {}
@@ -39,7 +36,7 @@ def remove_from_cart(cart_id):
         cart_id (int): The ID of the cart item to remove.
 
     Returns:
-        Redirect to the cart view with a flash message indicating success or failure.
+        Redirect to the cart view page with a flash message.
     """
     cart_item = Cart.query.get_or_404(cart_id)
     if cart_item.user_id != current_user.id:
@@ -57,11 +54,8 @@ def checkout():
     """
     Checkout the current user's cart.
 
-    Creates orders for each seller based on the items in the cart, sends notification
-    emails to the sellers, clears the cart, and redirects to the cart view with a flash message.
-
     Returns:
-        Redirect to the cart view with a flash message indicating success or failure.
+        Redirect to the cart view page with a flash message.
     """
     cart_items = Cart.query.filter_by(user_id=current_user.id).all()
     if not cart_items:
@@ -93,7 +87,7 @@ def checkout():
             send_email(
                 recipient=seller.email,
                 subject="New Order Received",
-                body="You have received a new order containing the following cards:\n"
+                body=f"You have received a new order containing the following cards:\n"
                 + "\n".join(f"- {item.card.name} (x{item.quantity})" for item in items)
                 + f"\n\nBuyer Details:\nName: {current_user.username}\n"
                 f"Contact: {current_user.contact_details} ({current_user.contact_preference})\n"

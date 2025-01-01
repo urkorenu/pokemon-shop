@@ -3,7 +3,7 @@ from ..models import Card, User, db
 from app.utils import roles_required, delete_user_account
 from ..mail_service import send_email
 
-# Create a Blueprint for admin routes
+# Create a Blueprint for the admin routes
 admin_bp = Blueprint("admin", __name__)
 
 
@@ -12,19 +12,18 @@ admin_bp = Blueprint("admin", __name__)
 def manage_users():
     """
     Route to manage users. Allows searching, updating, and deleting users.
-    Only accessible by admin users.
+    Only accessible to users with the 'admin' role.
 
-    Methods:
-        GET: Renders the user management page with a list of users.
-        POST: Handles user updates and deletions.
+    GET: Renders the user management page with a list of users.
+    POST: Handles user updates and deletions.
 
     Returns:
-        Rendered template for user management.
+        Rendered template for the user management page.
     """
-    # Get the search query from the request
+    # Get the search query from the request arguments
     search_query = request.args.get("search", "")
 
-    # Filter users based on the search query or get all users
+    # Filter users based on the search query or get all users if no search query is provided
     users = (
         User.query.filter(
             User.username.ilike(f"%{search_query}%")
@@ -52,12 +51,6 @@ def manage_users():
             user.location = request.form.get(f"location_{user_id}")
             user.contact_preference = request.form.get(f"contact_preference_{user_id}")
             user.contact_details = request.form.get(f"contact_details_{user_id}")
-            user.rating = (
-                float(request.form.get(f"rating_{user_id}"))
-                if request.form.get(f"rating_{user_id}")
-                else None
-            )
-            user.feedback_count = int(request.form.get(f"feedback_count_{user_id}", 0))
             user.request_status = request.form.get(
                 f"request_status_{user_id}", ""
             ).strip()
@@ -95,4 +88,5 @@ def manage_users():
             else:
                 flash("Invalid role data.", "error")
 
+    # Render the user management template with the list of users
     return render_template("manage_users.html", users=users)

@@ -1,16 +1,24 @@
+# Variable for user data to be applied to the instance
 variable "user_data" {
   description = "User data to be applied to the instance"
   type        = string
   default     = ""
 }
 
+# Resource for the NAT instance
 resource "aws_instance" "nat_instance" {
+  # AMI ID for the instance
   ami                    = var.ami_id
+  # Instance type
   instance_type          = var.instance_type
+  # Key name for SSH access
   key_name               = var.key_name
+  # Subnet ID for the instance
   subnet_id              = var.subnet_id
+  # Security group IDs for the instance
   vpc_security_group_ids = [var.security_group]
 
+  # Disable source/destination checks for NAT functionality
   source_dest_check = false
 
   # NAT instance user data script
@@ -37,6 +45,7 @@ resource "aws_instance" "nat_instance" {
     sudo systemctl start sshd
   EOF
 
+  # Tags for the instance
   tags = {
     Name = var.instance_name
   }
@@ -71,17 +80,12 @@ resource "aws_route" "nat_route" {
   depends_on = [aws_instance.nat_instance]
 }
 
-
-
-
 # Output for instance ID
 output "ec2_instance_id" {
   value = aws_instance.nat_instance.id
 }
 
+# Output for NAT instance network interface ID
 output "nat_instance_network_interface_id" {
-  value = aws_instance.nat_instance.primary_network_interface_id  # Correct attribute
+  value = aws_instance.nat_instance.primary_network_interface_id
 }
-
-
-

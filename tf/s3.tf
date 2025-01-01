@@ -3,6 +3,7 @@ data "aws_s3_bucket" "pokemon_pics" {
   bucket = "pokemon--pics" # Name of the existing bucket
 }
 
+# Uncomment the following resource block to create a new S3 bucket
 # resource "aws_s3_bucket" "pokemon_pics" {
 #   bucket = "pokemon-pics2"
 #

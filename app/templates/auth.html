@@ -146,6 +146,13 @@
                                 <label for="contact_details" class="form-label">{{ _("Contact Details") }}</label>
                                 <input type="text" class="form-control" name="contact_details" placeholder="{{ _('Phone or Facebook Link') }}" required>
                             </div>
+			    <div class="text-center mt-3">
+				<small>
+				    {{ _('By signing up, you agree to our') }}
+				    <a href="{{ url_for('user.privacy_policy') }}">{{ _('Privacy Policy') }}</a> {{ _('and') }}
+				    <a href="{{ url_for('user.terms_of_use') }}">{{ _('Terms of Use') }}</a>.
+				</small>
+			    </div>
                             <button type="submit" class="btn btn-success w-100">{{ _("Register") }}</button>
                         </form>
                     </div>

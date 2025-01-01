@@ -100,6 +100,7 @@ class Card(db.Model):
     uploader_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
     uploader = db.relationship("User", backref="uploaded_cards")
     follow_tcg = db.Column(db.Boolean, default=False)
+    back_image_url = db.Column(db.String(251), nullable=True)
 
 
 # Define the association table for orders and cards

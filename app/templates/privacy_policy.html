@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>{{ _("Privacy Policy") }}</h1>
+    <p>
+        {{ _("At Pika-Card, we respect your privacy and are committed to protecting your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our services. By accessing our platform, you agree to the terms outlined in this policy.") }}
+    </p>
+    <h2>{{ _("1. Information We Collect") }}</h2>
+    <ul>
+        <li><strong>{{ _("Personal Information:") }}</strong> {{ _("When you register, we collect details such as your name, email address, and contact preferences.") }}</li>
+        <li><strong>{{ _("Profile Information:") }}</strong> {{ _("Optional details like your location and contact methods (e.g., phone or social media links).") }}</li>
+        <li><strong>{{ _("Usage Data:") }}</strong> {{ _("General analytics on platform activity, such as page views and interactions, to improve user experience.") }}</li>
+    </ul>
+    <h2>{{ _("2. How We Use Your Information") }}</h2>
+    <ul>
+        <li>{{ _("To create and manage your account.") }}</li>
+        <li>{{ _("To facilitate communication between buyers and sellers.") }}</li>
+        <li>{{ _("To provide customer support and respond to inquiries.") }}</li>
+        <li>{{ _("To improve our platform through analytics and feedback.") }}</li>
+    </ul>
+    <h2>{{ _("3. Sharing Your Information") }}</h2>
+    <p>
+        {{ _("We do not sell or rent your personal information. However, basic details like your username and contact preferences will be visible to other users to enable communication. We may share your data with legal authorities if required by law.") }}
+    </p>
+    <h2>{{ _("4. Your Rights") }}</h2>
+    <ul>
+        <li>{{ _("You can update or delete your profile information at any time.") }}</li>
+        <li>{{ _("You may delete your account by doing so in the account section or by contacting our support team.") }}</li>
+        <li>{{ _("You can request a copy of your data or ask for its removal, subject to applicable laws.") }}</li>
+    </ul>
+    <h2>{{ _("5. Data Security") }}</h2>
+    <p>
+        {{ _("We implement reasonable security measures to protect your data. However, no system is completely secure, and we cannot guarantee the absolute safety of your information.") }}
+    </p>
+    <h2>{{ _("6. Changes to This Privacy Policy") }}</h2>
+    <p>
+        {{ _("We may update this policy from time to time. Any changes will be posted on this page with a revised 'Last Updated' date.") }}
+    </p>
+    <h2>{{ _("7. Contact Us") }}</h2>
+    <p>
+        {{ _("If you have any questions or concerns about our Privacy Policy, please reach out to us at:") }}
+    </p>
+    <div class="text-center">
+        <a href="{{ url_for('user.contact_us') }}" class="btn btn-primary btn-lg shadow">
+            <i class="bi bi-envelope"></i> {{ _("Contact Us") }}
+        </a>
+    </div>
+</div>
+{% endblock %}
+

@@ -330,6 +330,14 @@ def delete_card(card_id):
         except Exception as e:
             print(f"Failed to delete {card.image_url} from S3: {e}", flush=True)
             flash("Failed to delete the image from S3.", "danger")
+    if card.back_image_url:
+        try:
+            s3.delete_object(
+                Bucket=Config.S3_BUCKET, Key=urlparse(card.image_url).path.lstrip("/")
+            )
+        except Exception as e:
+            print(f"Failed to delete {card.image_url} from S3: {e}", flush=True)
+            flash("Failed to delete the image from S3.", "danger")
     if current_user.role == "admin" and card.uploader_id != current_user.id:
         uploader = User.query.get(card.uploader_id)
         if uploader and uploader.email:
@@ -491,6 +499,22 @@ def about_us():
     return render_template("about.html")
 
 
+@user_bp.route("/privacy-policy")
+def privacy_policy():
+    """
+    Render the Privacy Policy page.
+    """
+    return render_template("privacy_policy.html")
+
+
+@user_bp.route("/terms-of-use")
+def terms_of_use():
+    """
+    Render the Terms of Use page.
+    """
+    return render_template("terms_of_use.html")
+
+
 @user_bp.route("/health", methods=["GET"])
 def health_check():
     """
@@ -554,7 +578,7 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
     if name_query:
         query = query.filter(Card.name.ilike(f"%{name_query}%"))
     if set_name_query:
-        query = query.filter(Card.set_name == set_name_query)
+        query = query.filter(Card.set_name.ilike(f"%{set_name_query}%"))
     if location_query:
         query = query.filter(uploader_alias.location.ilike(f"%{location_query}%"))
     if is_graded == "yes":
@@ -590,6 +614,7 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
             "amount": card.amount,
             "is_graded": card.is_graded,
             "image_url": card.image_url,
+            "back_image_url": card.back_image_url,
             "card_type": card.card_type,
             "condition": card.condition,
             "uploaded_at": card.uploaded_at,

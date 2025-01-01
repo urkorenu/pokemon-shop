@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>{{ _("Terms of Use") }}</h1>
+    <p>
+        {{ _("Welcome to Pika-Card! By using our platform, you agree to abide by these Terms of Use. If you do not agree to these terms, please discontinue using our services.") }}
+    </p>
+    <h2>{{ _("1. Nature of the Service") }}</h2>
+    <p>
+        {{ _("Pika-Card is a free platform designed to connect sellers and buyers for trading collectible cards and related items. We do not manage payments, transactions, or guarantee the fulfillment of agreements between users.") }}
+    </p>
+    <h2>{{ _("2. User Responsibilities") }}</h2>
+    <ul>
+        <li>{{ _("Users must provide accurate and up-to-date information during registration.") }}</li>
+        <li>{{ _("Users must be 18+ years old.") }}</li>
+        <li>{{ _("Sellers are responsible for the accuracy of item listings, including descriptions, conditions, and images.") }}</li>
+        <li>{{ _("Buyers and sellers are solely responsible for arranging payment, delivery, and other transaction details.") }}</li>
+        <li>{{ _("You agree not to engage in fraudulent, harmful, or illegal activities while using the platform.") }}</li>
+    </ul>
+    <h2>{{ _("3. Content Guidelines") }}</h2>
+    <p>
+        {{ _("Users may upload content, such as item listings and images, subject to the following conditions:") }}
+    </p>
+    <ul>
+        <li>{{ _("Content must not infringe on intellectual property rights.") }}</li>
+        <li>{{ _("Content must not be offensive, misleading, or harmful.") }}</li>
+        <li>{{ _("We reserve the right to remove content that violates these guidelines.") }}</li>
+    </ul>
+    <h2>{{ _("4. Limitation of Liability") }}</h2>
+    <p>
+        {{ _("Pika-Card is not liable for disputes, losses, or damages arising from interactions between users. We provide the platform 'as is' and make no warranties regarding the reliability or accuracy of user-generated content.") }}
+    </p>
+    <h2>{{ _("5. Termination") }}</h2>
+    <p>
+        {{ _("We reserve the right to suspend or terminate your account if you violate these Terms or engage in prohibited activities.") }}
+    </p>
+    <h2>{{ _("6. Changes to These Terms") }}</h2>
+    <p>
+        {{ _("We may update these Terms of Use at any time. Continued use of the platform constitutes acceptance of any changes.") }}
+    </p>
+    <h2>{{ _("7. Governing Law") }}</h2>
+    <p>
+        {{ _("These terms are governed by the laws of the State of Israel. Any disputes arising out of or in connection with these terms will be resolved exclusively in the competent courts located in Israel.") }}
+    </p>
+    <h2>{{ _("8. Contact Us") }}</h2>
+    <p>
+        {{ _("If you have questions about these Terms, please contact us at:") }}
+    </p>
+    <div class="text-center">
+        <a href="{{ url_for('user.contact_us') }}" class="btn btn-primary btn-lg shadow">
+            <i class="bi bi-envelope"></i> {{ _("Contact Us") }}
+        </a>
+    </div>
+</div>
+{% endblock %}
+
