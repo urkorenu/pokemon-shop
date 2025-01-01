@@ -18,8 +18,6 @@
                     <th>Location</th>
                     <th>Contact Preference</th>
                     <th>Contact Details</th>
-                    <th>Rating</th>
-                    <th>Feedback Count</th>
                     <th>Request Status</th>
                     <th>Current Role</th>
                     <th>Promote To</th>
@@ -35,8 +33,6 @@
                     <td><input type="text" name="location_{{ user.id }}" class="form-control" value="{{ user.location }}"></td>
                     <td><input type="text" name="contact_preference_{{ user.id }}" class="form-control" value="{{ user.contact_preference }}"></td>
                     <td><input type="text" name="contact_details_{{ user.id }}" class="form-control" value="{{ user.contact_details }}"></td>
-                    <td><input type="number" step="0.1" name="rating_{{ user.id }}" class="form-control" value="{{ user.rating }}"></td>
-                    <td><input type="number" name="feedback_count_{{ user.id }}" class="form-control" value="{{ user.feedback_count }}"></td>
                     <td><input type="text" name="request_status_{{ user.id }}" class="form-control" value="{{ user.request_status }}"></td>
                     <td>{{ user.role }}</td>
                     <td>
