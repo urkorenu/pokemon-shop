@@ -23,24 +23,29 @@ app = Flask(__name__)
 app.app_context().push()
 
 def fetch_tcg_price(card_name, set_name, number, card_type):
-    """Fetch the latest price for a card using the get_card_details function."""
-    with app.test_request_context(
-            f"/card-details?language=en&set_name={set_name}&number={number}"
-    ):
-        response = get_card_details()
+    """Fetch the latest price for a card using the cached route."""
+    try:
+        # Construct the URL for the card details API
+        api_url = f"http://localhost:5000/seller/card-details?language=en&set_name={set_name}&number={number}"
+        headers = {"X-Bypass-Token": os.getenv("BYPASS_TOKEN")}
+        response = requests.get(api_url, headers=headers, timeout=10)
 
-    if response.status_code != 200:
-        print(f"Error fetching TCG price for {card_name}: {response.json.get('error', 'Unknown error')}")
+        if response.status_code != 200:
+            print(f"Error fetching TCG price for {card_name}: {response.json().get('error', 'Unknown error')}")
+            return None
+
+        # Parse the response
+        data = response.json()
+        prices = data.get("prices", {})
+        market_price = prices.get(card_type.lower(), {}).get("market")
+
+        if market_price is None:
+            print(f"No market price found for card '{card_name}' with type '{card_type}'")
+
+        return market_price
+    except requests.RequestException as e:
+        print(f"Error fetching TCG price for {card_name}: {e}")
         return None
-
-    data = response.get_json()
-    prices = data.get("prices", {})
-    market_price = prices.get(card_type.lower(), {}).get("market")
-
-    if market_price is None:
-        print(f"No market price found for card '{card_name}' with type '{card_type}'")
-
-    return market_price
 
 
 def analyze_price_changes(cards, price_changes):

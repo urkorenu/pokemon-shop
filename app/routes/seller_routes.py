@@ -6,6 +6,7 @@ from app.upload_to_s3 import upload_to_s3
 from config import Config
 from app import cache
 from app.utils import roles_required
+import os
 
 # Create a Blueprint for the seller routes
 seller_bp = Blueprint("seller", __name__)
@@ -254,7 +255,6 @@ def get_japanese_sets():
 
 
 @seller_bp.route("/card-details", methods=["GET"])
-@roles_required("admin", "uploader")
 @cache.cached(timeout=86400, query_string=True)
 def get_card_details():
     """
@@ -263,6 +263,16 @@ def get_card_details():
     Returns:
         JSON response with the card details or an error message.
     """
+    if not current_user.is_authenticated or current_user.role == "normal":
+        # Check for a special token to allow programmatic access
+        bypass_token = request.headers.get("X-Bypass-Token")
+        if bypass_token != os.getenv("BYPASS_TOKEN"):  # Store token in environment variables
+            return jsonify({"error": "Unauthorized access"}), 401
+        else:
+            print("Bypass token accepted", flush = True)
+
+    print(f"Parameters: {request.args}", flush = True)
+
     language, set_name, number = (
         request.args.get("language", "en"),
         request.args.get("set_name"),
