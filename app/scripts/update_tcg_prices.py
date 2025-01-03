@@ -80,6 +80,8 @@ def update_tcg_prices():
         cards = (
             session.query(Card).filter(Card.follow_tcg == True, Card.amount == 1).all()
         )
+        total_old_price = 0
+        total_new_price = 0
 
         if not cards:
             print("No cards found with follow_tcg=True.")
@@ -97,9 +99,12 @@ def update_tcg_prices():
             # Fetch the updated price
             new_price = fetch_tcg_price(card_name, set_name, number, card.card_type)
             if new_price is not None:
+                total_old_price += card.price
                 # Update the database
                 card.tcg_price = new_price
                 card.price = round(new_price * 3.56 + 0.5, 0)
+                card.price = 1 if card.price < 1 else card.price
+                total_new_price += card.price
                 print(f"Updated card '{card_name}' with new TCG price: {new_price}")
             else:
                 print(f"No price found for card '{card_name}'")
@@ -107,6 +112,9 @@ def update_tcg_prices():
         # Commit changes to the database
         session.commit()
         print("TCG price update process completed successfully!")
+        print(f"Total old price: {total_old_price}")
+        print(f"Total new price: {total_new_price}")
+        print(f"Total price difference: {total_new_price - total_old_price}")
 
     except Exception as e:
         session.rollback()
