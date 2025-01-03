@@ -136,23 +136,6 @@
         {% endif %}
     </div>
 
-    {% include "_search_form.html" %}
-
-    <!-- Uploaded Cards Section -->
-    <h3 class="uploaded-cards-title">{{ _('Uploaded Cards') }}</h3>
-    <div class="row">
-        {% if cards %}
-        {% for card in cards %}
-            {% include '_card_item.html' %}
-        {% endfor %}
-        {% else %}
-        <div class="col-12 text-center">
-            <p>{{ _('This user has not uploaded any cards yet.') }}</p>
-        </div>
-        {% endif %}
-    </div>
-
-    {% include "_pagination_form.html" %}
 </div>
 {% endblock %}
 

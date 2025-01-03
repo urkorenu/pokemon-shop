@@ -85,6 +85,24 @@ class Pagination:
 
 
 @user_bp.route("/")
+def home_page():
+    page = request.args.get("page", 1, type=int)
+    filtered_data = filter_cards(page=page)
+    cards_list, unique_set_names, stats = (
+        filtered_data["cards"],
+        filtered_data["unique_set_names"],
+        filtered_data["stats"],
+    )
+    return render_template(
+        "index.html",
+        cards=cards_list,
+        unique_set_names=unique_set_names,
+        cities=CITIES_IN_ISRAEL,
+        **stats,
+        show_sold_checkbox=False,
+    )
+
+@user_bp.route("/cards")
 def view_cards():
     """
     Route to view cards.
