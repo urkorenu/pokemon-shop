@@ -87,7 +87,7 @@ def update_tcg_prices():
                 total_old_price += card.price
                 old_price = card.price
                 card.tcg_price = new_price
-                card.price = round(new_price * 3.56 + 0.5, 0)
+                card.price = round(new_price * 3.65 + 0.5, 0)
                 card.price = max(card.price, 1)
                 total_new_price += card.price
                 price_changes.append((card, card.price - old_price))
