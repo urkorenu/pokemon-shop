@@ -1,126 +1,176 @@
 <style>
-    /* Modern Styling for Search Form */
-    .search-container {
-        background-color: #f9f9f9;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        margin-bottom: 20px;
-    }
 
-    .search-container h5 {
-        font-weight: bold;
-        color: #3B4CCA;
-        text-align: center;
-        margin-bottom: 20px;
-    }
+	/* Pokémon Card Back Color Theme for Search Form */
+	:root {
+	    --primary-color: #0A285F; /* Dark Blue */
+	    --secondary-color: #375A9E; /* Lighter Blue */
+	    --accent-color: #FFCB05; /* Yellow */
+	    --gradient-color: #729DCB; /* Gradient Blue */
+	    --text-color-light: #FFFFFF; /* White Text */
+	    --text-color-dark: #000000; /* Dark Text */
+	}
 
-    .form-row {
+	/* Search Form Styling */
+	.search-container {
+	    background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+	    color: var(--text-color-light);
+	    padding: 20px;
+	    border-radius: 12px;
+	    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+	    margin-bottom: 20px;
+	}
+
+	/* Section Title */
+	.search-container h5 {
+	    font-weight: bold;
+	    color: var(--accent-color);
+	    text-align: center;
+	    margin-bottom: 20px;
+	}
+
+	/* Form Inputs and Labels */
+	.form-label {
+	    color: var(--text-color-light);
+	    font-size: 0.9rem;
+	    font-weight: bold;
+	    margin-bottom: 5px;
+	    display: block;
+	}
+
+	.form-control, .form-select {
+	    border-radius: 8px;
+	    padding: 10px;
+	    font-size: 0.9rem;
+	    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+	    background-color: var(--text-color-light);
+	    color: var(--text-color-dark);
+	}
+
+	.form-control:focus, .form-select:focus {
+	    border-color: var(--accent-color);
+	    box-shadow: 0 0 5px rgba(255, 203, 5, 0.5);
+	}
+
+	/* Buttons */
+	.btn-container .btn-primary {
+	    background-color: var(--accent-color);
+	    border: none;
+	    padding: 10px 20px;
+	    font-size: 0.9rem;
+	    font-weight: bold;
+	    border-radius: 8px;
+	    color: var(--text-color-dark);
+	    transition: background-color 0.3s ease-in-out;
+	}
+
+	.btn-container .btn-primary:hover {
+	    background-color: var(--secondary-color);
+	    color: var(--text-color-light);
+	}
+
+	.btn-outline-secondary {
+	    background-color: var(--text-color-light);
+	    color: var(--text-color-dark);
+	    border: 2px solid var(--accent-color);
+	    font-size: 0.9rem;
+	    font-weight: bold;
+	    border-radius: 8px;
+	}
+
+	.btn-outline-secondary:hover {
+	    background-color: var(--accent-color);
+	    color: var(--text-color-dark);
+	}
+
+	/* Compact Showcase Section */
+	.showcase-container {
+	    display: flex;
+	    justify-content: space-between;
+	    gap: 15px;
+	    margin-bottom: 20px;
+	}
+
+	.showcase-card {
+	    flex: 1;
+	    text-align: center;
+	    padding: 20px;
+	    background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+	    border-radius: 12px;
+	    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+	    transition: transform 0.2s, box-shadow 0.2s;
+	    color: var(--text-color-light);
+	}
+
+	.showcase-card:hover {
+	    transform: translateY(-5px);
+	    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+	}
+
+	.showcase-title {
+	    font-size: 1rem;
+	    color: var(--accent-color);
+	    margin-bottom: 10px;
+	}
+
+	.showcase-value {
+	    font-size: 1.5rem;
+	    font-weight: bold;
+	    color: var(--text-color-light);
+	}
+
+	/* Responsive Adjustments */
+	@media (max-width: 768px) {
+	    .form-row {
+		flex-direction: column;
+	    }
+
+	    .form-group {
+		flex: 1 1 100%;
+	    }
+
+	    .showcase-container {
+		flex-direction: column;
+	    }
+	}
+	    /* Collapsible Section */
+    .collapse-header {
         display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
         justify-content: space-between;
-    }
-
-    .form-group {
-        flex: 1 1 calc(25% - 15px);
-        min-width: 150px;
-    }
-
-    .form-label {
-        font-size: 0.9rem;
-        font-weight: bold;
-        margin-bottom: 5px;
-        display: block;
-    }
-
-    .form-control, .form-select {
-        border-radius: 8px;
+        align-items: center;
+        cursor: pointer;
         padding: 10px;
-        font-size: 0.9rem;
-        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-    }
-
-    .form-control:focus, .form-select:focus {
-        border-color: #3B4CCA;
-        box-shadow: 0 0 5px rgba(59, 76, 202, 0.5);
-    }
-
-    .btn-container {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-    }
-
-    .btn-primary {
-        background-color: #3B4CCA;
-        border: none;
-        padding: 10px 20px;
-        font-size: 0.9rem;
-        font-weight: bold;
+        background: var(--accent-color);
+        color: var(--text-color-dark);
         border-radius: 8px;
-        transition: background-color 0.3s ease-in-out;
-    }
-
-    .btn-primary:hover {
-        background-color: #2a3698;
-    }
-
-    .btn-outline-secondary {
-        padding: 10px 20px;
-        font-size: 0.9rem;
         font-weight: bold;
-        border-radius: 8px;
-    }
-
-    /* Compact Showcase Section */
-    .showcase-container {
-        display: flex;
-        justify-content: space-between;
-        gap: 15px;
-        margin-bottom: 20px;
-    }
-
-    .showcase-card {
-        flex: 1;
-        text-align: center;
-        padding: 20px;
-        background-color: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .showcase-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
-    }
-
-    .showcase-title {
-        font-size: 1rem;
-        color: #666;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         margin-bottom: 10px;
     }
 
-    .showcase-value {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #333;
+    .collapse-header:hover {
+        background: var(--secondary-color);
+        color: var(--text-color-light);
     }
 
-    @media (max-width: 768px) {
-        .form-row {
-            flex-direction: column;
-        }
-
-        .form-group {
-            flex: 1 1 100%;
-        }
-
-        .showcase-container {
-            flex-direction: column;
-        }
+    .collapse-icon {
+        transition: transform 0.3s;
     }
+
+    .collapse-header.collapsed .collapse-icon {
+        transform: rotate(90deg);
+    }
+
+    /* Search Container */
+    .search-container {
+        background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+        color: var(--text-color-light);
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        margin-bottom: 20px;
+    }
+
+
 </style>
 
 <div class="showcase-container">
@@ -141,72 +191,91 @@
     </div>
 </div>
 
-<div class="search-container">
-    <h5>{{ _('Search for Pokémon Cards') }}</h5>
-    <form method="GET" action="{{ url_for('user.view_cards') }}">
-        <div class="form-row">
-            <!-- Pokémon Name -->
-            <div class="form-group">
-                <label for="name" class="form-label">{{ _('Pokémon Name') }}</label>
-                <input type="text" name="name" id="name" class="form-control" placeholder="{{ _('Enter Pokémon Name') }}"
-                       value="{{ request.args.get('name', '') }}">
-            </div>
+<div class="collapse-header" data-bs-toggle="collapse" data-bs-target="#search-collapse" aria-expanded="true">
+    {{ _('Search for Pokémon Cards') }}
+    <span class="collapse-icon bi bi-chevron-right"></span>
+</div>
 
-            <!-- Set Name -->
-            <div class="form-group">
-                <label for="set_name" class="form-label">{{ _('Set Name') }}</label>
-                <input class="form-control" list="set_names" id="set_name" name="set_name" placeholder="{{ _('Type to search set...') }}"
-                       value="{{ request.args.get('set_name', '') }}">
-                <datalist id="set_names">
-                    {% for set_name in unique_set_names %}
-                    <option value="{{ set_name }}">{{ set_name }}</option>
-                    {% endfor %}
-                </datalist>
-            </div>
+<div id="search-collapse" class="collapse show">
+    <div class="search-container">
+        <form method="GET" action="{{ url_for('user.view_cards') }}">
+            <div class="form-row">
+                <!-- Pokémon Name -->
+                <div class="form-group">
+                    <label for="name" class="form-label">{{ _('Pokémon Name') }}</label>
+                    <input type="text" name="name" id="name" class="form-control" placeholder="{{ _('Enter Pokémon Name') }}"
+                           value="{{ request.args.get('name', '') }}">
+                </div>
 
-            <!-- Graded -->
-            <div class="form-group">
-                <label for="is_graded" class="form-label">{{ _('Graded') }}</label>
-                <select name="is_graded" id="is_graded" class="form-select">
-                    <option value="">{{ _('Select...') }}</option>
-                    <option value="yes" {% if request.args.get('is_graded') == 'yes' %}selected{% endif %}>{{ _('Yes') }}</option>
-                    <option value="no" {% if request.args.get('is_graded') == 'no' %}selected{% endif %}>{{ _('No') }}</option>
-                </select>
-            </div>
+                <!-- Set Name -->
+                <div class="form-group">
+                    <label for="set_name" class="form-label">{{ _('Set Name') }}</label>
+                    <input class="form-control" list="set_names" id="set_name" name="set_name" placeholder="{{ _('Type to search set...') }}"
+                           value="{{ request.args.get('set_name', '') }}">
+                    <datalist id="set_names">
+                        {% for set_name in unique_set_names %}
+                        <option value="{{ set_name }}">{{ set_name }}</option>
+                        {% endfor %}
+                    </datalist>
+                </div>
 
-            <!-- Location -->
-            <div class="form-group">
-                <label for="location" class="form-label">{{ _('Location') }}</label>
-                <select name="location" id="location" class="form-select">
-                    <option value="">{{ _('Select...') }}</option>
-                    {% for city in cities %}
-                    <option value="{{ city }}" {% if request.args.get('location') == city %}selected{% endif %}>{{ city }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+                <!-- Graded -->
+                <div class="form-group">
+                    <label for="is_graded" class="form-label">{{ _('Graded?') }}</label>
+                    <select name="is_graded" id="is_graded" class="form-select">
+                        <option value="">{{ _('Select...') }}</option>
+                        <option value="yes" {% if request.args.get('is_graded') == 'yes' %}selected{% endif %}>{{ _('Yes') }}</option>
+                        <option value="no" {% if request.args.get('is_graded') == 'no' %}selected{% endif %}>{{ _('No') }}</option>
+                    </select>
+                </div>
 
-            <!-- User Filter -->
-            <div class="form-group">
-                <label for="user" class="form-label">{{ _('User') }}</label>
-                <select name="user" id="user" class="form-select">
-                    <option value="">{{ _('Select User') }}</option>
-                    {% for user in users %}
-                    <option value="{{ user }}" {% if request.args.get('user') == user %}selected{% endif %}>{{ user }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+                <!-- Language -->
+                <div class="form-group">
+                    <label for="language" class="form-label">{{ _('Language') }}</label>
+                    <select name="language" id="language" class="form-select">
+                        <option value="">{{ _('Select Language') }}</option>
+                        <option value="en" {% if request.args.get('language') == 'en' %}selected{% endif %}>{{ _('English') }}</option>
+                        <option value="jp" {% if request.args.get('language') == 'jp' %}selected{% endif %}>{{ _('Japanese') }}</option>
+                    </select>
+                </div>
 
-	    <!-- Sort Options -->
-	    <div class="col-sm-6 col-md-2">
-                <label for="sort" class="form-label">{{ _('Sort') }}</label>
-		<select name="sort" class="form-select">
-		    <option value="">{{ _('Sort By') }}</option>
-		    <option value="price_asc" {% if request.args.get('sort') == 'price_asc' %}selected{% endif %}>{{ _('Price: Low to High') }}</option>
-		    <option value="price_desc" {% if request.args.get('sort') == 'price_desc' %}selected{% endif %}>{{ _('Price: High to Low') }}</option>
-		    <option value="card_number" {% if request.args.get('sort') == 'card_number' %}selected{% endif %}>{{ _('Card Number') }}</option>
-		</select>
-	    </div>
-            <!-- Hide My Cards -->
+
+                <!-- Location -->
+                <div class="form-group">
+                    <label for="location" class="form-label">{{ _('Location') }}</label>
+                    <select name="location" id="location" class="form-select">
+                        <option value="">{{ _('Select...') }}</option>
+                        {% for city in cities %}
+                        <option value="{{ city }}" {% if request.args.get('location') == city %}selected{% endif %}>{{ city }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+				<!-- User Filter -->
+				<div class="form-group">
+					<label for="user" class="form-label">{{ _('User') }}</label>
+					<input class="form-control" list="users_list" id="user" name="user" placeholder="{{ _('Search User') }}"
+						   value="{{ request.args.get('user', '') }}">
+					<datalist id="users_list">
+						{% for user in users %}
+						<option value="{{ user }}">{{ user }}</option>
+						{% endfor %}
+					</datalist>
+				</div>
+			</div>
+
+			<div class="col-sm-6 col-md-2">
+					<label for="sort" class="form-label">{{ _('Sort') }}</label>
+			<select name="sort" class="form-select">
+				<option value="">{{ _('Sort By') }}</option>
+				<option value="price_asc" {% if request.args.get('sort') == 'price_asc' %}selected{% endif %}>{{ _('Price: Low to High') }}</option>
+				<option value="price_desc" {% if request.args.get('sort') == 'price_desc' %}selected{% endif %}>{{ _('Price: High to Low') }}</option>
+				<option value="card_number" {% if request.args.get('sort') == 'card_number' %}selected{% endif %}>{{ _('Card Number') }}</option>
+			</select>
+			</div>
+
+
+			<!-- Hide My Cards -->
 
             <div class="form-group">
                 <div class="form-check">
@@ -216,21 +285,89 @@
                 </div>
             </div>
 
-        </div>
+                <!-- Cards with Back Image -->
+                <div class="form-group">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="has_back_image" id="hasBackImage"
+                               {% if request.args.get('has_back_image') == 'on' %}checked{% endif %}>
+                        <label class="form-check-label" for="hasBackImage">{{ _('Cards with Back Image') }}</label>
+                    </div>
+                </div>
 
-        <!-- Buttons -->
-        <div class="btn-container mt-4">
-            <button type="submit" class="btn btn-primary">{{ _('Search') }}</button>
-            <a href="{{ url_for('user.view_cards') }}" class="btn btn-outline-secondary">{{ _('Reset') }}</a>
-        </div>
-    </form>
+            <!-- Buttons -->
+            <div class="btn-container mt-4">
+                <button type="submit" class="btn btn-primary">{{ _('Search') }}</button>
+                <a href="{{ url_for('user.view_cards') }}" class="btn btn-outline-secondary">{{ _('Reset') }}</a>
+            </div>
+        </form>
+    </div>
 </div>
-<!-- Autocomplete Script -->
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const setNames = {{ unique_set_names|tojson }};
+document.addEventListener("DOMContentLoaded", function () {
+    const setNames = {{ unique_set_names|tojson }}; // Ensure this includes all sets from the backend
     const setNameInput = document.getElementById("set_name");
-    new Awesomplete(setNameInput, { list: setNames });
+
+    // Initialize Awesomplete with enhanced options
+    const awesomplete = new Awesomplete(setNameInput, {
+        list: setNames,
+        minChars: 1, // Show suggestions after typing 1 character
+        maxItems: 20, // Limit the number of suggestions
+        filter: (text, input) => {
+            // Case-insensitive and partial matching
+            return text.toLowerCase().includes(input.toLowerCase());
+        },
+        item: (text, input) => {
+            // Highlight matching parts in black with bold styling
+            const regex = new RegExp(input, "i");
+            const highlighted = text.replace(regex, match => `<strong>${match}</strong>`);
+            return Awesomplete.ITEM(`<div style="color: #000;">${highlighted}</div>`, text);
+        }
+    });
+
+    // Style dropdown items explicitly for black text
+    const style = document.createElement("style");
+    style.textContent = `
+        .awesomplete {
+            max-width: 100%;
+            background-color: #fff; /* White background */
+            border: 1px solid #ccc; /* Light border */
+            z-index: 1000; /* Ensure it appears above other elements */
+        }
+        .awesomplete li {
+            font-size: 1rem;
+            padding: 8px 12px;
+            cursor: pointer;
+            color: #000; /* Black text */
+            transition: background-color 0.2s;
+        }
+        .awesomplete li:hover {
+            background-color: var(--secondary-color);
+            color: var(--text-color-light); /* White text on hover */
+        }
+        .awesomplete strong {
+            font-weight: bold;
+            color: #000; /* Black highlight */
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Add debouncing to reduce processing on input
+    let debounceTimeout;
+    setNameInput.addEventListener("input", function () {
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(() => {
+            awesomplete.evaluate();
+        }, 300); // Debounce time
+    });
+
+    // Ensure all sets are included
+    awesomplete.list = [...new Set(setNames.map(name => name.trim()))]; // Remove duplicates and trim spaces
+});
+document.addEventListener("DOMContentLoaded", function() {
+    const collapseHeader = document.querySelector('.collapse-header');
+    collapseHeader.addEventListener('click', () => {
+        collapseHeader.classList.toggle('collapsed');
+    });
 });
 </script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.5/awesomplete.min.css">

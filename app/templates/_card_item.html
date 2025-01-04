@@ -1,137 +1,134 @@
 <style>
-    /* Card Styling */
+
+    /* Pokémon-Inspired Elegant Card Styling */
     .card {
-        height: 100%;
-        transition: transform 0.3s, box-shadow 0.3s;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        overflow: hidden;
+	height: 100%;
+	transition: transform 0.3s, box-shadow 0.3s;
+	border-radius: 12px;
+	border: 2px solid transparent;
+	background: linear-gradient(white, white) padding-box,
+		    linear-gradient(90deg, #3B4CCA, #EE1C25) border-box; /* Gradient Border */
+	background-color: #FFFFFF; /* Soft White Interior */
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+	overflow: hidden;
     }
 
     .card:hover {
-        transform: scale(1.03);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+	transform: translateY(-5px); /* Lift on hover */
+	box-shadow: 0 8px 16px rgba(59, 76, 202, 0.3); /* Glow shadow on hover */
+	border-color: #FFCB05; /* Highlight border with Pokémon Yellow */
     }
 
+    /* Card Image */
     .card-img-top {
-        height: 220px;
-        object-fit: cover;
+	height: 220px;
+	object-fit: cover;
+	border-bottom: 2px solid #3B4CCA; /* Blue Bottom Border */
     }
 
-    /* Add to Cart Button Hover */
+    /* Add to Cart Button */
     .add-to-cart-btn {
-        display: none;
-        position: absolute;
-        bottom: 15px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 10;
-        background-color: #3B4CCA;
-        color: #fff;
-        font-size: 0.9rem;
-        padding: 6px 12px;
-        border-radius: 20px;
+	display: none;
+	position: absolute;
+	bottom: 15px;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 10;
+	background-color: #FFCB05; /* Pokémon Yellow */
+	color: #000; /* Black Text */
+	font-size: 0.9rem;
+	padding: 6px 12px;
+	border-radius: 20px;
+	font-weight: bold;
     }
 
     .card:hover .add-to-cart-btn {
-        display: inline-block;
+	display: inline-block;
     }
 
     /* Card Body */
     .card-body {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        height: 100%;
-        padding: 10px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	height: 100%;
+	padding: 10px;
+	background-color: #FFFFFF; /* White Interior */
     }
 
-    .card-title {
-        font-size: 1.1rem;
-        margin-bottom: 8px;
-        font-weight: bold;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+	.card-title {
+		font-size: 1.1rem;
+		margin-bottom: 8px;
+		font-weight: bold;
+		color: #3B4CCA; /* Pokémon Blue */
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		text-align: center; /* Ensures the text is centered horizontally */
+	}
 
     .card-text {
-        font-size: 0.9rem;
-        margin-bottom: 0;
-        flex-grow: 1;
+	font-size: 0.9rem;
+	margin-bottom: 0;
+	flex-grow: 1;
+	color: #555; /* Subtle Gray for Text */
     }
 
+    /* Badge Styling */
     .badge {
-        font-size: 0.8rem;
-    }
-
-    .badge-top-left {
-        top: 10px;
-        left: 10px;
-    }
-
-    .badge-top-right {
-        top: 10px;
-        right: 10px;
-    }
-
-    .badge-bottom-left {
-        bottom: 10px;
-        left: 10px;
-    }
-
-    .badge-bottom-right {
-        bottom: 10px;
-        right: 10px;
+	font-size: 0.8rem;
+	background-color: #FFCB05; /* Yellow Background */
+	color: #000; /* Black Text */
     }
 
     .badge-modern {
-        font-size: 0.7rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 4px 8px;
-        border-radius: 12px;
-        background-color: #007bff;
-        color: white;
-        position: absolute;
-        top: 10px; /* Positioned at the top-right corner */
-        right: 10px;
-        z-index: 5;
-        cursor: pointer;
-        transition: background-color 0.3s, transform 0.3s;
+	font-size: 0.7rem;
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	padding: 4px 8px;
+	border-radius: 12px;
+	background-color: #EE1C25; /* Red Background */
+	color: #FFFFFF; /* White Text */
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	z-index: 5;
+	cursor: pointer;
+	transition: background-color 0.3s, transform 0.3s;
     }
 
     .badge-modern:hover {
-        background-color: #0056b3;
-        transform: scale(1.05);
-    }
-
-    .badge-modern i {
-        font-size: 1rem;
+	background-color: #3B4CCA; /* Blue on Hover */
+	transform: scale(1.05);
     }
 
     /* Modal Styling */
     .modal-content {
-        border-radius: 12px;
+	border-radius: 12px;
+	background-color: #FFFFFF; /* White Background */
+	border: 2px solid #3B4CCA; /* Blue Border */
+	color: #000000; /* Black Text */
     }
 
     .modal-body img {
-        max-height: 450px;
-        object-fit: contain;
+	max-height: 450px;
+	object-fit: contain;
+	border: 2px solid #EE1C25; /* Red Border Around Image */
     }
 
     /* Report Button Styling */
     .btn-report {
-        background-color: #ffc107;
-        color: #000;
+	background-color: #FFCB05; /* Yellow Background */
+	color: #000; /* Black Text */
     }
 
-    /* Footer Button Styling */
+    /* Sold Button Styling */
     .btn-sold {
-        background-color: #dc3545;
-        color: white;
+	background-color: #EE1C25; /* Red Background */
+	color: #FFFFFF; /* White Text */
     }
+
 </style>
 
 <div class="col-md-3 mb-4">
@@ -241,6 +238,10 @@
 			    <strong>{{ _('TCGPlayer Price (NM):') }}</strong> ${{ card.tcg_price if card.tcg_price else _('N/A') }}
                         </p>
                     </div>
+                    <button type="button" class="btn btn-report w-100 mt-2" data-bs-toggle="modal"
+                            data-bs-target="#reportModal{{ card.id }}">
+                        <i class="bi bi-flag"></i> {{ _('Report') }}
+                    </button>
                 </div>
             </div>
         </div>

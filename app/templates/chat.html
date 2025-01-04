@@ -6,15 +6,16 @@
         height: calc(100vh - 70px); /* Adjust for header height */
         display: flex;
         flex-direction: row;
-        border: 1px solid #ddd;
-        border-radius: 8px;
+        border: 2px solid var(--secondary-color); /* Blue Border */
+        border-radius: 12px;
         overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     }
 
     /* Sidebar */
     .sidebar {
-        border-right: 1px solid #ddd;
-        background: #f8f9fa;
+        border-right: 2px solid var(--secondary-color); /* Blue Border */
+        background: var(--primary-color); /* Pokémon Yellow */
         height: 100%;
         overflow-y: auto;
         flex: 0 0 25%; /* Fixed width for sidebar */
@@ -24,9 +25,10 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 10px;
-        background: #3b4cca;
-        color: white;
+        padding: 15px;
+        background: var(--accent-color); /* Pokémon Red */
+        color: var(--text-color-light); /* White */
+        font-weight: bold;
     }
 
     .sidebar-header h5 {
@@ -39,31 +41,35 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 10px;
-        transition: all 0.2s;
+        padding: 15px;
+        background: var(--primary-color); /* Yellow */
+        border-bottom: 1px solid var(--secondary-color); /* Blue Divider */
+        transition: all 0.3s;
     }
 
     .user-item:hover {
-        background: #f0f0f0;
+        background: var(--secondary-color); /* Blue Hover */
+        color: var(--text-color-light); /* White Text */
         cursor: pointer;
     }
 
     .user-item.active {
-        background: #e0e7ff;
+        background: var(--accent-color); /* Red Active State */
+        color: var(--text-color-light); /* White Text */
         font-weight: bold;
     }
 
     .unread-badge {
-        background-color: #dc3545;
-        color: white;
+        background-color: var(--accent-color); /* Red */
+        color: var(--text-color-light); /* White */
         font-size: 0.75rem;
-        padding: 2px 6px;
+        padding: 4px 8px;
         border-radius: 12px;
     }
 
     .recent-message {
         font-size: 0.85rem;
-        color: #6c757d;
+        color: var(--secondary-color); /* Blue */
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
@@ -79,18 +85,19 @@
     }
 
     .chat-header {
-        background: #3b4cca;
-        color: white;
+        background: var(--secondary-color); /* Blue */
+        color: var(--text-color-light); /* White */
         padding: 15px;
         font-size: 1.25rem;
+        font-weight: bold;
         text-align: center;
     }
 
     .chat-box {
         flex: 1;
         overflow-y: auto;
-        padding: 10px;
-        background: #f9f9f9;
+        padding: 20px;
+        background: var(--primary-color); /* Yellow */
         display: flex;
         flex-direction: column;
         gap: 10px;
@@ -98,45 +105,34 @@
 
     /* Messages */
     .message {
-        margin: 5px 0;
         display: flex;
         align-items: center;
         font-size: 0.9rem;
     }
 
-    /* Default styling: English (ltr) */
     .message.sent {
-	justify-content: flex-start;
+        justify-content: flex-end;
     }
 
     .message.received {
-	justify-content: flex-end;
-    }
-
-    /* Styling for Hebrew (rtl) */
-    html[dir="rtl"] .message.sent {
-	justify-content: flex-end;
-    }
-
-    html[dir="rtl"] .message.received {
-	justify-content: flex-start;
+        justify-content: flex-start;
     }
 
     .message-bubble {
         max-width: 70%;
-        padding: 10px;
+        padding: 15px;
         border-radius: 15px;
         position: relative;
     }
 
     .message.sent .message-bubble {
-        background-color: #3b4cca;
-        color: white;
+        background-color: var(--accent-color); /* Red */
+        color: var(--text-color-light); /* White */
     }
 
     .message.received .message-bubble {
-        background-color: #f1f1f1;
-        color: #333;
+        background-color: #f1f1f1; /* Light Gray */
+        color: #333; /* Dark Text */
     }
 
     .timestamp {
@@ -150,11 +146,9 @@
     .input-section {
         display: flex;
         align-items: center;
-        border-top: 1px solid #ddd;
-        padding: 10px;
-        background: #f8f9fa;
-        position: sticky;
-        bottom: 0;
+        border-top: 2px solid var(--secondary-color); /* Blue Border */
+        padding: 15px;
+        background: #f9f9f9;
     }
 
     .input-section input {
@@ -162,38 +156,29 @@
         margin-right: 10px;
         border-radius: 15px;
         padding: 10px;
-        border: 1px solid #ddd;
+        border: 2px solid var(--secondary-color); /* Blue Border */
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .input-section input:focus {
+        border-color: var(--accent-color); /* Red Border */
+        box-shadow: 0 0 5px rgba(238, 28, 37, 0.5); /* Red Glow */
     }
 
     .input-section button {
-        background: #3b4cca;
-        color: white;
+        background: var(--accent-color); /* Red */
+        color: var(--text-color-light); /* White */
         border: none;
         border-radius: 15px;
         padding: 10px 20px;
         cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s, transform 0.2s;
     }
 
     .input-section button:hover {
-        background: #2a3698;
-    }
-
-    #sidebar-popup {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: #f8f9fa;
-        z-index: 1050;
-        overflow-y: auto;
-        transition: all 0.3s ease-in-out;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    }
-
-    #sidebar-popup.active {
-        display: block;
+        background: #a5121a; /* Darker Red */
+        transform: translateY(-2px);
     }
 
     /* Floating Button */
@@ -201,8 +186,8 @@
         position: fixed;
         bottom: 20px;
         right: 20px;
-        background-color: #3b4cca;
-        color: white;
+        background-color: var(--secondary-color); /* Blue */
+        color: var(--text-color-light); /* White */
         font-size: 1.5rem;
         width: 50px;
         height: 50px;
@@ -213,10 +198,11 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         z-index: 1060;
         border: none;
+        transition: background-color 0.3s;
     }
 
     .floating-button:hover {
-        background-color: #2a3698;
+        background-color: var(--accent-color); /* Red */
     }
 
     /* Mobile Responsiveness */
@@ -230,6 +216,7 @@
         }
     }
 </style>
+
 
 <audio id="send-sound" src="{{ url_for('static', filename='sounds/send.wav') }}"></audio>
 <audio id="receive-sound" src="{{ url_for('static', filename='sounds/receive.wav') }}"></audio>
@@ -370,6 +357,18 @@
         const sidebar = document.getElementById("sidebar-popup");
         sidebar.classList.toggle("active");
     }
+    document.addEventListener("DOMContentLoaded", () => {
+    const messageInput = document.getElementById("message-input");
+
+    // Attach event listener to detect "Enter" key press
+    messageInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault(); // Prevent default behavior of "Enter" key
+            sendMessage();
+        }
+    });
+});
+
 </script>
 {% endblock %}
 

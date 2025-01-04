@@ -1,6 +1,122 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    /* Form Container */
+    form {
+        max-width: 600px;
+        margin: auto;
+        background: #FFFFFF; /* White Background */
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Form Title */
+    h2 {
+        color: var(--secondary-color); /* Pokémon Blue */
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+    }
+
+    /* Labels */
+    .form-label {
+        font-weight: bold;
+        color: var(--primary-color); /* Pokémon Yellow */
+        margin-bottom: 5px;
+    }
+
+    /* Inputs and Selects */
+    .form-control, .form-select {
+        border: 2px solid var(--secondary-color); /* Blue Border */
+        border-radius: 8px;
+        padding: 10px;
+        font-size: 1rem;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--accent-color); /* Pokémon Red */
+        box-shadow: 0 0 5px rgba(238, 28, 37, 0.5); /* Red Glow */
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background-color: var(--primary-color); /* Pokémon Yellow */
+        color: #FFFFFF; /* White Background */
+        font-weight: bold;
+        padding: 10px 20px;
+        border-radius: 8px;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .btn-primary:hover {
+        background-color: var(--accent-color); /* Pokémon Red */
+        transform: translateY(-3px);
+    }
+
+    /* File Inputs */
+    input[type="file"] {
+        border: 2px dashed var(--secondary-color);
+        padding: 10px;
+        border-radius: 8px;
+        transition: border-color 0.3s;
+    }
+
+    input[type="file"]:hover {
+        border-color: var(--accent-color); /* Pokémon Red */
+    }
+
+    /* Small Text and Warnings */
+    .text-muted {
+        color: var(--secondary-color); /* Subtle Blue */
+        font-size: 0.85rem;
+    }
+
+    /* Checkboxes and Radio Buttons */
+    .form-check-input {
+        border-radius: 50%;
+        border: 2px solid var(--primary-color); /* Yellow */
+    }
+
+    .form-check-input:checked {
+        background-color: var(--accent-color); /* Red */
+        border-color: var(--accent-color);
+    }
+
+    /* Group Inputs */
+    .input-group-text {
+        background-color: var(--secondary-color); /* Blue Background */
+        color: var(--text-color-light); /* White Text */
+        border-radius: 8px 0 0 8px;
+        border: none;
+    }
+
+    /* Layout Improvements */
+    .mb-3 {
+        margin-bottom: 20px !important;
+    }
+
+    /* Graded Fields */
+    #graded_fields {
+        padding: 15px;
+        border: 2px solid var(--primary-color); /* Yellow Border */
+        border-radius: 8px;
+        background-color: #FFF8E1; /* Subtle Yellow Background */
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        form {
+            padding: 15px;
+        }
+        .btn-primary {
+            width: 100%;
+        }
+    }
+</style>
+
 <h2 class="text-center mb-4">{{ _("Upload New Pokémon Card") }}</h2>
 
 <form action="{{ url_for('seller.upload_card') }}" method="POST" enctype="multipart/form-data">
@@ -51,7 +167,7 @@
         </div>
         <div class="form-check mt-2">
             <input type="checkbox" id="follow_tcg" name="follow_tcg" class="form-check-input">
-            <label for="follow_tcg" class="form-check-label">{{ _("Follow TCGPlayer Price (The price is for Ungraded in NM condition)") }}</label>
+            <label for="follow_tcg" class="form-label">{{ _("Follow TCGPlayer Price (The price is for Ungraded in NM condition)") }}</label>
         </div>
     </div>
 
@@ -73,7 +189,7 @@
     <!-- Is Graded -->
     <div class="form-check mb-3">
         <input type="checkbox" id="is_graded" name="is_graded" class="form-check-input">
-        <label for="is_graded" class="form-check-label">{{ _("Is Graded?") }}</label>
+        <label for="is_graded" class="form-label">{{ _("Is Graded?") }}</label>
     </div>
     <!-- Grade -->
     <div id="graded_fields" class="mb-3" style="display: none;">
@@ -226,15 +342,15 @@
 
 	    for (const key of Object.keys(availablePrices)) {
 		if (key.toLowerCase() === normalizedCardType) {
-		    tcgPriceUSD = parseFloat(availablePrices[key]?.market || 0.0);
+		    tcgPriceUSD = parseFloat(availablePrices[key]?.market || 0.00);
 		    break;
 		}
 	    }
 
 	    if (tcgPriceUSD > 0) {
-		const conversionRate = 3.56;
+		const conversionRate = 3.65;
 		const tcgPriceILS = Math.round(tcgPriceUSD * conversionRate);
-		priceInput.value = tcgPriceILS;
+		priceInput.value = tcgPriceILS || 1;
 	    } else {
 		throw new Error("No TCG price found for this card type.");
 	    }

@@ -854,3 +854,65 @@ msgstr "הפרות חוזרות יובילו לביטול קבוע של זכוי
 
 msgid "Request Uploader Role"
 msgstr "הגשת בקשה"
+
+msgid "The first trusted Israeli marketplace for Pokémon."
+msgstr "שוק בטוח לקלפי אספנות תוצרת כחול לבן."
+
+msgid "Pokémon Collectors IL"
+msgstr "אספני פוקימון ישראל"
+
+msgid "Search for Pokémon Cards"
+msgstr "חיפוש קלפי פוקימון"
+
+msgid "Pokémon Name"
+msgstr "פוקימון"
+
+msgid "Enter Pokémon Name"
+msgstr "הכנס שם של פוקימון"
+
+msgid "Select..."
+msgstr "בחר..."
+
+msgid "Sort"
+msgstr "מיון"
+
+msgid "User"
+msgstr "משתמש"
+
+msgid "Hide My Cards"
+msgstr "הסתר את הקלפים שלי"
+
+msgid "Our Partners"
+msgstr "השותפים שלנו"
+
+msgid "Start Searching"
+msgstr "התחל לחפש"
+
+msgid "Chat"
+msgstr "צ׳אט"
+
+msgid "Chat with User"
+msgstr "שלח הודעה"
+
+msgid "Language"
+msgstr "שפה"
+
+msgid "Select Language"
+msgstr "בחר שפה"
+
+msgid "Cards with Back Image"
+msgstr "קלפים עם תמונת גב"
+
+msgid "The biggest community for Pokémon collectors in Israel."
+msgstr "הקהילה הכי גדולה בישראל לאספני פוקימון בישראל."
+
+msgid "Experts in grading, authenticating, and selling collectibles like cards, comics, and toys."
+msgstr "חברה המתמחה בדירוג, אימות, קניה, ייעוץ ומכירה של כל פריטי האספנות הקיימים."
+
+msgid "Browse User Cards"
+msgstr "צפה בקלפים של המשתמש"
+
+msgid "Search User"
+msgstr "חפש משתמש"
+
+

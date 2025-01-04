@@ -4,70 +4,170 @@
 <style>
     /* Profile Header Styling */
     .profile-header {
-        background-color: #f9f9f9;
+        background: var(--primary-color); /* Pokémon Yellow */
         padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        color: var(--text-color-dark); /* Dark Text */
     }
 
     .profile-header h2 {
-        font-size: 1.8rem;
+        font-size: 2rem;
         font-weight: bold;
         margin-bottom: 0.5rem;
+        color: var(--accent-color); /* Pokémon Red */
     }
 
     .profile-header p {
         margin: 0.3rem 0;
-        font-size: 0.9rem;
-        color: #6c757d;
+        font-size: 1rem;
+        color: var(--secondary-color); /* Blue */
     }
 
     .btn-report {
-        background-color: #dc3545;
-        color: #fff;
-        border-radius: 5px;
-        padding: 8px 12px;
-        font-size: 0.9rem;
+        background: var(--accent-color); /* Pokémon Red */
+        color: var(--text-color-light); /* White */
+        border-radius: 8px;
+        padding: 10px 15px;
+        font-size: 1rem;
         font-weight: bold;
+        transition: background-color 0.3s, transform 0.2s;
     }
 
     .btn-report:hover {
-        background-color: #b02a37;
+        background: #a5121a; /* Darker Red */
+        transform: translateY(-2px);
     }
 
     /* Feedback Section */
+    .feedback-section h3 {
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: var(--secondary-color); /* Blue */
+        margin-bottom: 20px;
+    }
+
     .feedback-card {
-        background-color: #fff;
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        background: #fff; /* White Background */
+        border: 2px solid var(--secondary-color); /* Blue Border */
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle Shadow */
         margin-bottom: 20px;
         padding: 15px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .feedback-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     }
 
     .feedback-card .feedback-user {
         font-weight: bold;
-        color: #3B4CCA;
+        color: var(--accent-color); /* Red */
+        font-size: 1.1rem;
     }
 
     .feedback-card p {
         margin: 0;
-        font-size: 0.9rem;
+        font-size: 1rem;
+        color: var(--text-color-dark); /* Dark Text */
     }
 
     .feedback-rating {
-        color: #ffc107;
+        color: #ffc107; /* Yellow */
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background: var(--secondary-color); /* Blue */
+        color: var(--text-color-light); /* White */
+        border-radius: 8px;
+        padding: 10px 20px;
         font-size: 1rem;
+        font-weight: bold;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .btn-primary:hover {
+        background: var(--accent-color); /* Red */
+        transform: translateY(-2px);
+    }
+
+    /* Report User Modal */
+    .modal-content {
+        border-radius: 12px;
+        border: 2px solid var(--primary-color); /* Yellow Border */
+        padding: 20px;
     }
 
     /* Uploaded Cards Section */
     .uploaded-cards-title {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
         font-weight: bold;
-        color: #3B4CCA;
+        color: var(--secondary-color); /* Blue */
         margin-top: 40px;
         margin-bottom: 20px;
     }
+
+    /* No Feedback Message */
+    .text-muted {
+        color: var(--secondary-color); /* Blue */
+        font-style: italic;
+        font-size: 1rem;
+    }
+
+    /* Chat Button */
+    .chat-button .btn {
+        background: var(--secondary-color); /* Blue */
+        color: var(--text-color-light); /* White */
+        border-radius: 8px;
+        padding: 10px 15px;
+        font-size: 1rem;
+        font-weight: bold;
+        transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .chat-button .btn:hover {
+        background: var(--accent-color); /* Red */
+        transform: translateY(-2px);
+    }
+	/* Centered Button Container */
+	.center-button-container {
+		display: flex;
+		justify-content: center;
+		width: 100%; /* Ensures it spans the full width of the parent container */
+		margin-top: 10px;
+	}
+	
+	/* Report User Modal */
+	.modal-content {
+		border-radius: 12px;
+		border: 2px solid var(--primary-color); /* Yellow Border */
+		padding: 20px;
+	}
+
+	/* Modal Header */
+	.modal-header {
+		background-color: var(--primary-color); /* Pokémon Yellow */
+        color: var(--text-color-light); /* White */
+		border-bottom: 1px solid var(--secondary-color); /* Optional: Add a bottom border */
+	}
+
+	.modal-header h5 {
+		font-size: 1.5rem;
+		font-weight: bold;
+		margin: 0;
+	}
+
+	/* Form Labels */
+	.modal-body .form-label {
+		color: var(--text-color-dark); /* Ensure labels are dark and visible */
+		font-weight: bold;
+	}
+
 </style>
 
 <div class="container mt-4">
@@ -135,6 +235,11 @@
         <p class="text-muted">{{ _('No feedback available yet.') }}</p>
         {% endif %}
     </div>
+	<div class="center-button-container">
+		<a href="{{ url_for('user.view_cards') }}?user={{ user.username }}" class="btn btn-primary">
+			<i class="bi bi-collection"></i> {{ _('Browse User Cards') }}
+		</a>
+	</div>
 
 </div>
 {% endblock %}
