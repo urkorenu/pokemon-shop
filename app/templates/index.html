@@ -31,23 +31,25 @@
     }
 
     .partner-links {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
+        gap: 20px; /* Add vertical space between partners */
     }
 
     .partner-links a {
         text-decoration: none;
         color: #fff;
-        background: #3B4CCA;
         padding: 10px 20px;
+        background-color: var(--secondary-color); /* Use your theme's secondary color */
         border-radius: 8px;
-        font-weight: bold;
-        transition: background 0.3s ease-in-out;
+        transition: background-color 0.3s;
     }
 
     .partner-links a:hover {
-        background: #1F8EF1;
+        background-color: var(--accent-color); /* Use your theme's accent color */
+    }
+
+    .partner-links p {
+        margin: 0;
+        color: var(--text-color-light); /* Use light text for better contrast */
     }
 
     .search-section {
@@ -88,15 +90,15 @@
 
 <div class="partnership-section text-center">
     <h2 class="mb-3">{{ _('Our Partners') }}</h2>
-    <div class="partner-links">
-        <div>
-            <a href="https://www.facebook.com/groups/pokemoncollectorsil" target="_blank">
+    <div class="partner-links d-flex flex-column align-items-center">
+        <div class="mb-3">
+            <a href="https://www.facebook.com/groups/pokemoncollectorsil" target="_blank" class="btn btn-primary">
                 {{ _('Pokémon Collectors IL') }}
             </a>
             <p class="text-light small mt-2">{{ _('The biggest community for Pokémon collectors in Israel.') }}</p>
         </div>
         <div>
-            <a href="https://macollectables.com" target="_blank">
+            <a href="https://macollectables.com" target="_blank" class="btn btn-primary">
                 {{ _('Ma Collectables') }}
             </a>
             <p class="text-light small mt-2">{{ _('Experts in grading, authenticating, and selling collectibles like cards, comics, and toys.') }}</p>
