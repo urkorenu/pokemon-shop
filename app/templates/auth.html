@@ -2,56 +2,96 @@
 
 {% block content %}
 <style>
-    /* Card Styling */
+    /* Authentication Page Styling */
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - var(--navbar-height)); /* Adjust for navbar height */
+    }
+
     .auth-card {
         border: none;
         border-radius: 12px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        background-color: var(--primary-color); /* Dark Blue */
+        color: var(--text-color-light); /* White */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        max-width: 450px;
     }
 
     .card-header {
-        background: linear-gradient(135deg, #3B4CCA, #2a3698);
-        color: #fff;
+        background: var(--accent-color); /* Yellow */
+        color: var(--text-color-dark); /* Black */
+        text-align: center;
+        padding: 20px;
+        font-size: 1.5rem;
+        font-weight: bold;
         border-top-left-radius: 12px;
         border-top-right-radius: 12px;
-        text-align: center;
+    }
+
+    .card-body {
         padding: 20px;
     }
 
-    .card-header h3 {
-        margin: 0;
-        font-weight: bold;
-    }
-
-    /* Input Field Styling */
-    .form-control:focus, .form-select:focus {
-        border-color: #3B4CCA;
-        box-shadow: 0 0 5px rgba(59, 76, 202, 0.5);
-    }
-
-    /* Button Styling */
-    .btn-primary, .btn-success {
-        padding: 10px;
-        font-weight: bold;
+    .auth-card .btn {
         border-radius: 8px;
-        transition: background-color 0.3s ease;
+        font-weight: bold;
+        padding: 10px 15px;
+        width: 100%;
     }
 
-    .btn-primary:hover {
-        background-color: #2a3698;
+    .auth-card .btn-primary {
+        background-color: var(--secondary-color); /* Medium Blue */
+        color: var(--text-color-light); /* White */
     }
 
-    .btn-success:hover {
-        background-color: #218838;
+    .auth-card .btn-primary:hover {
+        background-color: var(--primary-color); /* Dark Blue */
+        color: var(--accent-color); /* Yellow */
     }
 
-    /* Toggle Link */
-    #toggle-link {
-        cursor: pointer;
+    .auth-card .btn-success {
+        background-color: #28a745; /* Green */
+        color: var(--text-color-light); /* White */
+    }
+
+    .auth-card .btn-success:hover {
+        background-color: #218838; /* Dark Green */
+    }
+
+    .form-control, .form-select {
+        background: var(--text-color-light); /* White */
+        color: var(--text-color-dark); /* Black */
+        border-radius: 8px;
+        border: 1px solid var(--secondary-color); /* Medium Blue */
+        transition: box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--accent-color); /* Yellow */
+        box-shadow: 0 0 8px rgba(255, 203, 5, 0.6); /* Glow effect */
+    }
+
+    .card-footer {
+        background: var(--secondary-color); /* Medium Blue */
+        color: var(--text-color-light); /* White */
+        padding: 10px 20px;
+        text-align: center;
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+    }
+
+    .card-footer a {
+        color: var(--accent-color); /* Yellow */
         font-weight: bold;
     }
 
-    /* Form Toggle Animation */
+    .card-footer a:hover {
+        color: var(--text-color-light); /* White */
+    }
+
     .form-container {
         transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
     }
@@ -67,105 +107,89 @@
         opacity: 1;
         transform: translateY(0);
     }
-
-    html[dir="rtl"] body,
-    html[dir="rtl"] .form-label,
-    html[dir="rtl"] .form-control,
-    html[dir="rtl"] .card-header h3,
-    html[dir="rtl"] .card-footer small {
-        text-align: left !important;
-    }
 </style>
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <!-- Authentication Card -->
-            <div class="card auth-card">
-                <div class="card-header">
-                    <h3 id="form-title">{{ _("Login") }}</h3>
-                </div>
-                <div class="card-body">
-
-                    <!-- Login Form -->
-                    <div id="login-form" class="form-container form-visible">
-                        <form action="{{ url_for('auth.auth') }}" method="POST">
-                            <input type="hidden" name="form_type" value="login">
-                            <div class="mb-3">
-                                <label for="email-login" class="form-label">{{ _("Email") }}</label>
-                                <input type="email" class="form-control" name="email" placeholder="{{ _('Enter your email') }}" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="password-login" class="form-label">{{ _("Password") }}</label>
-                                <input type="password" class="form-control" name="password" placeholder="{{ _('Enter your password') }}" required>
-                            </div>
-			    <div class="mb-3 form-check">
-				<input type="checkbox" class="form-check-input" name="remember" id="remember">
-				<label class="form-check-label" for="remember">{{ _("Remember Me") }}</label>
-			    </div>
-                            <button type="submit" class="btn btn-primary w-100">{{ _("Login") }}</button>
-                        </form>
+<div class="auth-container">
+    <div class="card auth-card">
+        <div class="card-header">
+            <h3 id="form-title">{{ _("Login") }}</h3>
+        </div>
+        <div class="card-body">
+            <!-- Login Form -->
+            <div id="login-form" class="form-container form-visible">
+                <form action="{{ url_for('auth.auth') }}" method="POST">
+                    <input type="hidden" name="form_type" value="login">
+                    <div class="mb-3">
+                        <label for="email-login" class="form-label">{{ _("Email") }}</label>
+                        <input type="email" class="form-control" name="email" placeholder="{{ _('Enter your email') }}" required>
                     </div>
-
-                    <!-- Register Form -->
-                    <div id="register-form" class="form-container form-hidden">
-                        <form action="{{ url_for('auth.auth') }}" method="POST">
-                            <input type="hidden" name="form_type" value="register">
-                            <div class="mb-3">
-                                <label for="username" class="form-label">{{ _("Username") }}</label>
-                                <input type="text" class="form-control" name="username" placeholder="{{ _('Choose a username') }}" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="email-register" class="form-label">{{ _("Email") }}</label>
-                                <input type="email" class="form-control" name="email" placeholder="{{ _('Enter your email') }}" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="password-register" class="form-label">{{ _("Password") }}</label>
-                                <input type="password" class="form-control" name="password" placeholder="{{ _('Choose a password') }}" required>
-				<small class="text-muted">
-				    {{ _("Password must be at least 8 characters long and include uppercase, lowercase and numbers.") }}
-				</small>
-                            </div>
-                            <div class="mb-3">
-                                <label for="location" class="form-label">{{ _("Location") }}</label>
-                                <select class="form-select" name="location" required>
-                                    <option value="" disabled selected>{{ _('Select your area') }}</option>
-                                    {% for city in cities %}
-                                    <option value="{{ city }}">{{ city }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-			    <div class="mb-3">
-				<label for="contact_preference" class="form-label">{{ _("Contact Preference") }}</label>
-				<select class="form-select" name="contact_preference" required>
-				    <option value="phone">{{ _("Phone") }}</option>
-				    <option value="facebook">{{ _("Facebook") }}</option>
-				</select>
-			    </div>
-                            <div class="mb-3">
-                                <label for="contact_details" class="form-label">{{ _("Contact Details") }}</label>
-                                <input type="text" class="form-control" name="contact_details" placeholder="{{ _('Phone or Facebook Link') }}" required>
-                            </div>
-			    <div class="text-center mt-3">
-				<small>
-				    {{ _('By signing up, you agree to our') }}
-				    <a href="{{ url_for('user.privacy_policy') }}">{{ _('Privacy Policy') }}</a> {{ _('and') }}
-				    <a href="{{ url_for('user.terms_of_use') }}">{{ _('Terms of Use') }}</a>.
-				</small>
-			    </div>
-                            <button type="submit" class="btn btn-success w-100">{{ _("Register") }}</button>
-                        </form>
+                    <div class="mb-3">
+                        <label for="password-login" class="form-label">{{ _("Password") }}</label>
+                        <input type="password" class="form-control" name="password" placeholder="{{ _('Enter your password') }}" required>
                     </div>
-                </div>
-
-                <!-- Toggle Footer -->
-                <div class="card-footer text-center">
-                    <small>
-                        <span id="toggle-text">{{ _("Don't have an account? ") }}</span>
-                        <a id="toggle-link" class="text-primary">{{ _("Register here") }}</a>
-                    </small>
-                </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" name="remember" id="remember">
+                        <label class="form-check-label" for="remember">{{ _("Remember Me") }}</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">{{ _("Login") }}</button>
+                </form>
             </div>
+
+            <!-- Register Form -->
+            <div id="register-form" class="form-container form-hidden">
+                <form action="{{ url_for('auth.auth') }}" method="POST">
+                    <input type="hidden" name="form_type" value="register">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">{{ _("Username") }}</label>
+                        <input type="text" class="form-control" name="username" placeholder="{{ _('Choose a username') }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email-register" class="form-label">{{ _("Email") }}</label>
+                        <input type="email" class="form-control" name="email" placeholder="{{ _('Enter your email') }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password-register" class="form-label">{{ _("Password") }}</label>
+                        <input type="password" class="form-control" name="password" placeholder="{{ _('Choose a password') }}" required>
+                        <small class="form-label">
+                            {{ _("Password must include uppercase, lowercase, and numbers.") }}
+                        </small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="location" class="form-label">{{ _("Location") }}</label>
+                        <select class="form-select" name="location" required>
+                            <option value="" disabled selected>{{ _('Select your area') }}</option>
+                            {% for city in cities %}
+                            <option value="{{ city }}">{{ city }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="contact_preference" class="form-label">{{ _("Contact Preference") }}</label>
+                        <select class="form-select" name="contact_preference" required>
+                            <option value="facebook">{{ _("Facebook") }}</option>
+                            <option value="phone">{{ _("Phone") }}</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="contact_details" class="form-label">{{ _("Contact Details") }}</label>
+                        <input type="text" class="form-control" name="contact_details" placeholder="{{ _('Phone or Facebook Link') }}" required>
+                    </div>
+					<div class="mb-3">
+					<small>
+						{{ _('By signing up, you agree to our') }}
+						<a href="{{ url_for('user.privacy_policy') }}">{{ _('Privacy Policy') }}</a> {{ _('and') }}
+						<a href="{{ url_for('user.terms_of_use') }}">{{ _('Terms of Use') }}</a>.
+					</small>
+					</div>
+                    <button type="submit" class="btn btn-success">{{ _("Register") }}</button>
+                </form>
+            </div>
+        </div>
+        <div class="card-footer">
+            <small>
+                <span id="toggle-text">{{ _("Don't have an account? ") }}</span>
+                <a id="toggle-link" class="text-primary">{{ _("Register here") }}</a>
+            </small>
         </div>
     </div>
 </div>

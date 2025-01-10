@@ -484,7 +484,7 @@ msgid "Send Message"
 msgstr "שלח הודעה"
 
 msgid "Login"
-msgstr "התחבר"
+msgstr "התחברות"
 
 msgid "Enter your email"
 msgstr "הזן את האימייל שלך"
@@ -691,7 +691,7 @@ msgid "Sellers are responsible for the accuracy of item listings, including desc
 msgstr "מוכרים אחראים לדיוק של רישומי המוצרים, כולל תיאורים, מצבים ותמונות."
 
 msgid "Users must be 18+ years old."
-msgstr "משתמשים נדרים להיות מעל גיל 18."
+msgstr "משתמשים נדרשים להיות מעל גיל 18."
 
 msgid "Buyers and sellers are solely responsible for arranging payment, delivery, and other transaction details."
 msgstr "קונים ומוכרים אחראים בלעדית לסידור התשלום, המשלוח ופרטי העסקה האחרים."
@@ -914,5 +914,8 @@ msgstr "צפה בקלפים של המשתמש"
 
 msgid "Search User"
 msgstr "חפש משתמש"
+
+msgid "Password must include uppercase, lowercase, and numbers."
+msgstr "הסיסמא חייבת להכיל אות גדולה, אות קטנה ומספר. לפות 8 תוים."
 
 
