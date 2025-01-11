@@ -915,7 +915,25 @@ msgstr "צפה בקלפים של המשתמש"
 msgid "Search User"
 msgstr "חפש משתמש"
 
-msgid "Password must include uppercase, lowercase, and numbers."
-msgstr "הסיסמא חייבת להכיל אות גדולה, אות קטנה ומספר. לפות 8 תוים."
+msgid "Password must include uppercase, lowercase, and numbers. At least 8 characters."
+msgstr "הסיסמא חייבת להכיל אות גדולה, אות קטנה ומספר. לפחות 8 תוים."
+
+msgid "Browse Cards"
+msgstr "צפה בקלפים"
+
+msgid "Forgot Password?"
+msgstr "שכחת סיסמא?"
+
+msgid "Forgot Password"
+msgstr "איפוס סיסמא"
+
+msgid "Sent Reset Link"
+msgstr "שלח קישור לאיפוס"
+
+msgid "Enter your email address"
+msgstr "הכנס את המייל שלך"
+
+msgid "Remembered your password?"
+msgstr "נזכרת בסיסמא שלך?"
 
 
