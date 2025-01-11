@@ -22,3 +22,4 @@ eventlet
 flask_cors
 kombu
 flask_limiter
+google-auth

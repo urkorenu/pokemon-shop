@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, jsonify
 from flask_login import login_user, logout_user, login_required, current_user
 from ..models import User, db
 from flask_bcrypt import generate_password_hash, check_password_hash
@@ -9,6 +9,10 @@ from app.utils import delete_user_account
 import re
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from itsdangerous import URLSafeTimedSerializer
+from google.oauth2 import id_token
+from google.auth.transport import requests
+
 
 # Initialize rate limiter
 limiter = Limiter(key_func=get_remote_address)
@@ -35,6 +39,9 @@ def auth():
             email, password = request.form.get("email"), request.form.get("password")
             user = User.query.filter_by(email=email).first()
             if user and user.check_password(password):
+                if not user.is_active:
+                    flash("Your account is not activated. Please check your email.", "error")
+                    return redirect(url_for("auth.auth"))
                 if user.role == "banned":
                     flash("Your account has been banned", "error")
                     return redirect(url_for("auth.auth"))
@@ -83,6 +90,14 @@ def auth():
             db.session.add(user)
             try:
                 db.session.commit()
+                serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
+                token = serializer.dumps(user.email)
+                activation_link = url_for("auth.confirm_email", token=token, _external=True)
+                send_email(
+                    recipient=user.email,
+                    subject="Activate Your Account",
+                    body=f"Click the link to activate your account: {activation_link}"
+                )
                 flash("Registration successful! Please log in.", "success")
                 return redirect(url_for("auth.auth"))
             except Exception as e:
@@ -260,3 +275,120 @@ def is_password_strong(password):
         bool: True if the password is strong, False otherwise.
     """
     return bool(re.match(r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{8,}$", password))
+
+# Email Confirmation Route
+@auth_bp.route("/confirm_email/<token>")
+def confirm_email(token):
+    serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
+    try:
+        email = serializer.loads(token, max_age=3600)
+        user = User.query.filter_by(email=email).first()
+        if user:
+            user.is_active = True
+            db.session.commit()
+            flash("Your email has been confirmed. Please log in.", "success")
+            return redirect(url_for("auth.auth"))
+        else:
+            flash("Invalid or expired token.", "danger")
+    except Exception as e:
+        flash("Invalid or expired token.", "danger")
+    return redirect(url_for("auth.auth"))
+
+# Forgot Password Request
+@auth_bp.route("/forgot_password", methods=["GET", "POST"])
+def forgot_password():
+    serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
+    if request.method == "POST":
+        email = request.form.get("email")
+        user = User.query.filter_by(email=email).first()
+        if user:
+            token = serializer.dumps(email)
+            reset_link = url_for("auth.reset_password", token=token, _external=True)
+            send_email(
+                recipient=email,
+                subject="Password Reset Request",
+                body=f"Click the link to reset your password: {reset_link}",
+            )
+            flash("Password reset instructions sent to your email.", "info")
+        else:
+            flash("Email not found.", "danger")
+    return render_template("forgot_password.html")
+
+# Reset Password Route
+@auth_bp.route("/reset_password/<token>", methods=["GET", "POST"])
+def reset_password(token):
+    serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
+    try:
+        email = serializer.loads(token, max_age=3600)
+    except Exception as e:
+        flash("Invalid or expired token.", "danger")
+        return redirect(url_for("auth.auth"))
+
+    if request.method == "POST":
+        password = request.form.get("password")
+        if not is_password_strong(password):
+            flash("Password does not meet strength requirements.", "danger")
+            return redirect(url_for("auth.reset_password", token=token))
+        user = User.query.filter_by(email=email).first()
+        if user:
+            user.set_password(password)
+            db.session.commit()
+            flash("Your password has been reset. Please log in.", "success")
+            return redirect(url_for("auth.auth"))
+        else:
+            flash("User not found.", "danger")
+    return render_template("reset_password.html", token=token)
+
+@auth_bp.route('/google-signin', methods=['POST'])
+def google_signin():
+    token = request.json.get('token')
+    try:
+        # Verify the token with Google's servers
+        idinfo = id_token.verify_oauth2_token(
+            token,
+            requests.Request(),
+            "169202792825-l01b3l32pb9pdug96d98po37upjn4dgp.apps.googleusercontent.com"
+        )
+        print(f"Decoded token: {idinfo}", flush=True)
+
+        # Extract user information from the token
+        user_id = idinfo['sub']
+        email = idinfo['email']
+        name = idinfo.get('name', 'Google User')  # Default to 'Google User' if no name is provided
+
+        print(f"Email: {email}, User ID: {user_id}", flush=True)
+
+        # Check if user already exists in the database
+        user = User.query.filter_by(email=email).first()
+        print(f"Existing user: {user}", flush=True)
+
+        if not user:
+            # Create a new user if one doesn't exist
+            user = User(
+                username=name,
+                email=email,
+                google_id=user_id,
+                contact_preference="google",
+                contact_details="N/A", 
+                is_active=True,
+                role="normal",
+            )
+            db.session.add(user)
+            db.session.commit()
+            print(f"Created new user: {user}", flush=True)
+
+        # Log the user in
+        login_user(user)
+        print(f"Is user authenticated: {current_user.is_authenticated}", flush=True)
+
+        # Respond with success
+        return jsonify({"success": True})
+    except ValueError as e:
+        # Token verification failed
+        print(f"Error verifying token: {e}", flush=True)
+        return jsonify({"success": False, "error": "Invalid token"})
+    except Exception as e:
+        # Catch other exceptions
+        print(f"Unexpected error: {e}", flush=True)
+        return jsonify({"success": False, "error": "An unexpected error occurred"})
+
