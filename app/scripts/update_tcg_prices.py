@@ -4,6 +4,8 @@ from app.models import Card
 from config import Config
 import requests
 import os
+from flask import Flask, request
+from app.routes.seller_routes import get_card_details
 
 # Database configuration
 DATABASE_URI = (
@@ -13,63 +15,49 @@ DATABASE_URI = (
 BASE_URL = "https://api.pokemontcg.io/v2"
 API_KEY = Config.API_KEY
 
-
 # Create a database engine
 engine = create_engine(DATABASE_URI)
 Session = sessionmaker(bind=engine)
 session = Session()
-
+app = Flask(__name__)
+app.app_context().push()
 
 def fetch_tcg_price(card_name, set_name, number, card_type):
-    """Fetch the latest price for a card from TCGPlayer."""
+    """Fetch the latest price for a card using the cached route."""
     try:
-        # Construct the query
-        query = f'set.name:"{set_name}" number:"{number}"'
-        response = requests.get(
-            f"{BASE_URL}/cards",
-            headers={"X-Api-Key": API_KEY},
-            params={"q": query},
-            timeout=10,
-        )
-        response.raise_for_status()
+        # Construct the URL for the card details API
+        api_url = f"http://localhost:5000/seller/card-details?language=en&set_name={set_name}&number={number}"
+        headers = {"X-Bypass-Token": os.getenv("BYPASS_TOKEN")}
+        response = requests.get(api_url, headers=headers, timeout=10)
 
-        # Parse the API response
-        card_data = response.json().get("data", [])
-        if not card_data:
-            print(f"No card found for query: {query}")
+        if response.status_code != 200:
+            print(f"Error fetching TCG price for {card_name}: {response.json().get('error', 'Unknown error')}")
             return None
 
-        # Filter for an exact match
-        filtered_cards = [
-            card
-            for card in card_data
-            if card.get("set", {}).get("name", "").strip().lower()
-            == set_name.strip().lower()
-            and str(card.get("number", "")).strip().lower()
-            == str(number).strip().lower()
-        ]
-
-        if not filtered_cards:
-            print(f"No exact match found for query: {query}")
-            return None
-
-        # Extract the card details
-        card_details = filtered_cards[0]
-        tcg_price_data = card_details.get("tcgplayer", {}).get("prices", {})
-
-        # Fetch the price based on card_type
-        market_price = tcg_price_data.get(card_type.lower(), {}).get("market")
+        # Parse the response
+        data = response.json()
+        prices = data.get("prices", {})
+        market_price = prices.get(card_type.lower(), {}).get("market")
 
         if market_price is None:
-            print(
-                f"No market price found for card '{card_name}' with type '{card_type}'. Full API Response: {response.json()}"
-            )
+            print(f"No market price found for card '{card_name}' with type '{card_type}'")
 
-        print(f"Fetched price for card '{card_name}' ({card_type}): {market_price}")
         return market_price
     except requests.RequestException as e:
         print(f"Error fetching TCG price for {card_name}: {e}")
         return None
+
+
+def analyze_price_changes(cards, price_changes):
+    """Analyze and print the top 10 price increases and decreases."""
+    sorted_changes = sorted(price_changes, key=lambda x: x[1], reverse=True)
+    print("\nTop 10 Price Increases:")
+    for card, change in sorted_changes[:10]:
+        print(f"{card.name} (Set: {card.set_name}, Number: {card.number}) - Change: +{change:.2f}")
+
+    print("\nTop 10 Price Decreases:")
+    for card, change in sorted_changes[-10:]:
+        print(f"{card.name} (Set: {card.set_name}, Number: {card.number}) - Change: {change:.2f}")
 
 
 def update_tcg_prices():
@@ -77,9 +65,10 @@ def update_tcg_prices():
         print("Starting TCG price update process...")
 
         # Query all cards with follow_tcg=True and amount == 1
-        cards = (
-            session.query(Card).filter(Card.follow_tcg == True, Card.amount == 1).all()
-        )
+        cards = session.query(Card).filter(Card.follow_tcg == True, Card.amount == 1).all()
+        total_old_price = 0
+        total_new_price = 0
+        price_changes = []
 
         if not cards:
             print("No cards found with follow_tcg=True.")
@@ -90,28 +79,35 @@ def update_tcg_prices():
             card_name = card.name
             set_name = card.set_name
             number = card.number
+            card_type = card.card_type
 
-            print(
-                f"Fetching TCG price for card: {card_name} (Set: {set_name}, Number: {number})"
-            )
-            # Fetch the updated price
-            new_price = fetch_tcg_price(card_name, set_name, number, card.card_type)
+            print(f"Fetching TCG price for card: {card_name} (Set: {set_name}, Number: {number})")
+            new_price = fetch_tcg_price(card_name, set_name, number, card_type)
             if new_price is not None:
-                # Update the database
+                total_old_price += card.price
+                old_price = card.price
                 card.tcg_price = new_price
-                card.price = round(new_price * 3.56 + 0.5, 0)
+                card.price = round(new_price * 3.65 + 0.5, 0)
+                card.price = max(card.price, 1)
+                total_new_price += card.price
+                price_changes.append((card, card.price - old_price))
                 print(f"Updated card '{card_name}' with new TCG price: {new_price}")
             else:
                 print(f"No price found for card '{card_name}'")
 
         # Commit changes to the database
         session.commit()
-        print("TCG price update process completed successfully!")
+        print("\nTCG price update process completed successfully!")
+        print(f"Total old price: {total_old_price}")
+        print(f"Total new price: {total_new_price}")
+        print(f"Total price difference: {total_new_price - total_old_price}")
+
+        # Perform analysis
+        analyze_price_changes(cards, price_changes)
 
     except Exception as e:
         session.rollback()
         print(f"An error occurred: {e}")
-
     finally:
         session.close()
 

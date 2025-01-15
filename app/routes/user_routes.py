@@ -85,6 +85,24 @@ class Pagination:
 
 
 @user_bp.route("/")
+def home_page():
+    page = request.args.get("page", 1, type=int)
+    filtered_data = filter_cards(page=page)
+    cards_list, unique_set_names, stats = (
+        filtered_data["cards"],
+        filtered_data["unique_set_names"],
+        filtered_data["stats"],
+    )
+    return render_template(
+        "index.html",
+        cards=cards_list,
+        unique_set_names=unique_set_names,
+        cities=CITIES_IN_ISRAEL,
+        **stats,
+        show_sold_checkbox=False,
+    )
+
+@user_bp.route("/cards")
 def view_cards():
     """
     Route to view cards.
@@ -523,49 +541,24 @@ def health_check():
     """
     return jsonify({"status": "healthy"}), 200
 
-
-@user_bp.route("/templates/css/styles.css.jinja")
-def styles():
-    """
-    Route for the CSS styles.
-
-    Methods:
-        GET: Renders the CSS styles template.
-
-    Returns:
-        Rendered template for the CSS styles.
-    """
-    return render_template("css/styles.css.jinja")
-
-
 @cache.cached(timeout=60, query_string=True)
 def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_page=12):
-    """
-    Filter cards based on various criteria.
-
-    Args:
-        base_query (Query): Base query to filter cards.
-        user_id (int): ID of the user to filter cards by.
-        show_sold (bool): Whether to show sold cards.
-        page (int): Page number for pagination.
-        per_page (int): Number of items per page.
-
-    Returns:
-        dict: Filtered cards, unique set names, and statistics.
-    """
     uploader_alias = aliased(User)
     base_query = base_query or Card.query.options(joinedload(Card.uploader)).join(
         uploader_alias
     )
-    name_query, set_name_query, location_query = (
+    name_query, set_name_query, location_query, user_query, language_query = (
         request.args.get("name", "").strip(),
-        request.args.get("set_name", ""),
+        request.args.get("set_name", "").strip(),
         request.args.get("location", "").strip(),
+        request.args.get("user", "").strip(),
+        request.args.get("language", "").strip(),
     )
-    is_graded, sort_option, show_sold = (
+    is_graded, sort_option, show_sold, hide_my_cards = (
         request.args.get("is_graded", ""),
         request.args.get("sort", ""),
         request.args.get("show_sold", "off") == "on" or show_sold,
+        request.args.get("hide_my_cards", "off") == "on",
     )
 
     query = base_query.filter(
@@ -575,17 +568,24 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
         query = query.filter(Card.uploader_id == user_id)
     if not show_sold:
         query = query.filter(Card.amount > 0)
+    if hide_my_cards and current_user.is_authenticated:
+        query = query.filter(Card.uploader_id != current_user.id)
     if name_query:
         query = query.filter(Card.name.ilike(f"%{name_query}%"))
     if set_name_query:
         query = query.filter(Card.set_name.ilike(f"%{set_name_query}%"))
     if location_query:
         query = query.filter(uploader_alias.location.ilike(f"%{location_query}%"))
+    if user_query:
+        query = query.filter(uploader_alias.username.ilike(f"%{user_query}%"))
+    if language_query:
+        query = query.filter(Card.card_type.ilike(f"%{language_query}%"))
+    if request.args.get("has_back_image", "off") == "on":
+        query = query.filter(Card.back_image_url.isnot(None))
     if is_graded == "yes":
         query = query.filter(Card.is_graded.is_(True))
     elif is_graded == "no":
         query = query.filter(Card.is_graded.is_(False))
-
     if sort_option == "price_asc":
         query = query.order_by(Card.price.asc())
     elif sort_option == "price_desc":
@@ -621,15 +621,13 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
             "tcg_price": card.tcg_price,
             "grading_company": card.grading_company,
             "grade": card.grade,
-            "uploader": (
-                {
-                    "id": card.uploader.id,
-                    "username": card.uploader.username,
-                    "location": card.uploader.location,
-                }
-                if card.uploader
-                else None
-            ),
+            "uploader": {
+                "id": card.uploader.id,
+                "username": card.uploader.username,
+                "location": card.uploader.location,
+            }
+            if card.uploader
+            else None,
         }
         for card in paginated_cards.items
     ]
@@ -644,3 +642,4 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
             "total_graded": int(stats.total_graded),
         },
     }
+

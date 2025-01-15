@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* Modern Styling */
+    .hero-section {
+        background: url('/static/images/israel-flag-pattern.png') repeat; /* Israel flag pattern */
+        color: #fff;
+        padding: 50px 20px;
+        text-align: center;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        background-size: 150px auto; /* Adjust size of the flag pattern */
+    }
+
+    .hero-section h1 {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        font-weight: bold;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    }
+
+    .hero-section p {
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    }
+
+    .partnership-section {
+        margin: 30px 0;
+    }
+
+    .partner-links {
+        gap: 20px; /* Add vertical space between partners */
+    }
+
+    .partner-links a {
+        text-decoration: none;
+        color: #fff;
+        padding: 10px 20px;
+        background-color: var(--secondary-color); /* Use your theme's secondary color */
+        border-radius: 8px;
+        transition: background-color 0.3s;
+    }
+
+    .partner-links a:hover {
+        background-color: var(--accent-color); /* Use your theme's accent color */
+    }
+
+    .partner-links p {
+        margin: 0;
+        color: var(--text-color-light); /* Use light text for better contrast */
+    }
+
+    .search-section {
+        margin-top: 40px;
+    }
+
+    .logo-image {
+	width: 500px;
+	height: auto;
+    }
+
+    @media (max-width: 768px) {
+        .hero-section h1 {
+            font-size: 2rem;
+        }
+
+        .hero-section p {
+            font-size: 1rem;
+        }
+
+	.logo-image {
+	    width: 200px; 
+	}
+    }
+</style>
+
+<div class="hero-section">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="{{ _('Our Mission') }}" 
+    class="img-fluid logo-image">
+
+    <p>{{ _('The first trusted Israeli marketplace for Pokémon.') }}</p>
+    <a href="#search-section" class="btn btn-light btn-lg shadow">{{ _('Start Searching') }}</a>
+    <a href=" {{ url_for ('user.view_cards') }}" class="btn btn-light btn-lg shadow">{{ _('Browse Cards') }}</a>
+</div>
+
+<div id="search-section" class="search-section">
+    {% include "_search_form.html" %}
+</div>
+
+<div class="partnership-section text-center">
+    <h2 class="mb-3">{{ _('Our Partners') }}</h2>
+    <div class="partner-links d-flex flex-column align-items-center">
+        <div class="mb-3">
+            <a href="https://www.facebook.com/groups/pokemoncollectorsil" target="_blank" class="btn btn-primary">
+                {{ _('Pokémon Collectors IL') }}
+            </a>
+            <p class="text-light small mt-2">{{ _('The biggest community for Pokémon collectors in Israel.') }}</p>
+        </div>
+        <div>
+            <a href="https://macollectables.com" target="_blank" class="btn btn-primary">
+                {{ _('Ma Collectables') }}
+            </a>
+            <p class="text-light small mt-2">{{ _('Experts in grading, authenticating, and selling collectibles like cards, comics, and toys.') }}</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
