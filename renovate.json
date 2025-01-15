@@ -23,5 +23,8 @@
   "prHourlyLimit": 2,
   "prConcurrentLimit": 3,
   "timezone": "UTC",
-  "dependencyDashboard": true
+  "dependencyDashboard": true,
+  "vulnerabilityAlerts": {
+    "enabled": true
+  }
 }
