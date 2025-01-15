@@ -16,7 +16,8 @@
       "description": "Automatically merge updates with high confidence if tests pass",
       "automerge": true,
       "automergeType": "pr",
-      "minimumReleaseAge": "7 days"
+      "minimumReleaseAge": "7 days",
+      "matchUpdateTypes": ["major", "minor", "patch"]
     }
   ],
   "prHourlyLimit": 2,
