@@ -267,12 +267,14 @@ def get_card_details():
     if not current_user.is_authenticated or current_user.role == "normal":
         # Check for a special token to allow programmatic access
         bypass_token = request.headers.get("X-Bypass-Token")
-        if bypass_token != os.getenv("BYPASS_TOKEN"):  # Store token in environment variables
+        if bypass_token != os.getenv(
+            "BYPASS_TOKEN"
+        ):  # Store token in environment variables
             return jsonify({"error": "Unauthorized access"}), 401
         else:
-            print("Bypass token accepted", flush = True)
+            print("Bypass token accepted", flush=True)
 
-    print(f"Parameters: {request.args}", flush = True)
+    print(f"Parameters: {request.args}", flush=True)
 
     language, set_name, number = (
         request.args.get("language", "en"),

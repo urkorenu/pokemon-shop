@@ -35,7 +35,6 @@ class User(db.Model, UserMixin):
     request_status = db.Column(db.String(20), default=None)
     is_active = db.Column(db.Boolean, default=False)
 
-
     def set_password(self, password):
         """
         Set the password for the user.

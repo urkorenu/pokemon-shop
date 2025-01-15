@@ -22,6 +22,7 @@ session = Session()
 app = Flask(__name__)
 app.app_context().push()
 
+
 def fetch_tcg_price(card_name, set_name, number, card_type):
     """Fetch the latest price for a card using the cached route."""
     try:
@@ -31,7 +32,9 @@ def fetch_tcg_price(card_name, set_name, number, card_type):
         response = requests.get(api_url, headers=headers, timeout=10)
 
         if response.status_code != 200:
-            print(f"Error fetching TCG price for {card_name}: {response.json().get('error', 'Unknown error')}")
+            print(
+                f"Error fetching TCG price for {card_name}: {response.json().get('error', 'Unknown error')}"
+            )
             return None
 
         # Parse the response
@@ -40,7 +43,9 @@ def fetch_tcg_price(card_name, set_name, number, card_type):
         market_price = prices.get(card_type.lower(), {}).get("market")
 
         if market_price is None:
-            print(f"No market price found for card '{card_name}' with type '{card_type}'")
+            print(
+                f"No market price found for card '{card_name}' with type '{card_type}'"
+            )
 
         return market_price
     except requests.RequestException as e:
@@ -53,11 +58,15 @@ def analyze_price_changes(cards, price_changes):
     sorted_changes = sorted(price_changes, key=lambda x: x[1], reverse=True)
     print("\nTop 10 Price Increases:")
     for card, change in sorted_changes[:10]:
-        print(f"{card.name} (Set: {card.set_name}, Number: {card.number}) - Change: +{change:.2f}")
+        print(
+            f"{card.name} (Set: {card.set_name}, Number: {card.number}) - Change: +{change:.2f}"
+        )
 
     print("\nTop 10 Price Decreases:")
     for card, change in sorted_changes[-10:]:
-        print(f"{card.name} (Set: {card.set_name}, Number: {card.number}) - Change: {change:.2f}")
+        print(
+            f"{card.name} (Set: {card.set_name}, Number: {card.number}) - Change: {change:.2f}"
+        )
 
 
 def update_tcg_prices():
@@ -65,7 +74,9 @@ def update_tcg_prices():
         print("Starting TCG price update process...")
 
         # Query all cards with follow_tcg=True and amount == 1
-        cards = session.query(Card).filter(Card.follow_tcg == True, Card.amount == 1).all()
+        cards = (
+            session.query(Card).filter(Card.follow_tcg == True, Card.amount == 1).all()
+        )
         total_old_price = 0
         total_new_price = 0
         price_changes = []
@@ -81,7 +92,9 @@ def update_tcg_prices():
             number = card.number
             card_type = card.card_type
 
-            print(f"Fetching TCG price for card: {card_name} (Set: {set_name}, Number: {number})")
+            print(
+                f"Fetching TCG price for card: {card_name} (Set: {set_name}, Number: {number})"
+            )
             new_price = fetch_tcg_price(card_name, set_name, number, card_type)
             if new_price is not None:
                 total_old_price += card.price
