@@ -16,7 +16,6 @@
       "description": "Automatically merge updates with high confidence if tests pass",
       "automerge": true,
       "automergeType": "pr",
-      "matchConfidence": ["very high", "high"],
       "minimumReleaseAge": "7 days"
     }
   ],
