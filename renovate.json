@@ -1,0 +1,28 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":preserveSemverRanges",
+    ":rebaseStalePrs"
+  ],
+  "labels": [
+    "renovate"
+  ],
+  "baseBranches": ["$default"],
+  "rebaseWhen": "conflicted",
+  "packageRules": [
+    {
+      "groupName": "Critical Updates",
+      "description": "Automatically merge updates with high confidence if tests pass",
+      "automerge": true,
+      "automergeType": "pr",
+      "requiredStatusChecks": ["Lint", "Unit Tests", "Integration Tests"],
+      "matchConfidence": ["very high", "high"],
+      "minimumReleaseAge": "7 days"
+    }
+  ],
+  "prHourlyLimit": 2,
+  "prConcurrentLimit": 3,
+  "timezone": "UTC",
+  "dependencyDashboard": true
+}
