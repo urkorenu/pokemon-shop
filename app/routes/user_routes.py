@@ -102,6 +102,7 @@ def home_page():
         show_sold_checkbox=False,
     )
 
+
 @user_bp.route("/cards")
 def view_cards():
     """
@@ -541,6 +542,7 @@ def health_check():
     """
     return jsonify({"status": "healthy"}), 200
 
+
 @cache.cached(timeout=60, query_string=True)
 def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_page=12):
     uploader_alias = aliased(User)
@@ -621,13 +623,15 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
             "tcg_price": card.tcg_price,
             "grading_company": card.grading_company,
             "grade": card.grade,
-            "uploader": {
-                "id": card.uploader.id,
-                "username": card.uploader.username,
-                "location": card.uploader.location,
-            }
-            if card.uploader
-            else None,
+            "uploader": (
+                {
+                    "id": card.uploader.id,
+                    "username": card.uploader.username,
+                    "location": card.uploader.location,
+                }
+                if card.uploader
+                else None
+            ),
         }
         for card in paginated_cards.items
     ]
@@ -642,4 +646,3 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
             "total_graded": int(stats.total_graded),
         },
     }
-

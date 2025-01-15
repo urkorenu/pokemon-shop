@@ -1,4 +1,13 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, jsonify
+from flask import (
+    Blueprint,
+    render_template,
+    redirect,
+    url_for,
+    flash,
+    request,
+    current_app,
+    jsonify,
+)
 from flask_login import login_user, logout_user, login_required, current_user
 from ..models import User, db
 from flask_bcrypt import generate_password_hash, check_password_hash
@@ -40,7 +49,10 @@ def auth():
             user = User.query.filter_by(email=email).first()
             if user and user.check_password(password):
                 if not user.is_active:
-                    flash("Your account is not activated. Please check your email.", "error")
+                    flash(
+                        "Your account is not activated. Please check your email.",
+                        "error",
+                    )
                     return redirect(url_for("auth.auth"))
                 if user.role == "banned":
                     flash("Your account has been banned", "error")
@@ -92,11 +104,13 @@ def auth():
                 db.session.commit()
                 serializer = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
                 token = serializer.dumps(user.email)
-                activation_link = url_for("auth.confirm_email", token=token, _external=True)
+                activation_link = url_for(
+                    "auth.confirm_email", token=token, _external=True
+                )
                 send_email(
                     recipient=user.email,
                     subject="Activate Your Account",
-                    body=f"Click the link to activate your account: {activation_link}"
+                    body=f"Click the link to activate your account: {activation_link}",
                 )
                 flash("Registration successful! Please log in.", "success")
                 return redirect(url_for("auth.auth"))
@@ -276,6 +290,7 @@ def is_password_strong(password):
     """
     return bool(re.match(r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d]{8,}$", password))
 
+
 # Email Confirmation Route
 @auth_bp.route("/confirm_email/<token>")
 def confirm_email(token):
@@ -293,6 +308,7 @@ def confirm_email(token):
     except Exception as e:
         flash("Invalid or expired token.", "danger")
     return redirect(url_for("auth.auth"))
+
 
 # Forgot Password Request
 @auth_bp.route("/forgot_password", methods=["GET", "POST"])
@@ -313,6 +329,7 @@ def forgot_password():
         else:
             flash("Email not found.", "danger")
     return render_template("forgot_password.html")
+
 
 # Reset Password Route
 @auth_bp.route("/reset_password/<token>", methods=["GET", "POST"])
@@ -339,22 +356,25 @@ def reset_password(token):
             flash("User not found.", "danger")
     return render_template("reset_password.html", token=token)
 
-@auth_bp.route('/google-signin', methods=['POST'])
+
+@auth_bp.route("/google-signin", methods=["POST"])
 def google_signin():
-    token = request.json.get('token')
+    token = request.json.get("token")
     try:
         # Verify the token with Google's servers
         idinfo = id_token.verify_oauth2_token(
             token,
             requests.Request(),
-            "169202792825-l01b3l32pb9pdug96d98po37upjn4dgp.apps.googleusercontent.com"
+            "169202792825-l01b3l32pb9pdug96d98po37upjn4dgp.apps.googleusercontent.com",
         )
         print(f"Decoded token: {idinfo}", flush=True)
 
         # Extract user information from the token
-        user_id = idinfo['sub']
-        email = idinfo['email']
-        name = idinfo.get('name', 'Google User')  # Default to 'Google User' if no name is provided
+        user_id = idinfo["sub"]
+        email = idinfo["email"]
+        name = idinfo.get(
+            "name", "Google User"
+        )  # Default to 'Google User' if no name is provided
 
         print(f"Email: {email}, User ID: {user_id}", flush=True)
 
@@ -369,7 +389,7 @@ def google_signin():
                 email=email,
                 google_id=user_id,
                 contact_preference="google",
-                contact_details="N/A", 
+                contact_details="N/A",
                 is_active=True,
                 role="normal",
             )
@@ -391,4 +411,3 @@ def google_signin():
         # Catch other exceptions
         print(f"Unexpected error: {e}", flush=True)
         return jsonify({"success": False, "error": "An unexpected error occurred"})
-
