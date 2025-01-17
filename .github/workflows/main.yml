@@ -150,6 +150,12 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: il-central-1
+
+      # Checkout the code and pull the latest changes
+      - name: Checkout code and pull latest changes
+        run: |
+          cd pokemon-shop
+          git pull origin main
       # Deploy the application using AWS SSM
       - run: |
           IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/pokemon-shop:latest"
