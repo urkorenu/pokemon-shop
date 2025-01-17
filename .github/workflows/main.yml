@@ -58,7 +58,7 @@ jobs:
           --image-id ami-03d7ce6feba3797b6 \
           --instance-type t3.micro \
           --key-name pokemon-app \
-          --security-group-ids sg-025a7a4c8e76757a7 \
+          --security-group-ids sg-025a7a4c8e76757a7,sg-00846fdd7be685d85 \
           --subnet-id subnet-0f8017850528bd48a \
           --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=Test-Agent}]' \
           --query 'Instances[0].InstanceId' \
