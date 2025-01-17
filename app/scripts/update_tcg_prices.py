@@ -41,7 +41,9 @@ def fetch_tcg_price(card_name, set_name, number, card_type):
             print(
                 f"Error fetching TCG price for {card_name}: {response.json().get('error', 'Unknown error')}"
             )
-            print(f"API error for {card_name}:API URL: {api_url}, {response.status_code} - {response.text}")
+            print(
+                f"API error for {card_name}:API URL: {api_url}, {response.status_code} - {response.text}"
+            )
             return None
 
         # Parse the response
@@ -53,8 +55,9 @@ def fetch_tcg_price(card_name, set_name, number, card_type):
                 market_price = value.get("market")
                 break
         if market_price is None:
-            print(f"No market price for {card_name}. Prices: {prices}. card type: {card_type}")
-
+            print(
+                f"No market price for {card_name}. Prices: {prices}. card type: {card_type}"
+            )
 
         return market_price
     except requests.RequestException as e:
