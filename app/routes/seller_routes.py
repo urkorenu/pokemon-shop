@@ -139,7 +139,7 @@ def upload_card():
                 selected_price = tcg_price_data.get(card_type, {}).get("market", 0.0)
                 if follow_tcg:
                     price = round(selected_price * 3.65 + 0.5, 0)
-                    price = max(card.price, 1)
+                    price = max(price, 1)
                     condition = "NM"
 
             except requests.RequestException as e:

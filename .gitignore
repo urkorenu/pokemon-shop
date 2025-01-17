@@ -27,6 +27,7 @@ tf/.terraform.lock.hcl
 tf/*.tfstate
 tf/*.tfstate.*
 tf/providers/
+tf/scripts/ip*
 
 # Ignore .DS_Store files and .idea directory recursively
 **/.DS_Store
