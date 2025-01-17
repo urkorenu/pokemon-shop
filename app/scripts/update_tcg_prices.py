@@ -5,6 +5,7 @@ from config import Config
 import requests
 import os
 from flask import Flask, request
+import urllib.parse
 from app.routes.seller_routes import get_card_details
 
 # Database configuration
@@ -26,8 +27,13 @@ app.app_context().push()
 def fetch_tcg_price(card_name, set_name, number, card_type):
     """Fetch the latest price for a card using the cached route."""
     try:
+        # Encode the set name and number
+        encoded_set_name = urllib.parse.quote(set_name.strip())
+        encoded_number = urllib.parse.quote(number.strip())
+        normalized_card_type = card_type.lower()
+
         # Construct the URL for the card details API
-        api_url = f"http://localhost:5000/seller/card-details?language=en&set_name={set_name}&number={number}"
+        api_url = f"http://localhost:5000/seller/card-details?language=en&set_name={encoded_set_name}&number={encoded_number}"
         headers = {"X-Bypass-Token": os.getenv("BYPASS_TOKEN")}
         response = requests.get(api_url, headers=headers, timeout=10)
 
@@ -35,17 +41,20 @@ def fetch_tcg_price(card_name, set_name, number, card_type):
             print(
                 f"Error fetching TCG price for {card_name}: {response.json().get('error', 'Unknown error')}"
             )
+            print(f"API error for {card_name}:API URL: {api_url}, {response.status_code} - {response.text}")
             return None
 
         # Parse the response
         data = response.json()
         prices = data.get("prices", {})
-        market_price = prices.get(card_type.lower(), {}).get("market")
-
+        market_price = None
+        for key, value in prices.items():
+            if key.lower() == normalized_card_type:
+                market_price = value.get("market")
+                break
         if market_price is None:
-            print(
-                f"No market price found for card '{card_name}' with type '{card_type}'"
-            )
+            print(f"No market price for {card_name}. Prices: {prices}. card type: {card_type}")
+
 
         return market_price
     except requests.RequestException as e:
@@ -92,9 +101,6 @@ def update_tcg_prices():
             number = card.number
             card_type = card.card_type
 
-            print(
-                f"Fetching TCG price for card: {card_name} (Set: {set_name}, Number: {number})"
-            )
             new_price = fetch_tcg_price(card_name, set_name, number, card_type)
             if new_price is not None:
                 total_old_price += card.price
@@ -104,7 +110,6 @@ def update_tcg_prices():
                 card.price = max(card.price, 1)
                 total_new_price += card.price
                 price_changes.append((card, card.price - old_price))
-                print(f"Updated card '{card_name}' with new TCG price: {new_price}")
             else:
                 print(f"No price found for card '{card_name}'")
 
