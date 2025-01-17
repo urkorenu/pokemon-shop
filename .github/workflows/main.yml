@@ -180,7 +180,7 @@ jobs:
                 \"export API_KEY=${{ secrets.API_KEY }}\",
                 \"export ADMIN_MAIL=${{ secrets.ADMIN_MAIL }}\",
                 \"export ELASTIC_CACHE=${{ secrets.ELASTIC_CACHE }}\",
-                \"cd ~/pokemon-shop\",
+                \"cd /home/ec2-user/pokemon-shop\",
                 \"git pull origin main\",
                 \"docker pull $IMAGE_NAME\",
                 \"docker stop pokemon-shop-app-1 || true\",
