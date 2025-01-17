@@ -187,7 +187,7 @@ jobs:
                 \"docker rm pokemon-shop-app-1 || true\",
                 \"docker-compose pull\",
                 \"printenv > /tmp/pokemon-shop.env\",
-                \"docker-compose --env-file /tmp/pokemon-shop.env up app -d\"
+                \"docker-compose --env-file /tmp/pokemon-shop.env up -d app\"
               ]" \
               --output text
           done
