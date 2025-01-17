@@ -58,7 +58,7 @@ jobs:
             --image-id ami-03d7ce6feba3797b6 \
             --instance-type t3.micro \
             --key-name pokemon-app \
-            --security-group-ids sg-00846fdd7be685d85 \
+            --security-group-ids sg-025a7a4c8e76757a7,sg-0da61a11f4326aab4 \
             --subnet-id subnet-0f8017850528bd48a \
             --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=Test-Agent}]' \
             --query 'Instances[0].InstanceId' \
@@ -151,11 +151,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: il-central-1
 
-      # Checkout the code and pull the latest changes
-      - name: Checkout code and pull latest changes
-        run: |
-          cd pokemon-shop
-          git pull origin main
       # Deploy the application using AWS SSM
       - run: |
           IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/pokemon-shop:latest"
@@ -183,6 +178,8 @@ jobs:
                 \"export API_KEY=${{ secrets.API_KEY }}\",
                 \"export ADMIN_MAIL=${{ secrets.ADMIN_MAIL }}\",
                 \"export ELASTIC_CACHE=${{ secrets.ELASTIC_CACHE }}\",
+                \"cd pokemon-shop\",
+                \"git pull origin main\",
                 \"docker pull $IMAGE_NAME\",
                 \"docker stop pokemon-shop-app-1 || true\",
                 \"docker rm pokemon-shop-app-1 || true\",
