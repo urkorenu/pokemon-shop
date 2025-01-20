@@ -367,20 +367,12 @@ def google_signin():
             requests.Request(),
             "169202792825-l01b3l32pb9pdug96d98po37upjn4dgp.apps.googleusercontent.com",
         )
-        print(f"Decoded token: {idinfo}", flush=True)
-
-        # Extract user information from the token
         user_id = idinfo["sub"]
         email = idinfo["email"]
-        name = idinfo.get(
-            "name", "Google User"
-        )  # Default to 'Google User' if no name is provided
-
-        print(f"Email: {email}, User ID: {user_id}", flush=True)
+        name = idinfo.get("name", "Google User")
 
         # Check if user already exists in the database
         user = User.query.filter_by(email=email).first()
-        print(f"Existing user: {user}", flush=True)
 
         if not user:
             # Create a new user if one doesn't exist
@@ -395,19 +387,36 @@ def google_signin():
             )
             db.session.add(user)
             db.session.commit()
-            print(f"Created new user: {user}", flush=True)
 
         # Log the user in
         login_user(user)
-        print(f"Is user authenticated: {current_user.is_authenticated}", flush=True)
 
-        # Respond with success
-        return jsonify({"success": True})
+        # Redirect to the details page
+        return jsonify({"success": True, "redirect_url": url_for('auth.details')})
     except ValueError as e:
-        # Token verification failed
-        print(f"Error verifying token: {e}", flush=True)
         return jsonify({"success": False, "error": "Invalid token"})
     except Exception as e:
-        # Catch other exceptions
-        print(f"Unexpected error: {e}", flush=True)
         return jsonify({"success": False, "error": "An unexpected error occurred"})
+
+@auth_bp.route("/details", methods=["GET", "POST"])
+@login_required
+def details():
+    if request.method == "POST":
+        location = request.form.get("location")
+        contact_preference = request.form.get("contact_preference")
+        contact_details = request.form.get("contact_details")
+
+        if not location or not contact_preference or not contact_details:
+            flash("All fields are required.", "danger")
+            return redirect(url_for('auth.details'))
+
+        current_user.location = location
+        current_user.contact_preference = contact_preference
+        current_user.contact_details = contact_details
+        db.session.commit()
+        flash("Details updated successfully.", "success")
+        return redirect(url_for('user.home_page'))  
+
+    cities = CITIES_IN_ISRAEL
+    return render_template("details.html", cities=cities)
+
