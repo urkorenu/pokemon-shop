@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* Authentication Page Styling */
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - var(--navbar-height));
+    }
+
+    .auth-card {
+        border: none;
+        border-radius: 12px;
+        background-color: var(--primary-color);
+        color: var(--text-color-light);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        max-width: 450px;
+    }
+
+    .card-header {
+        background: var(--accent-color);
+        color: var(--text-color-dark);
+        text-align: center;
+        padding: 20px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .auth-card .btn {
+        border-radius: 8px;
+        font-weight: bold;
+        padding: 10px 15px;
+        width: 100%;
+    }
+
+    .auth-card .btn-success {
+        background-color: #28a745;
+        color: var(--text-color-light);
+    }
+
+    .auth-card .btn-success:hover {
+        background-color: #218838;
+    }
+
+    .form-control, .form-select {
+        background: var(--text-color-light);
+        color: var(--text-color-dark);
+        border-radius: 8px;
+        border: 1px solid var(--secondary-color);
+        transition: box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--accent-color);
+        box-shadow: 0 0 8px rgba(255, 203, 5, 0.6);
+    }
+</style>
+
+<div class="auth-container">
+    <div class="card auth-card">
+        <div class="card-header">
+            {{ _("Complete Your Profile") }}
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="location" class="form-label">{{ _("Location") }}</label>
+                    <select class="form-select" name="location" required>
+                        <option value="" disabled selected>{{ _('Select your area') }}</option>
+                        {% for city in cities %}
+                        <option value="{{ city }}">{{ city }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="contact_preference" class="form-label">{{ _("Contact Preference") }}</label>
+                    <select class="form-select" name="contact_preference" required>
+                        <option value="facebook">{{ _("Facebook") }}</option>
+                        <option value="phone">{{ _("Phone") }}</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="contact_details" class="form-label">{{ _("Contact Details") }}</label>
+                    <input type="text" class="form-control" name="contact_details" placeholder="{{ _('Phone or Facebook Link') }}" required>
+                </div>
+                <div class="mb-3">
+                    <small>
+                        {{ _("By signing up, you agree to our") }}
+                        <a href="{{ url_for('user.privacy_policy') }}">{{ _('Privacy Policy') }}</a> {{ _("and") }}
+                        <a href="{{ url_for('user.terms_of_use') }}">{{ _('Terms of Use') }}</a>.
+                    </small>
+                </div>
+                <button type="submit" class="btn btn-success">{{ _("Register") }}</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
