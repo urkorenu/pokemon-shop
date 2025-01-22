@@ -23,8 +23,6 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 from flask_babel import _
 
-
-
 # Initialize rate limiter
 limiter = Limiter(key_func=get_remote_address)
 
@@ -88,7 +86,8 @@ def auth():
                 return redirect(url_for("auth.auth"))
             if not is_password_strong(password):
                 flash(
-                    _("Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters."),
+                    _("Password must be at least 8 characters long and include uppercase, lowercase, numbers, "
+                      "and special characters."),
                     "error",
                 )
                 return redirect(url_for("auth.auth"))
@@ -205,7 +204,7 @@ def request_uploader():
         flash(_("You must accept the rules before submitting your request."), "danger")
         return redirect(url_for("auth.account"))
     if not all(
-        [current_user.email, current_user.location, current_user.contact_details]
+            [current_user.email, current_user.location, current_user.contact_details]
     ):
         flash(
             _("Please ensure your profile details (email, location, and contact details) are updated."),

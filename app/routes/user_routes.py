@@ -75,9 +75,9 @@ class Pagination:
         last = 0
         for num in range(1, self.pages + 1):
             if (
-                num <= left_edge
-                or (num > self.page - left_current and num < self.page + right_current)
-                or num > self.pages - right_edge
+                    num <= left_edge
+                    or (self.page - left_current < num < self.page + right_current)
+                    or num > self.pages - right_edge
             ):
                 if last + 1 != num:
                     yield None
@@ -245,7 +245,7 @@ def my_cards():
         Rendered template for the user's cards.
     """
     if current_user.role == "normal":
-        flash(("You do not have permission to access this page."), "danger")
+        flash(_("You do not have permission to access this page."), "danger")
         return redirect(url_for("user.view_cards"))
 
     # Get search query and pagination details
@@ -600,7 +600,7 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
         query.with_entities(
             func.count(Card.id).label("total_cards"),
             func.count(func.distinct(Card.set_name)).label("total_sets"),
-            func.count(case((Card.is_graded == True, 1))).label("total_graded"),
+            func.count(case((Card.is_graded, 1))).label("total_graded"),
         )
         .order_by(None)
         .first()

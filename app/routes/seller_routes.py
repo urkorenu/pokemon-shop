@@ -6,7 +6,6 @@ import requests
 from app.upload_to_s3 import upload_to_s3
 from config import Config
 from app import cache
-from app.utils import roles_required
 import os
 
 # Create a Blueprint for the seller routes
