@@ -395,12 +395,13 @@ def google_signin():
 
         # Redirect to the details page
         if register:
-            return jsonify({"success": True, "redirect_url": url_for('auth.details')})
-        return jsonify({"success": True, "redirect_url": url_for('user.home_page')})
+            return jsonify({"success": True, "redirect_url": url_for("auth.details")})
+        return jsonify({"success": True, "redirect_url": url_for("user.home_page")})
     except ValueError as e:
         return jsonify({"success": False, "error": "Invalid token"})
     except Exception as e:
         return jsonify({"success": False, "error": "An unexpected error occurred"})
+
 
 @auth_bp.route("/details", methods=["GET", "POST"])
 @login_required
@@ -412,15 +413,14 @@ def details():
 
         if not location or not contact_preference or not contact_details:
             flash("All fields are required.", "danger")
-            return redirect(url_for('auth.details'))
+            return redirect(url_for("auth.details"))
 
         current_user.location = location
         current_user.contact_preference = contact_preference
         current_user.contact_details = contact_details
         db.session.commit()
         flash("Details updated successfully.", "success")
-        return redirect(url_for('user.home_page'))  
+        return redirect(url_for("user.home_page"))
 
     cities = CITIES_IN_ISRAEL
     return render_template("details.html", cities=cities)
-
