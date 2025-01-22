@@ -1,11 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from ..models import Card, db, Order, order_cards, User
 from flask_login import current_user, login_required
+from flask_babel import _
 import requests
 from app.upload_to_s3 import upload_to_s3
 from config import Config
 from app import cache
-from app.utils import roles_required
 import os
 
 # Create a Blueprint for the seller routes
@@ -104,7 +104,7 @@ def upload_card():
 
                 if not card_data:
                     flash(
-                        "No card found. Please verify the set name and card number.",
+                        _("No card found. Please verify the set name and card number."),
                         "danger",
                     )
                     return render_template("upload.html", sets=sets)
@@ -131,7 +131,7 @@ def upload_card():
 
                 if name.lower() not in api_card_name.lower():
                     flash(
-                        f"Card name does not match. Expected: {api_card_name}", "danger"
+                        (f"Card name does not match. Expected: {api_card_name}"), "danger"
                     )
                     return render_template("upload.html", sets=sets)
 
@@ -144,7 +144,7 @@ def upload_card():
 
             except requests.RequestException as e:
                 print(f"Error fetching card details: {e}", flush=True)
-                flash("Failed to fetch card details. Please try again later.", "danger")
+                flash(_("Failed to fetch card details. Please try again later."), "danger")
                 return render_template("upload.html", sets=sets)
 
         elif language == "jp":
@@ -154,7 +154,7 @@ def upload_card():
                     (s["id"] for s in japanese_sets if s["name"] == set_name), None
                 )
                 if not set_id:
-                    flash("Set not found. Please verify the set name.", "danger")
+                    flash(_("Set not found. Please verify the set name."), "danger")
                     return render_template("upload.html", sets=sets)
 
                 response = requests.get(
@@ -168,7 +168,7 @@ def upload_card():
                     None,
                 )
                 if not card_data:
-                    flash("No card found. Please verify the card number.", "danger")
+                    flash(_("No card found. Please verify the card number."), "danger")
                     return render_template("upload.html", sets=sets)
 
                 name = card_data["name"]
@@ -177,12 +177,12 @@ def upload_card():
             except requests.RequestException as e:
                 print(f"Error fetching Japanese card details: {e}", flush=True)
                 flash(
-                    "Failed to fetch Japanese card details. Please try again later.",
+                    _("Failed to fetch Japanese card details. Please try again later."),
                     "danger",
                 )
                 return render_template("upload.html", sets=sets)
         else:
-            flash("Invalid language selection.", "danger")
+            flash(_("Invalid language selection."), "danger")
             return render_template("upload.html", sets=sets)
 
         image_url = upload_to_s3(file, bucket_name=Config.S3_BUCKET) if file else None
@@ -209,7 +209,7 @@ def upload_card():
         )
         db.session.add(card)
         db.session.commit()
-        flash("Card uploaded successfully!", "success")
+        flash(_("Card uploaded successfully!"), "success")
         return redirect(url_for("seller.upload_card"))
 
     return render_template("upload.html", sets=sets)
@@ -392,7 +392,7 @@ def seller_dashboard():
         Rendered template for the seller dashboard with orders and statistics.
     """
     if current_user.role not in ["uploader", "admin"]:
-        flash("You do not have permission to access this page.", "danger")
+        flash(_("You do not have permission to access this page."), "danger")
         return redirect(url_for("user.view_cards"))
 
     search_query = request.args.get("search", "").strip()

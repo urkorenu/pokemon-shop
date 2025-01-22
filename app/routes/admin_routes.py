@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from ..models import Card, User, db
 from app.utils import roles_required, delete_user_account
 from ..mail_service import send_email
+from flask_babel import _
 
 # Create a Blueprint for the admin routes
 admin_bp = Blueprint("admin", __name__)
@@ -39,7 +40,7 @@ def manage_users():
         delete_user_id = request.form.get("delete_user_id")
         if delete_user_id:
             success, message = delete_user_account(delete_user_id, is_admin=True)
-            flash(message, "success" if success else "danger")
+            flash(_(message), "success" if success else "danger")
             return redirect(url_for("admin.manage_users"))
 
         # Handle user updates
@@ -76,7 +77,7 @@ def manage_users():
                             "Account Banned",
                             f"Dear {user.username}, your account has been banned.\nReason: {ban_reason}",
                         )
-                        flash(f"User {user.username} has been banned.", "warning")
+                        flash(_(f"User {user.username} has been banned."), "warning")
                     elif old_role == "banned":
                         send_email(
                             user.email,
@@ -84,9 +85,9 @@ def manage_users():
                             f"Dear {user.username}, your account has been unbanned. You can access your account now.",
                         )
                 db.session.commit()
-                flash(f"User {user.username}'s role updated to {new_role}.", "success")
+                flash(_(f"User {user.username}'s role updated to {new_role}."), "success")
             else:
-                flash("Invalid role data.", "error")
+                flash(_("Invalid role data."), "error")
 
     # Render the user management template with the list of users
     return render_template("manage_users.html", users=users)

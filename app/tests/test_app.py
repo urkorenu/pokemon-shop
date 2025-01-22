@@ -34,7 +34,7 @@ def test_home_page(client):
     """
     response = client.get("/")
     assert response.status_code == 200
-    assert b"Available" in response.data  # Check if "Welcome" text is in the page
+    assert b"The first" in response.data  # Check if "Welcome" text is in the page
 
 
 def test_login_page(client):

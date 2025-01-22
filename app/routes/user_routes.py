@@ -9,6 +9,7 @@ from flask import (
     jsonify,
 )
 from flask_login import login_required, current_user
+from flask_babel import _
 from sqlalchemy.sql import func, case
 from sqlalchemy.orm import joinedload, aliased
 from sqlalchemy import or_
@@ -74,9 +75,9 @@ class Pagination:
         last = 0
         for num in range(1, self.pages + 1):
             if (
-                num <= left_edge
-                or (num > self.page - left_current and num < self.page + right_current)
-                or num > self.pages - right_edge
+                    num <= left_edge
+                    or (self.page - left_current < num < self.page + right_current)
+                    or num > self.pages - right_edge
             ):
                 if last + 1 != num:
                     yield None
@@ -176,14 +177,14 @@ def report_user(user_id):
     user = User.query.get_or_404(user_id)
     reason, details = request.form.get("reason"), request.form.get("details")
     if not reason:
-        flash("Please provide a reason for the report.", "danger")
+        flash(_("Please provide a reason for the report."), "danger")
         return redirect(url_for("user.profile", user_id=user_id))
     send_email(
         Config.ADMIN_MAIL,
         f"User Report - {user.username}",
         f"User '{current_user.username}' reported the user '{user.username}'.\nReason: {reason}\nDetails: {details if details else 'No additional details provided.'}",
     )
-    flash("User has been reported successfully. Thank you!", "success")
+    flash(_("User has been reported successfully. Thank you!"), "success")
     return redirect(url_for("user.profile", user_id=user_id))
 
 
@@ -244,7 +245,7 @@ def my_cards():
         Rendered template for the user's cards.
     """
     if current_user.role == "normal":
-        flash("You do not have permission to access this page.", "danger")
+        flash(_("You do not have permission to access this page."), "danger")
         return redirect(url_for("user.view_cards"))
 
     # Get search query and pagination details
@@ -295,7 +296,7 @@ def edit_card(card_id):
     """
     card = Card.query.get_or_404(card_id)
     if card.uploader_id != current_user.id:
-        flash("You do not have permission to edit this card.", "danger")
+        flash(_("You do not have permission to edit this card."), "danger")
         return redirect(url_for("user.my_cards"))
     if request.method == "POST":
         card.name = request.form.get("name", card.name)
@@ -316,7 +317,7 @@ def edit_card(card_id):
             grading_company if grading_company not in (None, "", "None") else None
         )
         db.session.commit()
-        flash("Card updated successfully!", "success")
+        flash(_("Card updated successfully!"), "success")
         return redirect(url_for("user.my_cards"))
     return render_template("edit_card.html", card=card)
 
@@ -338,7 +339,7 @@ def delete_card(card_id):
     """
     card = Card.query.get_or_404(card_id)
     if current_user.role != "admin" and card.uploader_id != current_user.id:
-        flash("You do not have permission to delete this card.", "danger")
+        flash(_("You do not have permission to delete this card."), "danger")
         return redirect(url_for("user.my_cards"))
     s3 = boto3.client("s3", region_name=Config.AWS_REGION)
     if card.image_url:
@@ -348,7 +349,7 @@ def delete_card(card_id):
             )
         except Exception as e:
             print(f"Failed to delete {card.image_url} from S3: {e}", flush=True)
-            flash("Failed to delete the image from S3.", "danger")
+            flash(_("Failed to delete the image from S3."), "danger")
     if card.back_image_url:
         try:
             s3.delete_object(
@@ -356,7 +357,7 @@ def delete_card(card_id):
             )
         except Exception as e:
             print(f"Failed to delete {card.image_url} from S3: {e}", flush=True)
-            flash("Failed to delete the image from S3.", "danger")
+            flash(_("Failed to delete the image from S3."), "danger")
     if current_user.role == "admin" and card.uploader_id != current_user.id:
         uploader = User.query.get(card.uploader_id)
         if uploader and uploader.email:
@@ -368,7 +369,7 @@ def delete_card(card_id):
     Cart.query.filter_by(card_id=card.id).delete()
     db.session.delete(card)
     db.session.commit()
-    flash("Card deleted successfully!", "success")
+    flash(_("Card deleted successfully!"), "success")
     return redirect(url_for("user.my_cards"))
 
 
@@ -394,7 +395,7 @@ def report_card(card_id):
         f"Report: Card #{card.id} - {reason}",
         f"Card Name: {card.name}\nReason: {reason}\nDetails: {details}\nUser: {current_user.username}",
     )
-    flash("Report submitted successfully. Admin will review it.", "success")
+    flash(_("Report submitted successfully. Admin will review it."), "success")
     return redirect(url_for("user.view_cards"))
 
 
@@ -413,7 +414,7 @@ def add_to_cart():
     card_id = request.form.get("card_id")
     card = Card.query.get_or_404(card_id)
     if card.uploader_id == current_user.id:
-        flash(f"You cant buy your own cards :)", "danger")
+        flash(_(f"You cant buy your own cards :)"), "danger")
 
     else:
         cart_item = Cart.query.filter_by(
@@ -423,10 +424,10 @@ def add_to_cart():
             if cart_item.quantity < card.amount:
                 cart_item.quantity += 1
                 db.session.commit()
-                flash(f"{card.name} has been added to your cart.", "success")
+                flash(_(f"{card.name} has been added to your cart."), "success")
             else:
                 flash(
-                    f"You cannot add more {card.name} cards. Only {card.amount} available.",
+                    _(f"You cannot add more {card.name} cards. Only {card.amount} available."),
                     "danger",
                 )
         else:
@@ -435,9 +436,9 @@ def add_to_cart():
                     Cart(user_id=current_user.id, card_id=card.id, quantity=1)
                 )
                 db.session.commit()
-                flash(f"{card.name} has been added to your cart.", "success")
+                flash(_(f"{card.name} has been added to your cart."), "success")
             else:
-                flash(f"{card.name} is out of stock.", "danger")
+                flash(_(f"{card.name} is out of stock."), "danger")
     return redirect(url_for("user.view_cards"))
 
 
@@ -483,7 +484,7 @@ def contact_us():
             request.form.get("message"),
         )
         if not (name and email and message_content):
-            flash("All fields are required!", "danger")
+            flash(_("All fields are required!"), "danger")
             return redirect(url_for("user.contact_us"))
         msg = f"""
         You have received a new message via Contact Us Form:
@@ -496,9 +497,9 @@ def contact_us():
         """
         try:
             send_email(Config.ADMIN_MAIL, f"New Contact Us Message from {name}", msg)
-            flash("Your message has been sent successfully!", "success")
+            flash(_("Your message has been sent successfully!"), "success")
         except Exception as e:
-            flash("Failed to send message. Please try again later.", "danger")
+            flash(_("Failed to send message. Please try again later."), "danger")
             print(str(e), flush=True)
         return redirect(url_for("user.contact_us"))
     return render_template("contact.html")
@@ -599,7 +600,7 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
         query.with_entities(
             func.count(Card.id).label("total_cards"),
             func.count(func.distinct(Card.set_name)).label("total_sets"),
-            func.count(case((Card.is_graded == True, 1))).label("total_graded"),
+            func.count(case((Card.is_graded, 1))).label("total_graded"),
         )
         .order_by(None)
         .first()

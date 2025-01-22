@@ -21,7 +21,7 @@ from flask_limiter.util import get_remote_address
 from itsdangerous import URLSafeTimedSerializer
 from google.oauth2 import id_token
 from google.auth.transport import requests
-
+from flask_babel import _
 
 # Initialize rate limiter
 limiter = Limiter(key_func=get_remote_address)
@@ -50,17 +50,17 @@ def auth():
             if user and user.check_password(password):
                 if not user.is_active:
                     flash(
-                        "Your account is not activated. Please check your email.",
+                        _("Your account is not activated. Please check your email."),
                         "error",
                     )
                     return redirect(url_for("auth.auth"))
                 if user.role == "banned":
-                    flash("Your account has been banned", "error")
+                    flash(_("Your account has been banned"), "error")
                     return redirect(url_for("auth.auth"))
                 login_user(user, remember=bool(request.form.get("remember")))
-                flash("Login successful!", "success")
+                flash(_("Login successful!"), "success")
                 return redirect(url_for("user.view_cards"))
-            flash("Invalid email or password.", "error")
+            flash(_("Invalid email or password."), "error")
         elif form_type == "register":
             username, email, password = (
                 request.form.get("username"),
@@ -73,20 +73,21 @@ def auth():
                 request.form.get("contact_details"),
             )
             if not all([username, email, password, location]):
-                flash("All fields are required.", "error")
+                flash(_("All fields are required."), "error")
                 return redirect(url_for("auth.auth"))
             if contact_preference not in ["phone", "facebook"] or not contact_details:
-                flash("Invalid contact preference or details.", "error")
+                flash(_("Invalid contact preference or details."), "error")
                 return redirect(url_for("auth.auth"))
             if User.query.filter_by(username=username).first():
-                flash("Username already taken. Please choose a different one.", "error")
+                flash(_("Username already taken. Please choose a different one."), "error")
                 return redirect(url_for("auth.auth"))
             if User.query.filter_by(email=email).first():
-                flash("Email already registered. Please log in.", "error")
+                flash(_("Email already registered. Please log in."), "error")
                 return redirect(url_for("auth.auth"))
             if not is_password_strong(password):
                 flash(
-                    "Password must be at least 8 characters long and include uppercase, lowercase, numbers, and special characters.",
+                    _("Password must be at least 8 characters long and include uppercase, lowercase, numbers, "
+                      "and special characters."),
                     "error",
                 )
                 return redirect(url_for("auth.auth"))
@@ -112,12 +113,12 @@ def auth():
                     subject="Activate Your Account",
                     body=f"Click the link to activate your account: {activation_link}",
                 )
-                flash("Registration successful! Please log in.", "success")
+                flash(_("Registration successful! Please log in."), "success")
                 return redirect(url_for("auth.auth"))
             except Exception as e:
                 db.session.rollback()
                 flash(
-                    "An error occurred during registration. Please try again.", "error"
+                    _("An error occurred during registration. Please try again."), "error"
                 )
                 print(f"Error during registration: {e}")
     return render_template("auth.html", cities=CITIES_IN_ISRAEL)
@@ -133,7 +134,7 @@ def logout():
         Redirect to the authentication page.
     """
     logout_user()
-    flash("You have been logged out.", "success")
+    flash(_("You have been logged out."), "success")
     return redirect(url_for("auth.auth"))
 
 
@@ -162,21 +163,21 @@ def account():
                 "contact_details", current_user.contact_details
             )
             db.session.commit()
-            flash("Profile updated successfully!", "success")
+            flash(_("Profile updated successfully!"), "success")
         elif action == "change_password":
             old_password, new_password = request.form.get(
                 "old_password"
             ), request.form.get("new_password")
             if not check_password_hash(current_user.password_hash, old_password):
-                flash("Old password is incorrect.", "danger")
+                flash(_("Old password is incorrect."), "danger")
             else:
                 current_user.password_hash = generate_password_hash(new_password)
                 db.session.commit()
-                flash("Password updated successfully!", "success")
+                flash(_("Password updated successfully!"), "success")
         elif action == "delete_account":
             db.session.delete(current_user)
             db.session.commit()
-            flash("Your account has been deleted.", "success")
+            flash(_("Your account has been deleted."), "success")
             return redirect(url_for("auth.login"))
         return redirect(url_for("auth.account"))
     return render_template("account.html", cities=CITIES_IN_ISRAEL)
@@ -194,19 +195,19 @@ def request_uploader():
         Redirect to the account management page.
     """
     if current_user.role in ["uploader", "admin"]:
-        flash("You already have the uploader or admin role.", "info")
+        flash(_("You already have the uploader or admin role."), "info")
         return redirect(url_for("auth.account"))
     if current_user.request_status == "Pending":
-        flash("Your request is already pending. Please wait for admin review.", "info")
+        flash(_("Your request is already pending. Please wait for admin review."), "info")
         return redirect(url_for("auth.account"))
     if not request.form.get("rules_accepted"):
-        flash("You must accept the rules before submitting your request.", "danger")
+        flash(_("You must accept the rules before submitting your request."), "danger")
         return redirect(url_for("auth.account"))
     if not all(
-        [current_user.email, current_user.location, current_user.contact_details]
+            [current_user.email, current_user.location, current_user.contact_details]
     ):
         flash(
-            "Please ensure your profile details (email, location, and contact details) are updated.",
+            _("Please ensure your profile details (email, location, and contact details) are updated."),
             "danger",
         )
         return redirect(url_for("auth.account"))
@@ -229,12 +230,12 @@ def request_uploader():
         )
         current_user.request_status = "Pending"
         db.session.commit()
-        flash(
-            "Your request to become an uploader has been submitted successfully!",
+        flash(_(
+            "Your request to become an uploader has been submitted successfully!"),
             "success",
         )
     except Exception as e:
-        flash("Failed to send the request. Please try again later.", "danger")
+        flash(_("Failed to send the request. Please try again later."), "danger")
         print(str(e))
     return redirect(url_for("auth.account"))
 
@@ -254,11 +255,11 @@ def change_password():
         "new_password"
     )
     if not check_password_hash(current_user.password_hash, old_password):
-        flash("Old password is incorrect.", "error")
+        flash(_("Old password is incorrect."), "error")
         return redirect(url_for("auth.account"))
     current_user.password_hash = generate_password_hash(new_password).decode("utf-8")
     db.session.commit()
-    flash("Password updated successfully!", "success")
+    flash(_("Password updated successfully!"), "success")
     return redirect(url_for("auth.account"))
 
 
@@ -274,7 +275,7 @@ def delete_account():
         Redirect to the authentication page.
     """
     success, message = delete_user_account(current_user.id)
-    flash(message, "success" if success else "danger")
+    flash(_(message), "success" if success else "danger")
     return redirect(url_for("auth.auth"))
 
 
@@ -301,12 +302,12 @@ def confirm_email(token):
         if user:
             user.is_active = True
             db.session.commit()
-            flash("Your email has been confirmed. Please log in.", "success")
+            flash(_("Your email has been confirmed. Please log in."), "success")
             return redirect(url_for("auth.auth"))
         else:
-            flash("Invalid or expired token.", "danger")
+            flash(_("Invalid or expired token."), "danger")
     except Exception as e:
-        flash("Invalid or expired token.", "danger")
+        flash(_("Invalid or expired token."), "danger")
     return redirect(url_for("auth.auth"))
 
 
@@ -325,9 +326,9 @@ def forgot_password():
                 subject="Password Reset Request",
                 body=f"Click the link to reset your password: {reset_link}",
             )
-            flash("Password reset instructions sent to your email.", "info")
+            flash(_("Password reset instructions sent to your email."), "info")
         else:
-            flash("Email not found.", "danger")
+            flash(_("Email not found."), "danger")
     return render_template("forgot_password.html")
 
 
@@ -338,22 +339,22 @@ def reset_password(token):
     try:
         email = serializer.loads(token, max_age=3600)
     except Exception as e:
-        flash("Invalid or expired token.", "danger")
+        flash(_("Invalid or expired token."), "danger")
         return redirect(url_for("auth.auth"))
 
     if request.method == "POST":
         password = request.form.get("password")
         if not is_password_strong(password):
-            flash("Password does not meet strength requirements.", "danger")
+            flash(_("Password does not meet strength requirements."), "danger")
             return redirect(url_for("auth.reset_password", token=token))
         user = User.query.filter_by(email=email).first()
         if user:
             user.set_password(password)
             db.session.commit()
-            flash("Your password has been reset. Please log in.", "success")
+            flash(_("Your password has been reset. Please log in."), "success")
             return redirect(url_for("auth.auth"))
         else:
-            flash("User not found.", "danger")
+            flash(_("User not found."), "danger")
     return render_template("reset_password.html", token=token)
 
 
@@ -412,14 +413,14 @@ def details():
         contact_details = request.form.get("contact_details")
 
         if not location or not contact_preference or not contact_details:
-            flash("All fields are required.", "danger")
+            flash(_("All fields are required."), "danger")
             return redirect(url_for("auth.details"))
 
         current_user.location = location
         current_user.contact_preference = contact_preference
         current_user.contact_details = contact_details
         db.session.commit()
-        flash("Details updated successfully.", "success")
+        flash(_("Details updated successfully."), "success")
         return redirect(url_for("user.home_page"))
 
     cities = CITIES_IN_ISRAEL

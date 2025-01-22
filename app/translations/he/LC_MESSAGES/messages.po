@@ -939,4 +939,170 @@ msgstr "נזכרת בסיסמא שלך?"
 msgid "Complete Your Profile"
 msgstr "עדכון החשבון"
 
+msgid "User {user.username} has been banned."
+msgstr "המשתמש {user.username} נחסם."
 
+msgid "User {user.username}'s role updated to {new_role}."
+msgstr "תפקידו של המשתמש {user.username} עודכן ל-{new_role}."
+
+msgid "Invalid role data."
+msgstr "נתוני תפקיד לא תקינים."
+
+msgid "Your account has been banned."
+msgstr "החשבון שלך נחסם."
+
+msgid "Login successful!"
+msgstr "התחברת בהצלחה!"
+
+msgid "Invalid email or password."
+msgstr "דוא\"ל או סיסמה שגויים."
+
+msgid "All fields are required."
+msgstr "יש למלא את כל השדות."
+
+msgid "Invalid contact preference or details."
+msgstr "פרטי או העדפת יצירת קשר שגויים."
+
+msgid "Username already taken. Please choose a different one."
+msgstr "שם המשתמש כבר תפוס. אנא בחר שם אחר."
+
+msgid "Email already registered. Please log in."
+msgstr "המייל כבר רשום. אנא התחבר."
+
+msgid "Registration successful! Please log in."
+msgstr "ההרשמה הושלמה בהצלחה! אנא התחבר."
+
+msgid "You have been logged out."
+msgstr "נותקת מהמערכת."
+
+msgid "Profile updated successfully!"
+msgstr "הפרופיל עודכן בהצלחה!"
+
+msgid "Old password is incorrect."
+msgstr "הסיסמה הישנה שגויה."
+
+msgid "Password updated successfully!"
+msgstr "הסיסמה עודכנה בהצלחה!"
+
+msgid "Your account has been deleted."
+msgstr "החשבון שלך נמחק."
+
+msgid "You already have the uploader or admin role."
+msgstr "כבר יש לך תפקיד של מעלה תוכן או מנהל מערכת."
+
+msgid "Your request is already pending. Please wait for admin review."
+msgstr "הבקשה שלך כבר ממתינה. אנא המתן לבדיקה של מנהל המערכת."
+
+msgid "You must accept the rules before submitting your request."
+msgstr "עליך לקבל את הכללים לפני שליחת הבקשה."
+
+msgid "Failed to send the request. Please try again later."
+msgstr "שליחת הבקשה נכשלה. אנא נסה שוב מאוחר יותר."
+
+msgid "Your email has been confirmed. Please log in."
+msgstr "כתובת המייל שלך אומתה. אנא התחבר."
+
+msgid "Invalid or expired token."
+msgstr "טוקן שגוי או שפג תוקפו."
+
+msgid "Password reset instructions sent to your email."
+msgstr "הוראות לאיפוס הסיסמה נשלחו למייל שלך."
+
+msgid "Email not found."
+msgstr "כתובת המייל לא נמצאה."
+
+msgid "Password does not meet strength requirements."
+msgstr "הסיסמה לא עומדת בדרישות החוזק."
+
+msgid "Your password has been reset. Please log in."
+msgstr "הסיסמה שלך אופסה. אנא התחבר."
+
+msgid "User not found."
+msgstr "המשתמש לא נמצא."
+
+msgid "You are not authorized to perform this action."
+msgstr "אין לך הרשאה לבצע פעולה זו."
+
+msgid "Item removed from cart."
+msgstr "הפריט הוסר מהעגלה."
+
+msgid "Your cart is empty."
+msgstr "העגלה שלך ריקה."
+
+msgid "Orders placed successfully! Sellers have been notified."
+msgstr "ההזמנות בוצעו בהצלחה! המוכרים קיבלו הודעה."
+
+msgid "You cannot order your own card."
+msgstr "אינך יכול להזמין את הכרטיס שלך."
+
+msgid "Seller information is missing for this card."
+msgstr "פרטי המוכר חסרים עבור הכרטיס הזה."
+
+msgid "You are not authorized to confirm this order."
+msgstr "אין לך הרשאה לאשר הזמנה זו."
+
+msgid "Order confirmed, and the buyer has been notified."
+msgstr "ההזמנה אושרה, והקונה קיבל הודעה."
+
+msgid "You are not authorized to reject this order."
+msgstr "אין לך הרשאה לדחות הזמנה זו."
+
+msgid "Order rejected successfully, and the buyer has been notified."
+msgstr "ההזמנה נדחתה בהצלחה, והקונה קיבל הודעה."
+
+msgid "You are not authorized to provide feedback for this order."
+msgstr "אין לך הרשאה לתת משוב להזמנה זו."
+
+msgid "Thank you for your feedback!"
+msgstr "תודה על המשוב שלך!"
+
+msgid "Failed to fetch card details. Please try again later."
+msgstr "נכשלה שליפת פרטי הכרטיס. אנא נסה שוב מאוחר יותר."
+
+msgid "Set not found. Please verify the set name."
+msgstr "הסט לא נמצא. אנא אמת את שם הסט."
+
+msgid "No card found. Please verify the card number."
+msgstr "לא נמצא כרטיס. אנא אמת את מספר הכרטיס."
+
+msgid "Invalid language selection."
+msgstr "בחירת שפה שגויה."
+
+msgid "Card uploaded successfully!"
+msgstr "הכרטיס הועלה בהצלחה!"
+
+msgid "You do not have permission to access this page."
+msgstr "אין לך הרשאה לגשת לעמוד זה."
+
+msgid "You do not have permission to edit this card."
+msgstr "אין לך הרשאה לערוך כרטיס זה."
+
+msgid "Card updated successfully!"
+msgstr "הכרטיס עודכן בהצלחה!"
+
+msgid "You do not have permission to delete this card."
+msgstr "אין לך הרשאה למחוק כרטיס זה."
+
+msgid "Failed to delete the image from S3."
+msgstr "נכשלה מחיקת התמונה מ-S3."
+
+msgid "Card deleted successfully!"
+msgstr "הכרטיס נמחק בהצלחה!"
+
+msgid "Report submitted successfully. Admin will review it."
+msgstr "הדיווח הוגש בהצלחה. המנהל יבדוק אותו."
+
+msgid "You can't buy your own cards :)"
+msgstr "אינך יכול לקנות את הקלפים שלך :)"
+
+msgid "{card.name} has been added to your cart."
+msgstr "{card.name} נוסף לעגלה שלך."
+
+msgid "{card.name} is out of stock."
+msgstr "{card.name} אזל מהמלאי."
+
+msgid "Your message has been sent successfully!"
+msgstr "ההודעה שלך נשלחה בהצלחה!"
+
+msgid "Failed to send message. Please try again later."
+msgstr "שליחת ההודעה נכשלה. אנא נסה שוב מאוחר יותר."

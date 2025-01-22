@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
+from flask_babel import _
 from ..models import Cart, Order, db, User
 from ..mail_service import send_email
 
@@ -40,11 +41,11 @@ def remove_from_cart(cart_id):
     """
     cart_item = Cart.query.get_or_404(cart_id)
     if cart_item.user_id != current_user.id:
-        flash("You are not authorized to perform this action.", "danger")
+        flash(_("You are not authorized to perform this action."), "danger")
         return redirect(url_for("cart.view_cart"))
     db.session.delete(cart_item)
     db.session.commit()
-    flash("Item removed from cart.", "success")
+    flash(_("Item removed from cart."), "success")
     return redirect(url_for("cart.view_cart"))
 
 
@@ -59,7 +60,7 @@ def checkout():
     """
     cart_items = Cart.query.filter_by(user_id=current_user.id).all()
     if not cart_items:
-        flash("Your cart is empty.", "error")
+        flash(_("Your cart is empty."), "error")
         return redirect(url_for("cart.view_cart"))
 
     grouped_cart = {}
@@ -96,5 +97,5 @@ def checkout():
 
     Cart.query.filter_by(user_id=current_user.id).delete()
     db.session.commit()
-    flash("Orders placed successfully! Sellers have been notified.", "success")
+    flash(_("Orders placed successfully! Sellers have been notified."), "success")
     return redirect(url_for("cart.view_cart"))

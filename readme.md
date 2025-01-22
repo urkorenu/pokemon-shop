@@ -27,37 +27,7 @@ A modern web application for managing and showcasing Pokémon cards with advance
 - **Database**: PostgreSQL (via AWS RDS).
 - **Cloud Services**: AWS S3 for image storage, AWS RDS for database and Elastic cache.
 - **Frontend**: Bootstrap 5.
-- **DevOps**: Docker, Terraform.
-
-## Setup Instructions
-
-1. **Clone the Repository**:
-    ```bash
-    git clone <repository-url>
-    cd pokemon-shop
-    ```
-
-2. **Set Up Environment Variables**:
-    Add the required environment variables to a `.env` file or export them manually:
-    ```bash
-    export SECRET_KEY=<your-secret-key>
-    export DB_USERNAME=<your-db-username>
-    export DB_PASSWORD=<your-db-password>
-    export DB_HOST=<your-db-host>
-    export DB_NAME=<your-db-name>
-    export AWS_ACCESS_KEY_ID=<your-aws-access-key>
-    export AWS_SECRET_ACCESS_KEY=<your-aws-secret-key>
-    export AWS_REGION=<your-aws-region>
-    export S3_BUCKET=<your-s3-bucket>
-    ```
-
-3. **Set Up Docker and Run the App**:
-    ```bash
-    docker-compose up --build
-    ```
-
-4. **Access the App**:
-    - Local: [http://localhost:5000](http://localhost:5000)
+- **DevOps**: Docker, Terraform, Github Actions.
 
 ## Admin Operations
 - **Admin Panel**: Accessible at `/admin/users`.

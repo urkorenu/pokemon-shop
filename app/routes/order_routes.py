@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_required, current_user
+from flask_babel import _
 from ..models import db, Order, Card, User, order_cards, Cart
 from ..mail_service import send_email
 
@@ -21,12 +22,12 @@ def place_order(card_id):
     """
     card = Card.query.get_or_404(card_id)
     if card.uploader_id == current_user.id:
-        flash("You cannot order your own card.", "error")
+        flash(_("You cannot order your own card."), "error")
         return redirect(url_for("user.view_cards"))
 
     seller_id = card.uploader_id
     if not seller_id:
-        flash("Seller information is missing for this card.", "error")
+        flash(_("Seller information is missing for this card."), "error")
         return redirect(url_for("user.view_cards"))
 
     order = Order(buyer_id=current_user.id, seller_id=seller_id, status="Pending")
@@ -59,7 +60,7 @@ def place_order(card_id):
     )
 
     flash(
-        "Order placed successfully! A summary has been sent to your email.", "success"
+        _("Order placed successfully! A summary has been sent to your email."), "success"
     )
 
     return redirect(url_for("user.view_cards"))
@@ -79,7 +80,7 @@ def confirm_order(order_id):
     """
     order = Order.query.get_or_404(order_id)
     if order.seller_id != current_user.id:
-        flash("You are not authorized to confirm this order.", "danger")
+        flash(_("You are not authorized to confirm this order."), "danger")
         return redirect(url_for("order.pending_orders"))
 
     for card in order.cards:
@@ -101,7 +102,7 @@ def confirm_order(order_id):
         f"Thank you for using our platform!",
     )
 
-    flash("Order confirmed, and the buyer has been notified.", "success")
+    flash(_("Order confirmed, and the buyer has been notified."), "success")
     return redirect(url_for("seller.seller_dashboard"))
 
 
@@ -119,7 +120,7 @@ def reject_order(order_id):
     """
     order = Order.query.get_or_404(order_id)
     if order.seller_id != current_user.id:
-        flash("You are not authorized to reject this order.", "danger")
+        flash(_("You are not authorized to reject this order."), "danger")
         return redirect(url_for("seller.seller_dashboard"))
 
     order.status = "Rejected"
@@ -134,7 +135,7 @@ def reject_order(order_id):
         f"Thank you for using our platform!",
     )
 
-    flash("Order rejected successfully, and the buyer has been notified.", "success")
+    flash(_("Order rejected successfully, and the buyer has been notified."), "success")
 
     return redirect(url_for("seller.seller_dashboard"))
 
@@ -153,7 +154,7 @@ def submit_feedback(order_id):
     """
     order = Order.query.get_or_404(order_id)
     if order.buyer_id != current_user.id or order.status != "Confirmed":
-        flash("You are not authorized to provide feedback for this order.", "danger")
+        flash(_("You are not authorized to provide feedback for this order."), "danger")
         return redirect(url_for("order.my_orders"))
 
     feedback = request.form.get("feedback")
@@ -172,7 +173,7 @@ def submit_feedback(order_id):
     seller.feedback_count += 1
 
     db.session.commit()
-    flash("Thank you for your feedback!", "success")
+    flash(_("Thank you for your feedback!"), "success")
     return redirect(url_for("order.my_orders"))
 
 
