@@ -275,10 +275,8 @@
         .then(res => res.json())
 		.then(data => {
 			if (data.success) {
-				console.log("Login successful", data);
-				window.location.href = "/";
+                window.location.href = data.redirect_url;
 			} else {
-				console.error("Login failed", data);
 				alert("Google Sign-In failed. Please try again.");
 			}
 		})

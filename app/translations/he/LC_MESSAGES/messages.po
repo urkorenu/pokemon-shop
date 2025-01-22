@@ -936,4 +936,7 @@ msgstr "הכנס את המייל שלך"
 msgid "Remembered your password?"
 msgstr "נזכרת בסיסמא שלך?"
 
+msgid "Complete Your Profile"
+msgstr "עדכון החשבון"
+
 
