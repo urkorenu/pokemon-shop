@@ -359,6 +359,7 @@ def reset_password(token):
 
 @auth_bp.route("/google-signin", methods=["POST"])
 def google_signin():
+    register = False
     token = request.json.get("token")
     try:
         # Verify the token with Google's servers
@@ -387,12 +388,15 @@ def google_signin():
             )
             db.session.add(user)
             db.session.commit()
+            register = True
 
         # Log the user in
         login_user(user)
 
         # Redirect to the details page
-        return jsonify({"success": True, "redirect_url": url_for('auth.details')})
+        if register:
+            return jsonify({"success": True, "redirect_url": url_for('auth.details')})
+        return jsonify({"success": True, "redirect_url": url_for('user.home_page')})
     except ValueError as e:
         return jsonify({"success": False, "error": "Invalid token"})
     except Exception as e:
