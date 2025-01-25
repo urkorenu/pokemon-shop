@@ -121,7 +121,7 @@
 
 <form action="{{ url_for('seller.upload_card') }}" method="POST" enctype="multipart/form-data">
     <div class="mb-3">
-	<label for="language" class="form-label">{{ _("Card Language:") }}</label>
+	<label for="language" class="form-label">*{{ _("Card Language:") }}</label>
 	<select id="language" name="language" class="form-select" onchange="toggleLanguage()">
 	    <option value="en" selected>{{ _("English") }}</option>
 	    <option value="jp">{{ _("Japanese") }}</option>
@@ -129,7 +129,7 @@
     </div>
     <!-- Set Name -->
     <div class="mb-3">
-        <label for="set_name" class="form-label">{{ _("Set Name:") }}</label>
+        <label for="set_name" class="form-label">*{{ _("Set Name:") }}</label>
         <input class="form-control" list="sets" id="set_name" name="set_name" placeholder="{{ _('Type to search...') }}" required>
         <datalist id="sets">
             {% for set in sets %}
@@ -140,19 +140,19 @@
 
     <!-- Card Number -->
     <div class="mb-3">
-        <label for="number" class="form-label">{{ _("Card Number:") }}</label>
+        <label for="number" class="form-label">*{{ _("Card Number:") }}</label>
         <input type="text" id="number" name="number" class="form-control" placeholder="{{ _('Enter card number') }}" required>
     </div>
 
     <!-- Card Name -->
     <div class="mb-3">
-        <label for="name" class="form-label">{{ _("Card Name:") }}</label>
+        <label for="name" class="form-label">*{{ _("Card Name:") }}</label>
         <input type="text" id="name" name="name" class="form-control" placeholder="{{ _('Card name will be auto-filled') }}" readonly required>
     </div>
 
     <!-- Card Type -->
     <div class="mb-3">
-        <label for="card_type" class="form-label">{{ _("Card Type:") }}</label>
+        <label for="card_type" class="form-label">*{{ _("Card Type:") }}</label>
         <select id="card_type" name="card_type" class="form-select" required>
             <option value="">{{ _("Select Card Type") }}</option>
         </select>
@@ -160,7 +160,7 @@
 
     <!-- Price or Follow TCGPlayer -->
     <div class="mb-3">
-        <label for="price" class="form-label">{{ _("Price:") }}</label>
+        <label for="price" class="form-label">*{{ _("Price:") }}</label>
         <div class="input-group">
             <span class="input-group-text">{{ _("ILS") }}</span>
             <input type="number" id="price" name="price" step="0.01" class="form-control" placeholder="{{ _('Enter price manually') }}">
@@ -173,7 +173,7 @@
 
     <!-- Condition -->
     <div class="mb-3">
-        <label for="condition" class="form-label">{{ _("Condition:") }}</label>
+        <label for="condition" class="form-label">*{{ _("Condition:") }}</label>
         <select id="condition" name="condition" class="form-select" required>
             <option value="NM">{{ _("Near Mint (NM)") }}</option>
             <option value="LP">{{ _("Lightly Played (LP)") }}</option>
@@ -205,7 +205,7 @@
 
     <!-- File Upload -->
     <div class="mb-3">
-        <label for="image" class="form-label">{{ _("Card Image:") }}</label>
+        <label for="image" class="form-label">*{{ _("Card Image:") }}</label>
         <input type="file" id="image" name="image" class="form-control" accept="image/*" required>
     </div>
 

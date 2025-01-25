@@ -1106,3 +1106,6 @@ msgstr "ההודעה שלך נשלחה בהצלחה!"
 
 msgid "Failed to send message. Please try again later."
 msgstr "שליחת ההודעה נכשלה. אנא נסה שוב מאוחר יותר."
+
+msgid "Back Image:"
+msgstr "גב הקלף"
