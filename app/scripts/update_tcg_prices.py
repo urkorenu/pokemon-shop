@@ -87,7 +87,7 @@ def update_tcg_prices():
 
         # Query all cards with follow_tcg=True and amount == 1
         cards = (
-            session.query(Card).filter(Card.follow_tcg == True, Card.amount == 1).all()
+            session.query(Card).filter(~Card.card_type.ilike("jpn"), Card.amount == 1).all()
         )
         total_old_price = 0
         total_new_price = 0
@@ -106,13 +106,17 @@ def update_tcg_prices():
 
             new_price = fetch_tcg_price(card_name, set_name, number, card_type)
             if new_price is not None:
-                total_old_price += card.price
                 old_price = card.price
+                old_tcg_price = card.tcg_price
                 card.tcg_price = new_price
-                card.price = round(new_price * 3.65 + 0.5, 0)
-                card.price = max(card.price, 1)
-                total_new_price += card.price
-                price_changes.append((card, card.price - old_price))
+                new_price_ils = max(round(new_price * 3.65 + 0.5, 0), 1)
+                if card.follow_tcg:
+                    card.price = new_price_ils
+                else:
+                    old_price = max(round(old_tcg_price * 3.65 + 0.5, 0), 1)
+                total_old_price += old_price
+                total_new_price += new_price_ils
+                price_changes.append((card, new_price_ils - old_price))
             else:
                 print(f"No price found for card '{card_name}'")
 
