@@ -349,7 +349,7 @@
 
 	    if (tcgPriceUSD > 0) {
 		const conversionRate = 3.65;
-		const tcgPriceILS = Math.round(tcgPriceUSD * conversionRate);
+		const tcgPriceILS = Math.round(tcgPriceUSD * conversionRate + 0.5);
 		priceInput.value = tcgPriceILS || 1;
 	    } else {
 		throw new Error("No TCG price found for this card type.");
