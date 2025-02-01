@@ -397,10 +397,10 @@ msgid "Delete"
 msgstr "מחק"
 
 msgid "Are you sure you want to delete this card?"
-msgstr "האם אתה בטוח שברצונך למחוק כרטיס זה?"
+msgstr "האם אתה בטוח שברצונך למחוק קלף זה?"
 
 msgid "No available cards."
-msgstr "אין כרטיסים זמינים."
+msgstr "אין קלפים זמינים."
 
 msgid "Sold Cards"
 msgstr "קלפים שנמכרו"
@@ -574,7 +574,7 @@ msgid "Set Name"
 msgstr "שם הסט"
 
 msgid "Card Type"
-msgstr "סוג הכרטיס"
+msgstr "סוג הקלף"
 
 msgid "Grading Company"
 msgstr "חברת דירוג"
@@ -1033,10 +1033,10 @@ msgid "Orders placed successfully! Sellers have been notified."
 msgstr "ההזמנות בוצעו בהצלחה! המוכרים קיבלו הודעה."
 
 msgid "You cannot order your own card."
-msgstr "אינך יכול להזמין את הכרטיס שלך."
+msgstr "אינך יכול להזמין את הקלף שלך."
 
 msgid "Seller information is missing for this card."
-msgstr "פרטי המוכר חסרים עבור הכרטיס הזה."
+msgstr "פרטי המוכר חסרים עבור הקלף הזה."
 
 msgid "You are not authorized to confirm this order."
 msgstr "אין לך הרשאה לאשר הזמנה זו."
@@ -1057,37 +1057,37 @@ msgid "Thank you for your feedback!"
 msgstr "תודה על המשוב שלך!"
 
 msgid "Failed to fetch card details. Please try again later."
-msgstr "נכשלה שליפת פרטי הכרטיס. אנא נסה שוב מאוחר יותר."
+msgstr "נכשלה שליפת פרטי הקלף. אנא נסה שוב מאוחר יותר."
 
 msgid "Set not found. Please verify the set name."
 msgstr "הסט לא נמצא. אנא אמת את שם הסט."
 
 msgid "No card found. Please verify the card number."
-msgstr "לא נמצא כרטיס. אנא אמת את מספר הכרטיס."
+msgstr "לא נמצא קלף. אנא אמת את מספר הקלף."
 
 msgid "Invalid language selection."
 msgstr "בחירת שפה שגויה."
 
 msgid "Card uploaded successfully!"
-msgstr "הכרטיס הועלה בהצלחה!"
+msgstr "הקלף הועלה בהצלחה!"
 
 msgid "You do not have permission to access this page."
 msgstr "אין לך הרשאה לגשת לעמוד זה."
 
 msgid "You do not have permission to edit this card."
-msgstr "אין לך הרשאה לערוך כרטיס זה."
+msgstr "אין לך הרשאה לערוך קלף זה."
 
 msgid "Card updated successfully!"
-msgstr "הכרטיס עודכן בהצלחה!"
+msgstr "הקלף עודכן בהצלחה!"
 
 msgid "You do not have permission to delete this card."
-msgstr "אין לך הרשאה למחוק כרטיס זה."
+msgstr "אין לך הרשאה למחוק קלף זה."
 
 msgid "Failed to delete the image from S3."
 msgstr "נכשלה מחיקת התמונה מ-S3."
 
 msgid "Card deleted successfully!"
-msgstr "הכרטיס נמחק בהצלחה!"
+msgstr "הקלף נמחק בהצלחה!"
 
 msgid "Report submitted successfully. Admin will review it."
 msgstr "הדיווח הוגש בהצלחה. המנהל יבדוק אותו."
