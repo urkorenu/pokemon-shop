@@ -137,6 +137,35 @@
 	    top: 0;
 	}
 
+	/* Center navbar items on mobile */
+	@media (max-width: 991.98px) {
+		.navbar-collapse {
+			text-align: center; /* Center-align the text */
+		}
+
+		.navbar-nav {
+			width: 100%; /* Make the nav take full width */
+			justify-content: center; /* Center the items horizontally */
+			flex-direction: column; /* Stack items vertically */
+		}
+
+		.navbar-nav .nav-item {
+			margin: 0.5rem 0; /* Add spacing between items */
+		}
+
+		.navbar-nav .dropdown-menu {
+			text-align: center; /* Center-align dropdown items */
+		}
+
+		.navbar-nav .dropdown-menu a {
+			display: block; /* Ensure dropdown items take full width */
+		}
+
+		.navbar-nav.ms-auto {
+			margin-left: 0 !important; /* Remove margin for the right-aligned items */
+		}
+	}
+
     </style>
 </head>
 <body>
