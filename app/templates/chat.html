@@ -214,9 +214,29 @@
         .sidebar {
             display: none;
         }
+
+        /* Sidebar Popup */
+        #sidebar-popup {
+            position: fixed;
+            top: 0;
+            left: -100%; /* Initially off-screen */
+            width: 80%; /* Adjust as needed */
+            height: 100%;
+            background: var(--primary-color); /* Pokémon Yellow */
+            z-index: 1050;
+            transition: left 0.3s ease-in-out;
+        }
+
+        #sidebar-popup.active {
+            left: 0; /* Bring it into view */
+        }
+
+        /* Prevent body scroll when sidebar is open */
+        body.sidebar-open {
+            overflow: hidden;
+        }
     }
 </style>
-
 
 <audio id="send-sound" src="{{ url_for('static', filename='sounds/send.wav') }}"></audio>
 <audio id="receive-sound" src="{{ url_for('static', filename='sounds/receive.wav') }}"></audio>
@@ -247,7 +267,7 @@
             <div class="chat-header">{{ _('Chat with') }} {{ receiver.username }}</div>
             <div id="chat-box" class="chat-box">
                 {% for msg in messages %}
-		<div class="message {{ 'sent' if msg.sender_id == current_user.id else 'received' }}">
+                <div class="message {{ 'sent' if msg.sender_id == current_user.id else 'received' }}">
                     <div class="message-bubble" dir="{{ 'rtl' if session.get('lang', 'en') == 'he' else 'ltr' }}">
                         <strong>{{ msg.sender_username }}</strong>: {{ msg.message }}
                         <div class="timestamp">{{ msg.timestamp }}</div>
@@ -314,23 +334,23 @@
             chatBox.appendChild(div);
         });
         chatBox.scrollTop = chatBox.scrollHeight;
-	document.getElementById("receive-sound").play(); // Play receive sound
+        document.getElementById("receive-sound").play(); // Play receive sound
     });
 
     socket.on("receive_message", (data) => {
-	const chatBox = document.getElementById("chat-box");
-	const direction = document.documentElement.getAttribute('dir'); // Get the global direction (ltr or rtl)
+        const chatBox = document.getElementById("chat-box");
+        const direction = document.documentElement.getAttribute('dir'); // Get the global direction (ltr or rtl)
 
-	const div = document.createElement("div");
-	div.className = `message ${data.sender_id === {{ current_user.id }} ? 'sent' : 'received'}`;
-	div.innerHTML = `
-	    <div class="message-bubble" dir="${direction}">
-		<strong>${data.username}</strong>: ${data.message}
-		<div class="timestamp">${data.timestamp}</div>
-	    </div>`;
-	chatBox.appendChild(div);
-	chatBox.scrollTop = chatBox.scrollHeight;
-	document.getElementById("receive-sound").play(); // Play receive sound
+        const div = document.createElement("div");
+        div.className = `message ${data.sender_id === {{ current_user.id }} ? 'sent' : 'received'}`;
+        div.innerHTML = `
+            <div class="message-bubble" dir="${direction}">
+                <strong>${data.username}</strong>: ${data.message}
+                <div class="timestamp">${data.timestamp}</div>
+            </div>`;
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+        document.getElementById("receive-sound").play(); // Play receive sound
     });
 
     function sendMessage() {
@@ -339,13 +359,7 @@
         if (message) {
             socket.emit("send_message", { receiver_id: room, message });
             messageInput.value = "";
-	    document.getElementById("send-sound").play(); // Play send sound
-        }
-    }
-
-    function handleEnter(event) {
-        if (event.key === "Enter") {
-            sendMessage();
+            document.getElementById("send-sound").play(); // Play send sound
         }
     }
 
@@ -355,20 +369,30 @@
 
     function toggleSidebar() {
         const sidebar = document.getElementById("sidebar-popup");
+        const body = document.body;
         sidebar.classList.toggle("active");
+        body.classList.toggle("sidebar-open");
     }
-    document.addEventListener("DOMContentLoaded", () => {
-    const messageInput = document.getElementById("message-input");
 
-    // Attach event listener to detect "Enter" key press
-    messageInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-            event.preventDefault(); // Prevent default behavior of "Enter" key
-            sendMessage();
+    // Close sidebar when clicking outside
+    document.addEventListener("click", (event) => {
+        const sidebar = document.getElementById("sidebar-popup");
+        const floatingButton = document.querySelector(".floating-button");
+        if (!sidebar.contains(event.target) && !floatingButton.contains(event.target)) {
+            sidebar.classList.remove("active");
+            document.body.classList.remove("sidebar-open");
         }
     });
-});
 
+    // Handle Enter key for sending messages
+    document.addEventListener("DOMContentLoaded", () => {
+        const messageInput = document.getElementById("message-input");
+        messageInput.addEventListener("keydown", (event) => {
+            if (event.key === "Enter") {
+                event.preventDefault(); // Prevent default behavior of "Enter" key
+                sendMessage();
+            }
+        });
+    });
 </script>
 {% endblock %}
-

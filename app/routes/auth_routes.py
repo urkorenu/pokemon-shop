@@ -393,6 +393,7 @@ def google_signin():
 
         # Log the user in
         login_user(user)
+        flash(_("Login successful!"), "success")
 
         # Redirect to the details page
         if register:

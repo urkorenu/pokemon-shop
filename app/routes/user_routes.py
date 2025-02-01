@@ -582,7 +582,10 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
     if user_query:
         query = query.filter(uploader_alias.username.ilike(f"%{user_query}%"))
     if language_query:
-        query = query.filter(Card.card_type.ilike(f"%{language_query}%"))
+        if language_query == "en":
+            query = query.filter(~Card.card_type.ilike(f"%{language_query}%"))
+        else:
+            query = query.filter(Card.card_type.ilike(f"%{language_query}%"))
     if request.args.get("has_back_image", "off") == "on":
         query = query.filter(Card.back_image_url.isnot(None))
     if is_graded == "yes":

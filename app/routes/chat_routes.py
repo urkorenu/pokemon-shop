@@ -92,9 +92,13 @@ def handle_connect():
         bool: False if the user is not authenticated.
     """
     if not current_user.is_authenticated:
-        print(f"Unauthorized connection attempt by {request.sid}")
+        print(f"Unauthorized connection attempt by {request.sid}", flush=True)
         return False
-    print(f"User connected: {current_user.username} (ID: {current_user.id})")
+    print(f"User connected: {current_user.username} (ID: {current_user.id})", flush=True)
+
+@socketio.on("disconnect")
+def handle_disconnect():
+    print(f"User disconnected: {current_user.username} (ID: {current_user.id})", flush=True)
 
 
 @socketio.on("send_message")
@@ -106,6 +110,14 @@ def send_message(data):
     Args:
         data (dict): Data containing the receiver ID and message content.
     """
+    if "message" not in data or not data["message"].strip():
+        emit("error", {"message": "Message cannot be empty"})
+        return
+
+    if len(data["message"]) > 1000:  # Adjust the limit as needed
+        emit("error", {"message": "Message is too long"})
+        return
+
     room = get_chat_room(current_user.id, int(data["receiver_id"]))
     message = {
         "username": current_user.username,
@@ -132,6 +144,16 @@ def join_room_handler(data):
     """
     if "receiver_id" not in data or not data["receiver_id"].isdigit():
         emit("error", {"message": "Invalid receiver ID"})
+        return
+
+    receiver_id = int(data["receiver_id"])
+    if receiver_id == current_user.id:
+        emit("error", {"message": "Cannot chat with yourself"})
+        return
+
+    receiver = User.query.get(receiver_id)
+    if not receiver:
+        emit("error", {"message": "Receiver not found"})
         return
 
     room = get_chat_room(current_user.id, int(data["receiver_id"]))

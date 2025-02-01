@@ -254,9 +254,7 @@ def get_japanese_sets():
         print(f"Error fetching Japanese sets: {e}", flush=True)
         return jsonify([]), 500
 
-
 @seller_bp.route("/card-details", methods=["GET"])
-@cache.cached(timeout=86400, query_string=True)
 def get_card_details():
     """
     Get details of a specific card.
@@ -284,6 +282,13 @@ def get_card_details():
 
     if not set_name or not number:
         return jsonify({"error": "Missing required parameters"}), 400
+
+    cache_key = f"card_details_{language}_{set_name}_{number}"
+
+    # Check the cache
+    cached_response = cache.get(cache_key)
+    if cached_response:
+        return cached_response
 
     try:
         if language == "en":
@@ -313,16 +318,14 @@ def get_card_details():
             card_name = card["name"]
             card_types = list(card.get("tcgplayer", {}).get("prices", {}).keys())
 
-            return jsonify(
+            response_data = jsonify(
                 {
                     "name": card_name,
                     "types": card_types,
                     "prices": card.get("tcgplayer", {}).get("prices", {}),
                 }
             )
-
         elif language == "jp":
-
             def get_set_id_by_name(sets_data, set_name):
                 """
                 Get the set ID by set name.
@@ -360,7 +363,7 @@ def get_card_details():
             if not card_data:
                 return jsonify({"error": "No card found"}), 404
 
-            return jsonify(
+            response_data = jsonify(
                 {
                     "name": card_data["name"],
                     "types": [
@@ -373,13 +376,15 @@ def get_card_details():
                     "prices": {},
                 }
             )
-
         else:
             return jsonify({"error": "Invalid language parameter"}), 400
 
+        # Cache only if the response was successful
+        cache.set(cache_key, response_data, timeout=43200)  # Cache for 12 hours
+        return response_data
+
     except requests.RequestException as e:
         print(f"Error fetching card details: {e}", flush=True)
-        return jsonify({"error": "Failed to fetch card details"}), 500
 
 
 @seller_bp.route("/seller-dashboard")
