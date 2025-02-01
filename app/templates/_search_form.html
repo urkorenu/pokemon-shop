@@ -363,12 +363,16 @@ document.addEventListener("DOMContentLoaded", function () {
     // Ensure all sets are included
     awesomplete.list = [...new Set(setNames.map(name => name.trim()))]; // Remove duplicates and trim spaces
 });
-document.addEventListener("DOMContentLoaded", function() {
-    const collapseHeader = document.querySelector('.collapse-header');
-    collapseHeader.addEventListener('click', () => {
-        collapseHeader.classList.toggle('collapsed');
-    });
-});
+
+	document.addEventListener("DOMContentLoaded", function () {
+		const isHomePage = window.location.pathname === '/';
+		const searchCollapse = document.getElementById('search-collapse');
+
+		// If it's not the home page, collapse the search bar
+		if (!isHomePage) {
+			searchCollapse.classList.remove('show');
+		}
+	});
 </script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.7/awesomplete.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.7/awesomplete.min.js"></script>
