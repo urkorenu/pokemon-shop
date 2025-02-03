@@ -439,7 +439,8 @@ def add_to_cart():
                 flash(_(f"{card.name} has been added to your cart."), "success")
             else:
                 flash(_(f"{card.name} is out of stock."), "danger")
-    return redirect(url_for("user.view_cards"))
+    next_page = request.form.get("next")
+    return redirect(next_page or url_for('user.view_cards'))
 
 
 @user_bp.route("/cart")
