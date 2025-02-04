@@ -4,7 +4,6 @@
 <style>
     /* Modern Styling */
     .hero-section {
-        background: url('/static/images/israel-flag-pattern.png') repeat; /* Israel flag pattern */
         color: #fff;
         padding: 50px 20px;
         text-align: center;
@@ -74,6 +73,13 @@
 	    width: 200px; 
 	}
     }
+
+	@media (max-width: 768px) {
+		.btn-lg {
+			font-size: 0.85rem; /* Smaller button text on mobile */
+			padding: 6px 12px; /* Reduce button padding */
+		}
+	}
 </style>
 
 <div class="hero-section">
