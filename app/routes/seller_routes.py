@@ -429,8 +429,8 @@ def seller_dashboard():
             }
         )
 
-    completed_orders_query = Order.query.filter_by(
-        seller_id=current_user.id, status="Confirmed"
+    completed_orders_query = Order.query.filter(
+        Order.seller_id == current_user.id, Order.status.in_(["Completed", "Confirmed"])
     )
     completed_orders = []
     for order in completed_orders_query:
@@ -440,7 +440,6 @@ def seller_dashboard():
             .filter(order_cards.c.order_id == order.id)
             .all()
         )
-        total_price = sum(card.price for card in cards)
         completed_orders.append(
             {
                 "id": order.id,
@@ -451,13 +450,19 @@ def seller_dashboard():
             }
         )
 
+    completed_orders_revenue = sum(order["total_price"] for order in completed_orders)
+
+    sold_cards_query = Card.query.filter(
+        Card.uploader_id == current_user.id, Card.amount == 0
+    ).all()
+
+    sold_cards_revenue = sum(card.price for card in sold_cards_query)  # Assuming 'price' field exists
+
     stats = {
         "pending_orders": len(pending_orders),
         "total_cards": Card.query.filter_by(uploader_id=current_user.id).count(),
-        "sold_cards": Card.query.filter(
-            Card.uploader_id == current_user.id, Card.amount == 0
-        ).count(),
-        "total_revenue": sum(order["total_price"] for order in completed_orders),
+        "sold_cards": len(sold_cards_query),
+        "total_revenue": sold_cards_revenue,
     }
 
     return render_template(
