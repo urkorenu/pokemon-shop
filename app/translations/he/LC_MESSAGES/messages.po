@@ -1109,3 +1109,6 @@ msgstr "שליחת ההודעה נכשלה. אנא נסה שוב מאוחר יו
 
 msgid "Back Image:"
 msgstr "גב הקלף"
+
+msgid "Mark as Sold"
+msgstr "סמן כנמכר"

@@ -277,6 +277,24 @@ def my_cards():
         search_query=search_query,
     )
 
+@user_bp.route("/mark-as-sold/<int:card_id>", methods=["POST"])
+@login_required
+def mark_as_sold(card_id):
+    """
+    Marks a card as sold by setting its amount to 0.
+    """
+    card = Card.query.filter_by(id=card_id, uploader_id=current_user.id).first()
+
+    if not card:
+        flash(_("Card not found or unauthorized action."), "danger")
+        return redirect(url_for("user.my_cards"))
+
+    card.amount = 0
+    db.session.commit()
+
+    flash(_("Card marked as sold."), "success")
+    return redirect(url_for("user.my_cards"))
+
 
 @user_bp.route("/edit-card/<int:card_id>", methods=["GET", "POST"])
 @login_required
