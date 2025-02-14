@@ -79,15 +79,19 @@ def auth():
                 flash(_("Invalid contact preference or details."), "error")
                 return redirect(url_for("auth.auth"))
             if User.query.filter_by(username=username).first():
-                flash(_("Username already taken. Please choose a different one."), "error")
+                flash(
+                    _("Username already taken. Please choose a different one."), "error"
+                )
                 return redirect(url_for("auth.auth"))
             if User.query.filter_by(email=email).first():
                 flash(_("Email already registered. Please log in."), "error")
                 return redirect(url_for("auth.auth"))
             if not is_password_strong(password):
                 flash(
-                    _("Password must be at least 8 characters long and include uppercase, lowercase, numbers, "
-                      "and special characters."),
+                    _(
+                        "Password must be at least 8 characters long and include uppercase, lowercase, numbers, "
+                        "and special characters."
+                    ),
                     "error",
                 )
                 return redirect(url_for("auth.auth"))
@@ -118,7 +122,8 @@ def auth():
             except Exception as e:
                 db.session.rollback()
                 flash(
-                    _("An error occurred during registration. Please try again."), "error"
+                    _("An error occurred during registration. Please try again."),
+                    "error",
                 )
                 print(f"Error during registration: {e}")
     return render_template("auth.html", cities=CITIES_IN_ISRAEL)
@@ -198,16 +203,20 @@ def request_uploader():
         flash(_("You already have the uploader or admin role."), "info")
         return redirect(url_for("auth.account"))
     if current_user.request_status == "Pending":
-        flash(_("Your request is already pending. Please wait for admin review."), "info")
+        flash(
+            _("Your request is already pending. Please wait for admin review."), "info"
+        )
         return redirect(url_for("auth.account"))
     if not request.form.get("rules_accepted"):
         flash(_("You must accept the rules before submitting your request."), "danger")
         return redirect(url_for("auth.account"))
     if not all(
-            [current_user.email, current_user.location, current_user.contact_details]
+        [current_user.email, current_user.location, current_user.contact_details]
     ):
         flash(
-            _("Please ensure your profile details (email, location, and contact details) are updated."),
+            _(
+                "Please ensure your profile details (email, location, and contact details) are updated."
+            ),
             "danger",
         )
         return redirect(url_for("auth.account"))
@@ -230,8 +239,8 @@ def request_uploader():
         )
         current_user.request_status = "Pending"
         db.session.commit()
-        flash(_(
-            "Your request to become an uploader has been submitted successfully!"),
+        flash(
+            _("Your request to become an uploader has been submitted successfully!"),
             "success",
         )
     except Exception as e:

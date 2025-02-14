@@ -60,7 +60,8 @@ def place_order(card_id):
     )
 
     flash(
-        _("Order placed successfully! A summary has been sent to your email."), "success"
+        _("Order placed successfully! A summary has been sent to your email."),
+        "success",
     )
 
     return redirect(url_for("user.view_cards"))

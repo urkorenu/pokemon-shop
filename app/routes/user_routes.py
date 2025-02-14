@@ -75,9 +75,9 @@ class Pagination:
         last = 0
         for num in range(1, self.pages + 1):
             if (
-                    num <= left_edge
-                    or (self.page - left_current < num < self.page + right_current)
-                    or num > self.pages - right_edge
+                num <= left_edge
+                or (self.page - left_current < num < self.page + right_current)
+                or num > self.pages - right_edge
             ):
                 if last + 1 != num:
                     yield None
@@ -277,6 +277,7 @@ def my_cards():
         search_query=search_query,
     )
 
+
 @user_bp.route("/mark-as-sold/<int:card_id>", methods=["POST"])
 @login_required
 def mark_as_sold(card_id):
@@ -445,7 +446,9 @@ def add_to_cart():
                 flash(_(f"{card.name} has been added to your cart."), "success")
             else:
                 flash(
-                    _(f"You cannot add more {card.name} cards. Only {card.amount} available."),
+                    _(
+                        f"You cannot add more {card.name} cards. Only {card.amount} available."
+                    ),
                     "danger",
                 )
         else:
@@ -458,7 +461,7 @@ def add_to_cart():
             else:
                 flash(_(f"{card.name} is out of stock."), "danger")
     next_page = request.form.get("next")
-    return redirect(next_page or url_for('user.view_cards'))
+    return redirect(next_page or url_for("user.view_cards"))
 
 
 @user_bp.route("/cart")

@@ -131,7 +131,8 @@ def upload_card():
 
                 if name.lower() not in api_card_name.lower():
                     flash(
-                        (f"Card name does not match. Expected: {api_card_name}"), "danger"
+                        (f"Card name does not match. Expected: {api_card_name}"),
+                        "danger",
                     )
                     return render_template("upload.html", sets=sets)
 
@@ -144,7 +145,9 @@ def upload_card():
 
             except requests.RequestException as e:
                 print(f"Error fetching card details: {e}", flush=True)
-                flash(_("Failed to fetch card details. Please try again later."), "danger")
+                flash(
+                    _("Failed to fetch card details. Please try again later."), "danger"
+                )
                 return render_template("upload.html", sets=sets)
 
         elif language == "jp":
@@ -254,6 +257,7 @@ def get_japanese_sets():
         print(f"Error fetching Japanese sets: {e}", flush=True)
         return jsonify([]), 500
 
+
 @seller_bp.route("/card-details", methods=["GET"])
 def get_card_details():
     """
@@ -326,6 +330,7 @@ def get_card_details():
                 }
             )
         elif language == "jp":
+
             def get_set_id_by_name(sets_data, set_name):
                 """
                 Get the set ID by set name.
@@ -457,7 +462,9 @@ def seller_dashboard():
         Card.uploader_id == current_user.id, Card.amount == 0
     ).all()
 
-    sold_cards_revenue = sum(card.price for card in sold_cards_query)  # Assuming 'price' field exists
+    sold_cards_revenue = sum(
+        card.price for card in sold_cards_query
+    )  # Assuming 'price' field exists
 
     stats = {
         "pending_orders": len(pending_orders),

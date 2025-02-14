@@ -85,7 +85,9 @@ def manage_users():
                             f"Dear {user.username}, your account has been unbanned. You can access your account now.",
                         )
                 db.session.commit()
-                flash(_(f"User {user.username}'s role updated to {new_role}."), "success")
+                flash(
+                    _(f"User {user.username}'s role updated to {new_role}."), "success"
+                )
             else:
                 flash(_("Invalid role data."), "error")
 
