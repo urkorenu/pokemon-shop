@@ -440,6 +440,7 @@ def seller_dashboard():
             .filter(order_cards.c.order_id == order.id)
             .all()
         )
+        total_price = sum(card.price for card in cards)
         completed_orders.append(
             {
                 "id": order.id,
