@@ -94,11 +94,17 @@ def handle_connect():
     if not current_user.is_authenticated:
         print(f"Unauthorized connection attempt by {request.sid}", flush=True)
         return False
-    print(f"User connected: {current_user.username} (ID: {current_user.id})", flush=True)
+    print(
+        f"User connected: {current_user.username} (ID: {current_user.id})", flush=True
+    )
+
 
 @socketio.on("disconnect")
 def handle_disconnect():
-    print(f"User disconnected: {current_user.username} (ID: {current_user.id})", flush=True)
+    print(
+        f"User disconnected: {current_user.username} (ID: {current_user.id})",
+        flush=True,
+    )
 
 
 @socketio.on("send_message")

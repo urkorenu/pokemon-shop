@@ -7,6 +7,7 @@ from flask import (
     flash,
     session,
     jsonify,
+    send_from_directory,
 )
 from flask_login import login_required, current_user
 from flask_babel import _
@@ -75,9 +76,9 @@ class Pagination:
         last = 0
         for num in range(1, self.pages + 1):
             if (
-                    num <= left_edge
-                    or (self.page - left_current < num < self.page + right_current)
-                    or num > self.pages - right_edge
+                num <= left_edge
+                or (self.page - left_current < num < self.page + right_current)
+                or num > self.pages - right_edge
             ):
                 if last + 1 != num:
                     yield None
@@ -278,6 +279,25 @@ def my_cards():
     )
 
 
+@user_bp.route("/mark-as-sold/<int:card_id>", methods=["POST"])
+@login_required
+def mark_as_sold(card_id):
+    """
+    Marks a card as sold by setting its amount to 0.
+    """
+    card = Card.query.filter_by(id=card_id, uploader_id=current_user.id).first()
+
+    if not card:
+        flash(_("Card not found or unauthorized action."), "danger")
+        return redirect(url_for("user.my_cards"))
+
+    card.amount = 0
+    db.session.commit()
+
+    flash(_("Card marked as sold."), "success")
+    return redirect(url_for("user.my_cards"))
+
+
 @user_bp.route("/edit-card/<int:card_id>", methods=["GET", "POST"])
 @login_required
 def edit_card(card_id):
@@ -427,7 +447,9 @@ def add_to_cart():
                 flash(_(f"{card.name} has been added to your cart."), "success")
             else:
                 flash(
-                    _(f"You cannot add more {card.name} cards. Only {card.amount} available."),
+                    _(
+                        f"You cannot add more {card.name} cards. Only {card.amount} available."
+                    ),
                     "danger",
                 )
         else:
@@ -440,7 +462,7 @@ def add_to_cart():
             else:
                 flash(_(f"{card.name} is out of stock."), "danger")
     next_page = request.form.get("next")
-    return redirect(next_page or url_for('user.view_cards'))
+    return redirect(next_page or url_for("user.view_cards"))
 
 
 @user_bp.route("/cart")
@@ -651,3 +673,8 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
             "total_graded": int(stats.total_graded),
         },
     }
+
+
+@user_bp.route("/ads.txt")
+def ads():
+    return send_from_directory("static", "ads.txt")
