@@ -674,6 +674,7 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
         },
     }
 
-@user_bp.route('/ads.txt')
+
+@user_bp.route("/ads.txt")
 def ads():
-    return send_from_directory('static', 'ads.txt')
+    return send_from_directory("static", "ads.txt")
