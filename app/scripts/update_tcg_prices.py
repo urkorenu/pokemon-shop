@@ -85,11 +85,9 @@ def update_tcg_prices():
     try:
         print("Starting TCG price update process...")
 
-        # Query all cards with follow_tcg=True and amount == 1
+        # Query all cards with amount == 1 and not jpn
         cards = (
-            session.query(Card)
-            .filter(~Card.card_type.ilike("jpn"), Card.amount == 1)
-            .all()
+            session.query(Card).filter(~Card.card_type.ilike("%jpn%"), Card.amount == 1).all()
         )
         total_old_price = 0
         total_new_price = 0
