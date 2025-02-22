@@ -7,6 +7,7 @@ from flask import (
     flash,
     session,
     jsonify,
+    send_from_directory,
 )
 from flask_login import login_required, current_user
 from flask_babel import _
@@ -672,3 +673,7 @@ def filter_cards(base_query=None, user_id=None, show_sold=False, page=1, per_pag
             "total_graded": int(stats.total_graded),
         },
     }
+
+@user_bp.route('/ads.txt')
+def ads():
+    return send_from_directory('static', 'ads.txt')
