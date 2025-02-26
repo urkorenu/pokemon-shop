@@ -75,7 +75,7 @@ jobs:
             --output text)
           echo "PUBLIC_IP=${PUBLIC_IP}" >> $GITHUB_ENV
       # SSH into the EC2 instance and run tests
-      - uses: appleboy/ssh-action@v1.2.0
+      - uses: appleboy/ssh-action@v1.2.1
         with:
           host: ${{ env.PUBLIC_IP }}
           username: ec2-user
