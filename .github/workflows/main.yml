@@ -19,7 +19,7 @@ jobs:
       # Set up Python environment
       - uses: actions/setup-python@v5
         with:
-          python-version: 3.13.1
+          python-version: 3.13.2
       # Install linting tools
       - run: pip install flake8 black
       # Run Black code formatter
@@ -75,7 +75,7 @@ jobs:
             --output text)
           echo "PUBLIC_IP=${PUBLIC_IP}" >> $GITHUB_ENV
       # SSH into the EC2 instance and run tests
-      - uses: appleboy/ssh-action@v1.2.1
+      - uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ env.PUBLIC_IP }}
           username: ec2-user
